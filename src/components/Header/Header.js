@@ -68,8 +68,8 @@ import Name from "./Name";
       <style>
       {style}
       </style>
-        <Button path={path} title={button_about.title} to={button_about.to}       toggleStyle={toggle=>{_toggleStyle(toggle)}}                        />
-        <Button path={path} title={button_blog.title} to={button_blog.to}         toggleStyle={toggle=>{_toggleStyle(toggle)}}                        />
+        {/* <Button path={path} title={button_about.title} to={button_about.to}       toggleStyle={toggle=>{_toggleStyle(toggle)}}                        /> */}
+        {/* <Button path={path} title={button_blog.title} to={button_blog.to}         toggleStyle={toggle=>{_toggleStyle(toggle)}}                        /> */}
         <Button path={path} title={button_contact.title} to={button_contact.to}   toggleStyle={toggle=>{_toggleStyle(toggle)}}                        />
         <Button path={path} title={button_projects.title} to={button_projects.to} toggleStyle={toggle=>{_toggleStyle(toggle)}}                        />
       </nav>

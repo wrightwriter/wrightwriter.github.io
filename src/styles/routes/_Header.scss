@@ -31,21 +31,23 @@ header {
 
     .FirstName {
       position: relative; // position
-      top: -10px;
+      top: -25px;
       color: rgba(245, 245, 220, 0.925);
       margin-left: -40px;
       padding-top: -21px;
       transition: color 700ms ease-in;
       transition: text-shadow 1s ease-in;
-      font-family: "arcon"; // style
+      // font-family: "arcon"; // style
+      font-family: 'Montserrat', sans-serif;
     }
     .LastName {
       position: relative;
       transition: all 0.4s ease-in;
       top: -30px; //TODO fix size for different screen size
       font-size: 1.5em;
-      color: fontColorHeader;
-      font-family: "arvo_bold"; // style
+      color: rgba(245, 245, 220, 0.925);
+      // font-family: "arvo_bold"; // style
+      font-family: 'Montserrat', sans-serif;
     }
   }
 

@@ -6,6 +6,32 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  .email{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    border-style: none;
+    letter-spacing: 0.1em;
+    font-family: "Merryweather", serif;
+    font-weight: 250;
+    font-style: italic;
+    color: white;
+    padding: 0 10px;
+    // border: 2px solid white;
+    // background-color: rgba(0, 0, 0, 0.486);
+    font-size: 1.3em;
+    width: 48%;
+    margin-right: 0.5em;
+    // background-color: red;
+    height: 5em;
+    padding-bottom: 0.8em;
+    width: 73%;
+    div{
+      margin: 0.5em;
+    }
+    margin-bottom: 1.5em;
+  }
   .UpperDiv {
     display: flex;
     flex-direction: row;

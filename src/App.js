@@ -19,17 +19,17 @@ function App(props) {
     setMouseX(e.screenX);
   }
   // Background code
-  useEffect(() => {
-    setVanta(
-      window.VANTA.WAVES({
-        el: "#background",
-        color: 0x0,
-        waveHeight: 16.0,
-        waveSpeed: 0.2,
-        zoom: 1.02,
-      })
-    );
-  }, []);
+  // useEffect(() => {
+  //   setVanta(
+  //     window.VANTA.WAVES({
+  //       el: "#background",
+  //       color: 0x0,
+  //       waveHeight: 16.0,
+  //       waveSpeed: 0.2,
+  //       zoom: 1.02,
+  //     })
+  //   );
+  // }, []);
 
   return (
     <div

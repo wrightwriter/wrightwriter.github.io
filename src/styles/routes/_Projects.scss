@@ -33,15 +33,23 @@
         width: 26em;
         height: auto;
       }
+      .imagesBox{
+        display: flex;
+        flex-wrap: wrap;
+        .image{
+          max-width: 19em;
+          object-fit: contain;
+          padding: 1em;
+        }
+      }
       .text {
         //float:right;
         //margin-left: auto;
         .title {
-          font-size: 3.4em;
+          font-size: 2.0em;
           font-family: "Merriweather", serif;
           font-weight: 900;
           font-style: italic;
-
           padding-top: 0.2em;
           padding-bottom: 0.4em;
         }

@@ -12,6 +12,14 @@ export default function Contact() {
   return (
     <div className='Page'>
       <article className='Contact'>
+        <div className='email'>
+          <div>
+            petar.guglev at gmail 
+          </div>
+          <div>
+            This form doesn't work lol.
+          </div>
+        </div>
         <div className='UpperDiv'>
           <input type="text"
             value={name}
