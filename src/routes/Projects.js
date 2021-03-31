@@ -4,41 +4,70 @@ import Lightbox from "react-image-lightbox"
 import {Route, Switch} from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
+
+
+
 const Images_Project_Pathtracing = {
-  title: "Pathtraced images",
+  title: "Pathtraced",
   description:
-    `Made with my own pathtracer`,
+    `Made with my own pathtracer. Everything is generated with isosurface SDFs, defined with math functions.`,
   pictures: [
-    "//placekitten.com/1500/500", 
-    "//placekitten.com/1500/500", 
-    "//placekitten.com/1500/500", 
-    "//placekitten.com/1500/500", 
-    "//placekitten.com/1500/500",
-    "//placekitten.com/1500/500",
-    "//placekitten.com/1500/500",
-    "//placekitten.com/1500/500",
+    require("../images/pathtraced/Ha2Ch0D.png").default,
+    require("../images/pathtraced/Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png").default,
+    require("../images/pathtraced/flowers.png").default,
+    require("../images/pathtraced/unknown.png").default,
+    // require("../images/pathtraced/QUacfvYAhZ9Jg8QBvZ0dscD3KGWEbNKpWm4wPcBqugJWgkLHX5TY4j3TDr4O9Q9rqb0LuiZL3gAAAABJRU5ErkJggg.png").default,
   ],
   image: "",
   side: "left"
 };
-const Images_Project_Shadertoy = {
-  title: "Pathtraced images",
+const Images_Project_Generative = {
+  title: "Generative",
   description:
-    `Made with my own pathtracer`,
+    `Varius mediums. All created with code.`,
   pictures: [
-    "//placekitten.com/1500/500", 
-    "//placekitten.com/1500/500", 
-    "//placekitten.com/1500/500", 
-    "//placekitten.com/1500/500", 
-    "//placekitten.com/1500/500",
-    "//placekitten.com/1500/500",
-    "//placekitten.com/1500/500",
-    "//placekitten.com/1500/500",
+    require("../images/generative/unknown.png").default,
+    require("../images/generative/soDroUS.gif").default,
+    require("../images/generative/1fFAAAAABJRU5ErkJggg.png").default,
+    require("../images/generative/P0y3BNk6U271AAAAAElFTkSuQmCC.png").default,
+    require("../images/generative/uPcWTedBzgAAAABJRU5ErkJggg.png").default,
+    require("../images/generative/tenor.gif").default,
+    // require("../images/generative/capture - 2021-02-06T155448.767.webm").default,
+  ],
+  image: "",
+  side: "left"
+};
+const Images_Project_Paintings = {
+  title: "Paintings/ Sculptures",
+  description:
+    ``,
+  pictures: [
+    require("../images/paintings/306.png").default,
+    require("../images/paintings/307-c.png").default,
+    require("../images/paintings/308-c.png").default,
+    require("../images/paintings/not305.png").default,
+    require("../images/paintings/290-a-c.png").default,
+    require("../images/paintings/302-o.png").default,
+    // require("../images/paintings/unknown.png").default,
   ],
   image: "",
   side: "left"
 };
 
+const Images_Project_Renders = {
+  title: "Renders",
+  description:
+    ``,
+  pictures: [
+    require("../images/renders/untitled10.png").default,
+    require("../images/renders/untitled11_2.png").default,
+    require("../images/renders/houdinifx_1b0usqcbZW.png").default,
+    // require("../images/renders/untitled12.png").default,
+    // require("../images/paintings/unknown.png").default,
+  ],
+  image: "",
+  side: "left"
+};
 
 
 export default function Projects() {
@@ -47,7 +76,9 @@ export default function Projects() {
       <div className='Projects'>
         <Category title='Visual/ GFX Programming'>
           <ImageProject project={Images_Project_Pathtracing} />
-          <ImageProject project={Images_Project_Shadertoy} />
+          <ImageProject project={Images_Project_Generative} />
+          <ImageProject project={Images_Project_Paintings} />
+          <ImageProject project={Images_Project_Renders} />
         </Category>
         <Category title='Audio'>
         </Category>
@@ -99,17 +130,25 @@ function ImageProject(props){
 
         <div className='imagesBox'>
           {
-            pictures.map((picture, idx)=>(
-              <img 
-                src={picture} 
-                className='image'
-                onClick={()=>{
-                  setIsOpen(true)
-                  setPhotoIndex(idx)
-                }}
-              >
-              </img>
-            ))
+            pictures.map((picture, idx)=>{
+
+              if( picture.split(".")[1] === "webm"){
+
+              } else{
+                return <img 
+                  src={picture} 
+                  className='image'
+                  onClick={()=>{
+                    setIsOpen(true)
+                    setPhotoIndex(idx)
+                  }}
+                >
+                </img>
+
+              }
+
+            }
+            )
 
           }
 
