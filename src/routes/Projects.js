@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import Lightbox from "react-image-lightbox"
 import {Route, Switch} from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import ModalVideo from 'react-modal-video'
 
 
 
@@ -32,7 +33,7 @@ const Images_Project_Generative = {
     require("../images/generative/P0y3BNk6U271AAAAAElFTkSuQmCC.png").default,
     require("../images/generative/uPcWTedBzgAAAABJRU5ErkJggg.png").default,
     require("../images/generative/tenor.gif").default,
-    // require("../images/generative/capture - 2021-02-06T155448.767.webm").default,
+    require("../images/generative/capture - 2021-02-06T155448.767.webm").default,
   ],
   image: "",
   side: "left"
@@ -96,9 +97,11 @@ function ImageProject(props){
 
   const [photoIndex, setPhotoIndex]= useState(0)
   const [isOpen, setIsOpen]= useState(false)
+  const [isVideoOpen, setIsVideoOpen]= useState(false)
 
   return (
     <article className='Project'>
+        <ModalVideo channel='custom' autoplay loop isOpen={isVideoOpen} url={pictures[photoIndex]} onClose={() => setIsVideoOpen(false)} />
         {isOpen && pictures && (
           <Lightbox
             mainSrc={pictures[photoIndex]}
@@ -109,7 +112,7 @@ function ImageProject(props){
                 setIsOpen(false)
               }
             }
-            onImageLoadError={()=>{alert("error loading")}}
+            // onImageLoadError={()=>{alert("error loading")}}
 
             onMovePrevRequest={() =>
               setPhotoIndex(
@@ -126,13 +129,21 @@ function ImageProject(props){
       {/* {project.image ? <img style={imgStyle} src={project.image} /> : <>no img</>} */}
       <div className='text'>
         <div className='title'>{project.title}</div>
-        <ReactMarkdown source={project.description} />
+        <ReactMarkdown className="description" source={project.description} />
 
         <div className='imagesBox'>
           {
             pictures.map((picture, idx)=>{
 
-              if( picture.split(".")[1] === "webm"){
+              if( picture.split(".")[picture.split(".").length - 1] === "webm"){
+                return <>
+                {/* <video controls="" autoplay="" name="media"><source src="http://localhost:3000/static/media/capture%20-%202021-02-06T155448.767.fe4671f6.webm" type="video/webm"></video> */}
+                <video width="460" height="230" frameborder="0" autoplay="" loop="" playsinline="" allowfullscreen="" tabindex="-1" class="image mtz-vlc-pboid"
+                  onClick={ ()=> { setPhotoIndex(idx);setIsVideoOpen(true) }}>
+                  <source src={pictures[idx]} />
+                  </video>
+                  </>
+
 
               } else{
                 return <img 

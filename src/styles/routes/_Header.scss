@@ -3,11 +3,14 @@ header {
   display: flex;
   flex-direction: row;
   width: 100%;
-
   .Name {
     font-size: 2.5em;
     padding-top: $headerPaddingTop/1;
     padding-left: $headerPaddingHorizontal/1;
+
+    @media (max-width: $smallScreenSize) {
+      padding-left: 3.4rem;
+    }
     color: $fontColorHeader;
     text-decoration: none;
     user-select: none;
@@ -32,7 +35,7 @@ header {
     .FirstName {
       position: relative; // position
       top: -25px;
-      color: rgba(245, 245, 220, 0.925);
+      color: rgba(255, 255, 255, 0.925);
       margin-left: -40px;
       padding-top: -21px;
       transition: color 700ms ease-in;
@@ -45,7 +48,7 @@ header {
       transition: all 0.4s ease-in;
       top: -30px; //TODO fix size for different screen size
       font-size: 1.5em;
-      color: rgba(245, 245, 220, 0.925);
+      color: rgba(255, 255, 255, 0.925);
       // font-family: "arvo_bold"; // style
       font-family: 'Montserrat', sans-serif;
     }
@@ -54,9 +57,13 @@ header {
   .Buttons {
     padding-top: $headerPaddingTop * 3;
     padding-right: $headerPaddingHorizontal * 2.3;
+
     display: flex;
     flex-direction: row;
     margin-left: auto;
+    @media (max-width: $smallScreenSize) {
+      padding-right: 2.4rem  !important;
+    }
     .Button {
       display: flex;
       flex-direction: column;

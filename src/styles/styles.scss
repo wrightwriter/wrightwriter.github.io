@@ -12,6 +12,8 @@ $headerPaddingHorizontal: 3.8em;
 $fontColorRoute1: rgb(255, 255, 255);
 $pageWidth: 50em;
 
+$smallScreenSize: 700px;
+
 // -=----- Routes -=----- //
 
 @import "./routes/About";
@@ -19,6 +21,8 @@ $pageWidth: 50em;
 @import "./routes/Header";
 @import "./routes/Projects";
 @import "./main";
+@import 'node_modules/react-modal-video/scss/modal-video.scss';
+
 
 // -=----- Fonts -=----- //
 @font-face {

@@ -5,6 +5,7 @@ import {createBrowserHistory} from "history";
 
 import "./styles/styles.scss";
 import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
+import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
 
 
 import App from "./App";
