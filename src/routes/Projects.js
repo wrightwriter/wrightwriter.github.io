@@ -26,14 +26,25 @@ const Images_Project_Generative = {
   title: "Generative",
   description:
     `Varius mediums. All created with code.`,
-  pictures: [
+    pictures: [
+    require("../images/generative/capture - 2021-03-31T131838.183.mp4").default,
+    require("../images/generative/capture - 2021-02-06T155448.767.mp4").default,
+    require("../images/generative/capture - 2021-02-04T235908.915.mp4").default,
+    // require("../images/generative/capture - 2021-02-23T135750.665.mp4").default,
+    require("../images/generative/capture - 2021-02-24T174055.362.mp4").default,
+    require("../images/generative/capture - 2021-01-25T215853.813.mp4").default, 
+    require("../images/generative/capture - 2021-04-01T215056.436.mp4").default, 
+    require("../images/generative/capture - 2021-04-01T215343.110.mp4").default, 
     require("../images/generative/unknown.png").default,
+    require("../images/generative/capture (59).mp4").default,
+    require("../images/generative/capture - 2021-02-08T195606.498.mp4").default,
+    require("../images/generative/capture - 2021-02-15T183608.531.mp4").default,
+    require("../images/generative/P0y3BNk6U271AAAAAElFTkSuQmCC.png").default,
     require("../images/generative/soDroUS.gif").default,
     require("../images/generative/1fFAAAAABJRU5ErkJggg.png").default,
-    require("../images/generative/P0y3BNk6U271AAAAAElFTkSuQmCC.png").default,
     require("../images/generative/uPcWTedBzgAAAABJRU5ErkJggg.png").default,
     require("../images/generative/tenor.gif").default,
-    require("../images/generative/capture - 2021-02-06T155448.767.webm").default,
+
   ],
   image: "",
   side: "left"
@@ -49,6 +60,8 @@ const Images_Project_Paintings = {
     require("../images/paintings/not305.png").default,
     require("../images/paintings/290-a-c.png").default,
     require("../images/paintings/302-o.png").default,
+
+
     // require("../images/paintings/unknown.png").default,
   ],
   image: "",
@@ -135,10 +148,11 @@ function ImageProject(props){
           {
             pictures.map((picture, idx)=>{
 
-              if( picture.split(".")[picture.split(".").length - 1] === "webm"){
-                return <>
+              const ext = picture.split(".")[picture.split(".").length - 1]
+              if( ext === "webm" || ext === "mp4"){
+                return <> 
                 {/* <video controls="" autoplay="" name="media"><source src="http://localhost:3000/static/media/capture%20-%202021-02-06T155448.767.fe4671f6.webm" type="video/webm"></video> */}
-                <video width="460" height="230" frameborder="0" autoplay="" loop="" playsinline="" allowfullscreen="" tabindex="-1" class="image mtz-vlc-pboid"
+                <video width="460" height="230" frameborder="0" autoPlay={true} loop={true} playsinline muted={true} allowfullscreen="" tabindex="-1" class="image mtz-vlc-pboid"
                   onClick={ ()=> { setPhotoIndex(idx);setIsVideoOpen(true) }}>
                   <source src={pictures[idx]} />
                   </video>
