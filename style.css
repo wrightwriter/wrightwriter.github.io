@@ -1,0 +1,46 @@
+@font-face {
+  font-family: "Petrona";
+  /* font-style: normal; */
+  /* font-weight: 400; */
+  src: url("./Petrona-VariableFont_wght.ttf") format("truetype");
+
+}
+@font-face {
+  font-family: "Petrona";
+  src: url("./Petrona-Italic-VariableFont_wght.ttf") format("truetype");
+  font-style: italic;
+}
+
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  --main-max-width: 40rem;
+  --text-font-weight: 500;
+  --link-font-weight: 800;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0px;
+  width: 100%;
+  height: 100%;
+  background: white;
+  /* filter: invert() hue-rotate(2.14rad) saturate(0.5); */
+
+}
+html {
+  width: 100%;
+  height: 100%;
+}
+
+canvas {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
