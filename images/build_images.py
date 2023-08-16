@@ -16,6 +16,7 @@ def get_media_dimensions(media_path):
         cap.release()
         return width, height
 
+
 # Function to generate JSON file with media sizes object
 def generate_json_file(folder_path, media_sizes):
     data = {'media_sizes': media_sizes}
