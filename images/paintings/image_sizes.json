@@ -2,99 +2,123 @@
     "media_sizes": {
         "1033.png": {
             "width": 1920,
-            "height": 1480
+            "height": 1480,
+            "has_thumb": true
         },
         "1041.png": {
             "width": 1920,
-            "height": 2600
+            "height": 2600,
+            "has_thumb": true
         },
         "1055.png": {
             "width": 1920,
-            "height": 2600
+            "height": 2600,
+            "has_thumb": true
         },
         "1112.png": {
             "width": 1170,
-            "height": 1860
+            "height": 1860,
+            "has_thumb": true
         },
         "1117-2.png": {
             "width": 1920,
-            "height": 1920
+            "height": 1920,
+            "has_thumb": true
         },
         "1119.png": {
             "width": 1920,
-            "height": 1920
+            "height": 1920,
+            "has_thumb": true
         },
         "1123-c.png": {
             "width": 1920,
-            "height": 1920
+            "height": 1920,
+            "has_thumb": true
         },
         "1123-e.png": {
             "width": 1920,
-            "height": 1080
+            "height": 1080,
+            "has_thumb": true
         },
         "1124-2.png": {
             "width": 1920,
-            "height": 2680
+            "height": 2680,
+            "has_thumb": true
         },
         "1129-pat-a.png": {
             "width": 2020,
-            "height": 1280
+            "height": 1280,
+            "has_thumb": true
         },
         "1130-a.png": {
             "width": 1920,
-            "height": 2580
+            "height": 2580,
+            "has_thumb": true
         },
         "1130-b.png": {
             "width": 1920,
-            "height": 2680
+            "height": 2680,
+            "has_thumb": true
         },
         "1131-a.png": {
             "width": 1920,
-            "height": 2880
+            "height": 2880,
+            "has_thumb": true
         },
         "1132-a.png": {
             "width": 1920,
-            "height": 2580
+            "height": 2580,
+            "has_thumb": true
         },
         "1135-b (1).jpg": {
             "width": 1920,
-            "height": 2780
+            "height": 2780,
+            "has_thumb": false
         },
         "1135-c.png": {
             "width": 1920,
-            "height": 1080
+            "height": 1080,
+            "has_thumb": true
         },
         "1137-a.png": {
             "width": 1920,
-            "height": 1880
+            "height": 1880,
+            "has_thumb": true
         },
         "1689957895824_2 (1).png": {
             "width": 1437,
-            "height": 1701
+            "height": 1701,
+            "has_thumb": true
         },
         "1690037672960_1 (1).png": {
             "width": 1804,
-            "height": 1785
+            "height": 1785,
+            "has_thumb": true
         },
         "1690102042507_1[1].png": {
             "width": 1616,
-            "height": 1448
+            "height": 1448,
+            "has_thumb": true
         },
         "302-o.png": {
             "width": 447,
-            "height": 373
+            "height": 373,
+            "has_thumb": false
         },
         "868.png": {
             "width": 1918,
-            "height": 3074
+            "height": 3074,
+            "has_thumb": true
         },
         "adsg.png": {
             "width": 826,
-            "height": 877
+            "height": 877,
+            "has_thumb": false
         },
         "unknown.png": {
             "width": 386,
-            "height": 381
+            "height": 381,
+            "has_thumb": false
         }
     }
 }

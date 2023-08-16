@@ -2,167 +2,208 @@
     "media_sizes": {
         "1001-b.png": {
             "width": 4224,
-            "height": 4290
+            "height": 4290,
+            "has_thumb": true
         },
         "1002.png": {
             "width": 3258,
-            "height": 4435
+            "height": 4435,
+            "has_thumb": true
         },
         "1004_out.png": {
             "width": 2964,
-            "height": 4268
+            "height": 4268,
+            "has_thumb": true
         },
         "1005_out.png": {
             "width": 2870,
-            "height": 4104
+            "height": 4104,
+            "has_thumb": true
         },
         "1006.png": {
             "width": 3084,
-            "height": 4316
+            "height": 4316,
+            "has_thumb": true
         },
         "1007_out.png": {
             "width": 3840,
-            "height": 3872
+            "height": 3872,
+            "has_thumb": true
         },
         "1008_out.png": {
             "width": 4000,
-            "height": 4000
+            "height": 4000,
+            "has_thumb": true
         },
         "1013_out.png": {
             "width": 4096,
-            "height": 4092
+            "height": 4092,
+            "has_thumb": true
         },
         "1030_in.png": {
             "width": 2540,
-            "height": 3525
+            "height": 3525,
+            "has_thumb": true
         },
         "1048_out.png": {
             "width": 4290,
-            "height": 5400
+            "height": 5400,
+            "has_thumb": true
         },
         "1052_out.png": {
             "width": 4320,
-            "height": 4320
+            "height": 4320,
+            "has_thumb": true
         },
         "1087_out.png": {
             "width": 1887,
-            "height": 1880
+            "height": 1880,
+            "has_thumb": true
         },
         "1089.png": {
             "width": 3584,
-            "height": 4684
+            "height": 4684,
+            "has_thumb": true
         },
         "1090.png": {
             "width": 3584,
-            "height": 4684
+            "height": 4684,
+            "has_thumb": true
         },
         "1093.png": {
             "width": 3584,
-            "height": 4684
+            "height": 4684,
+            "has_thumb": true
         },
         "1155-out.png": {
             "width": 3840,
-            "height": 4710
+            "height": 4710,
+            "has_thumb": true
         },
         "1x925 (1).png": {
             "width": 2115,
-            "height": 3000
+            "height": 3000,
+            "has_thumb": true
         },
         "1x929.png": {
             "width": 5802,
-            "height": 8000
+            "height": 8000,
+            "has_thumb": true
         },
         "1x933.png": {
             "width": 5000,
-            "height": 3182
+            "height": 3182,
+            "has_thumb": true
         },
         "1x935_out.png": {
             "width": 3402,
-            "height": 5222
+            "height": 5222,
+            "has_thumb": true
         },
         "493.png": {
             "width": 596,
-            "height": 657
+            "height": 657,
+            "has_thumb": false
         },
         "499.png": {
             "width": 3370,
-            "height": 4000
+            "height": 4000,
+            "has_thumb": true
         },
         "502.png": {
             "width": 2480,
-            "height": 2208
+            "height": 2208,
+            "has_thumb": true
         },
         "505-01.png": {
             "width": 1920,
-            "height": 1080
+            "height": 1080,
+            "has_thumb": true
         },
         "506-out.png": {
             "width": 1920,
-            "height": 1080
+            "height": 1080,
+            "has_thumb": true
         },
         "509.png": {
             "width": 2309,
-            "height": 2250
+            "height": 2250,
+            "has_thumb": true
         },
         "542.png": {
             "width": 2500,
-            "height": 2503
+            "height": 2503,
+            "has_thumb": true
         },
         "555.png": {
             "width": 2319,
-            "height": 3000
+            "height": 3000,
+            "has_thumb": true
         },
         "583-\u043e\u0443\u0442.png": {
             "width": 1500,
-            "height": 1500
+            "height": 1500,
+            "has_thumb": true
         },
         "587.png": {
             "width": 1620,
-            "height": 1080
+            "height": 1080,
+            "has_thumb": true
         },
         "588.png": {
             "width": 3240,
-            "height": 2160
+            "height": 2160,
+            "has_thumb": true
         },
         "591.png": {
             "width": 2160,
-            "height": 3840
+            "height": 3840,
+            "has_thumb": true
         },
         "592-out.png": {
             "width": 2256,
-            "height": 3300
+            "height": 3300,
+            "has_thumb": true
         },
         "593.png": {
             "width": 4000,
-            "height": 4788
+            "height": 4788,
+            "has_thumb": true
         },
         "713-output.png": {
             "width": 1920,
-            "height": 1080
+            "height": 1080,
+            "has_thumb": true
         },
         "919.png": {
             "width": 2334,
-            "height": 3500
+            "height": 3500,
+            "has_thumb": true
         },
         "934 out.png": {
             "width": 5000,
-            "height": 3168
+            "height": 3168,
+            "has_thumb": true
         },
         "938.png": {
             "width": 2825,
-            "height": 2959
+            "height": 2959,
+            "has_thumb": true
         },
         "940.png": {
             "width": 2495,
-            "height": 3230
+            "height": 3230,
+            "has_thumb": true
         },
         "995_out.png": {
             "width": 4416,
-            "height": 6092
+            "height": 6092,
+            "has_thumb": true
         },
         "nextversion952-in.png": {
             "width": 6000,
-            "height": 3486
+            "height": 3486,
+            "has_thumb": true
         }
     }
 }

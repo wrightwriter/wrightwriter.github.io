@@ -1,7 +1,11 @@
 import os
 import json
 import pathlib
+from pathlib import Path
+
 from PIL import Image
+
+THRESHOLD_PIXELS = 1_500_000
 
 # Function to get dimensions for image or video
 def get_media_dimensions(media_path):
@@ -15,6 +19,24 @@ def get_media_dimensions(media_path):
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         cap.release()
         return width, height
+def generate_thumbnail(image_path, filename, width, height):
+    folder_path = Path(image_path).parent
+
+    pixel_count = width * height
+
+    if pixel_count > THRESHOLD_PIXELS:
+        ratio = THRESHOLD_PIXELS / pixel_count
+        img = Image.open(image_path)
+        img = img.convert('RGB')
+        print("w/h " + str(width) + " " + str(height))
+        print("pixel count " + str(pixel_count))
+        print("ratio " + str(ratio))
+        img.thumbnail((width * ratio, height * ratio))
+        thumbnail_path = str(folder_path) + '/_thumb_' + os.path.splitext(filename)[0] + '.jpg'
+        img.save(thumbnail_path, format='JPEG')
+        return thumbnail_path
+    else:
+        return None
 
 
 # Function to generate JSON file with media sizes object
@@ -32,11 +54,17 @@ def process_folders(root_folder):
     for root, dirs, files in os.walk(root_folder):
         media_sizes = {}
         for file in files:
+            if file.startswith('_thumb_'):
+                continue
             print(file)
             if any(file.lower().endswith(format) for format in supported_formats):
                 media_path = os.path.join(root, file)
                 width, height = get_media_dimensions(media_path)
-                media_sizes[file] = {'width': width, 'height': height}
+                has_thumbnail = False
+                if file.lower().endswith('.png'):
+                    if generate_thumbnail(media_path, file, width, height):
+                        has_thumbnail = True
+                media_sizes[file] = {'width': width, 'height': height, 'has_thumb': has_thumbnail}
 
         if media_sizes:
             generate_json_file(root, media_sizes)
