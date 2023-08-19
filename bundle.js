@@ -69,15 +69,15 @@ ___CSS_LOADER_EXPORT___.push([module.id, `wbr{display:block;height:0.02rem;margi
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#bar.svelte-5qyb4t.svelte-5qyb4t{width:100%;margin-top:1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;width:100%}#bar.svelte-5qyb4t mark.svelte-5qyb4t{background:black}#bar.svelte-5qyb4t .logo.svelte-5qyb4t{font-size:4rem;margin-left:1rem;height:fit-content;text-decoration:none}#bar.svelte-5qyb4t .logo.logo-behind.svelte-5qyb4t{position:absolute}#bar.svelte-5qyb4t .logo.hovered.svelte-5qyb4t{color:black !important}#bar.svelte-5qyb4t .logo.hovered.hover-effect-0.svelte-5qyb4t{animation:svelte-5qyb4t-glitch-anim3 10s infinite linear alternate-reverse}@keyframes svelte-5qyb4t-distort1{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0.5rem, 0rem)}25%{transform:translate(0.5rem, 1.5rem)}37.5%{transform:translate(0rem, 0.5rem)}50%{transform:translate(0.5rem, 0.5rem)}62.5%{transform:translate(0.5rem, 0rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0rem, 0.5rem)}100%{transform:translate(1.5rem, 0.5rem)}}@keyframes svelte-5qyb4t-distort2{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0rem, 0.5rem)}25%{transform:translate(1.5rem, 0.5rem)}37.5%{transform:translate(1.5rem, 0rem)}50%{transform:translate(1.5rem, 0.5rem)}62.5%{transform:translate(0rem, 1.5rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0.5rem, 0rem)}100%{transform:translate(0.5rem, 0.5rem)}}@keyframes svelte-5qyb4t-glitch-anim3{0%{clip:rect(3.2rem, 9999px, 2rem, 0);transform-origin:center}2%{clip:rect(3.1rem, 9999px, 3.5rem, 0);transform-origin:center}4%{clip:rect(1.2rem, 9999px, 3rem, 0);transform-origin:center}6%{clip:rect(2.5rem, 9999px, 5rem, 0);transform-origin:center}8%{clip:rect(0.3rem, 9999px, 3rem, 0);transform-origin:center}10%{clip:rect(0.4rem, 9999px, 3.5rem, 0);transform-origin:center}12%{clip:rect(2rem, 9999px, 1rem, 0);transform-origin:center}14%{clip:rect(2.4rem, 9999px, 4rem, 0);transform-origin:center}16%{clip:rect(1.2rem, 9999px, 4.5rem, 0);transform-origin:center}18%{clip:rect(0.7rem, 9999px, 2rem, 0);transform-origin:center}20%{clip:rect(2rem, 9999px, 1rem, 0);transform-origin:center}22%{clip:rect(1.7rem, 9999px, 1rem, 0);transform-origin:center}24%{clip:rect(2.3rem, 9999px, 0.5rem, 0);transform-origin:center}26%{clip:rect(0.8rem, 9999px, 3rem, 0);transform-origin:center}28%{clip:rect(0.4rem, 9999px, 3rem, 0);transform-origin:center}30%{clip:rect(1.3rem, 9999px, 1.5rem, 0);transform-origin:center}32%{clip:rect(2.5rem, 9999px, 2.5rem, 0);transform-origin:center}34%{clip:rect(3.7rem, 9999px, 5rem, 0);transform-origin:center}36%{clip:rect(1.7rem, 9999px, 1rem, 0);transform-origin:center}38%{clip:rect(1.6rem, 9999px, 0.5rem, 0);transform-origin:center}40%{clip:rect(0.9rem, 9999px, 1rem, 0);transform-origin:center}42%{clip:rect(2.8rem, 9999px, 2.5rem, 0);transform-origin:center}44%{clip:rect(1.9rem, 9999px, 3rem, 0);transform-origin:center}46%{clip:rect(2.7rem, 9999px, 4rem, 0);transform-origin:center}48%{clip:rect(2.5rem, 9999px, 1.5rem, 0);transform-origin:center}50%{clip:rect(2.8rem, 9999px, 4.5rem, 0);transform-origin:center}52%{clip:rect(1.6rem, 9999px, 1.5rem, 0);transform-origin:center}54%{clip:rect(0.9rem, 9999px, 2.5rem, 0);transform-origin:center}56%{clip:rect(0.7rem, 9999px, 3rem, 0);transform-origin:center}58%{clip:rect(1.7rem, 9999px, 1rem, 0);transform-origin:center}60%{clip:rect(2.2rem, 9999px, 1.5rem, 0);transform-origin:center}62%{clip:rect(3rem, 9999px, 3rem, 0);transform-origin:center}64%{clip:rect(2.6rem, 9999px, 2rem, 0);transform-origin:center}66%{clip:rect(1rem, 9999px, 1.5rem, 0);transform-origin:center}68%{clip:rect(1.3rem, 9999px, 2rem, 0);transform-origin:center}70%{clip:rect(3.6rem, 9999px, 0.5rem, 0);transform-origin:center}72%{clip:rect(1.2rem, 9999px, 3.5rem, 0);transform-origin:center}74%{clip:rect(1.9rem, 9999px, 4rem, 0);transform-origin:center}76%{clip:rect(0.2rem, 9999px, 4rem, 0);transform-origin:center}78%{clip:rect(0.6rem, 9999px, 0.5rem, 0);transform-origin:center}80%{clip:rect(0.7rem, 9999px, 1.5rem, 0);transform-origin:center}82%{clip:rect(1.7rem, 9999px, 4.5rem, 0);transform-origin:center}84%{clip:rect(3.1rem, 9999px, 1rem, 0);transform-origin:center}86%{clip:rect(2.1rem, 9999px, 2rem, 0);transform-origin:center}88%{clip:rect(1.2rem, 9999px, 4rem, 0);transform-origin:center}90%{clip:rect(3.1rem, 9999px, 1rem, 0);transform-origin:center}92%{clip:rect(3.6rem, 9999px, 4.5rem, 0);transform-origin:center}94%{clip:rect(0.9rem, 9999px, 0.5rem, 0);transform-origin:center}96%{clip:rect(1.2rem, 9999px, 2.5rem, 0);transform-origin:center}98%{clip:rect(2.6rem, 9999px, 4.5rem, 0);transform-origin:center}}@keyframes svelte-5qyb4t-cooool{0%{color:red !important}2%{color:red !important}4%{color:red !important}6%{color:red !important}8%{color:red !important}10%{color:red !important}12%{color:red !important}14%{color:red !important}16%{color:red !important}18%{color:red !important}20%{color:red !important}22%{color:red !important}24%{color:red !important}26%{color:red !important}28%{color:red !important}30%{color:red !important}32%{color:red !important}34%{color:red !important}36%{color:red !important}38%{color:red !important}40%{color:red !important}42%{color:red !important}44%{color:red !important}46%{color:red !important}48%{color:red !important}50%{color:red !important}52%{color:red !important}54%{color:red !important}56%{color:red !important}58%{color:red !important}60%{color:red !important}62%{color:red !important}64%{color:red !important}66%{color:red !important}68%{color:red !important}70%{color:red !important}72%{color:red !important}74%{color:red !important}76%{color:red !important}78%{color:red !important}80%{color:red !important}82%{color:red !important}84%{color:red !important}86%{color:red !important}88%{color:red !important}90%{color:red !important}92%{color:red !important}94%{color:red !important}96%{color:red !important}98%{color:red !important}}#bar.svelte-5qyb4t .logo.hovered.hover-effect-0.logo-behind-a.svelte-5qyb4t{color:#ffc800 !important;animation:svelte-5qyb4t-distort1 300ms linear infinite, svelte-5qyb4t-glitch-anim3 5s infinite linear alternate-reverse, svelte-5qyb4t-cooool 5s infinite linear alternate-reverse}#bar.svelte-5qyb4t .logo.hovered.hover-effect-0.logo-behind-b.svelte-5qyb4t{color:#aa10f2 !important;animation:svelte-5qyb4t-distort2 300ms linear infinite, svelte-5qyb4t-glitch-anim3 3s infinite linear alternate-reverse}#bar.svelte-5qyb4t .logo.hover-effect-1.svelte-5qyb4t{animation:svelte-5qyb4t-glitch-skew 1s infinite linear alternate-reverse}@keyframes svelte-5qyb4t-glitch-anim{0%{clip:rect(0.9rem, 9999px, 4rem, 0);transform:skew(0.5deg);z-index:3}2%{clip:rect(0.2rem, 9999px, 2.5rem, 0);transform:skew(6deg);z-index:1}4%{clip:rect(2.1rem, 9999px, 4.5rem, 0);transform:skew(8.5deg);z-index:2}6%{clip:rect(3.6rem, 9999px, 2.5rem, 0);transform:skew(4deg);z-index:1}8%{clip:rect(3.6rem, 9999px, 4rem, 0);transform:skew(9.8deg);z-index:2}10%{clip:rect(0.9rem, 9999px, 2.5rem, 0);transform:skew(8.7deg);z-index:2}12%{clip:rect(0.7rem, 9999px, 0.5rem, 0);transform:skew(4.9deg);z-index:1}14%{clip:rect(2rem, 9999px, 0.5rem, 0);transform:skew(1deg);z-index:2}16%{clip:rect(0.7rem, 9999px, 1rem, 0);transform:skew(3.9deg);z-index:2}18%{clip:rect(1rem, 9999px, 3.5rem, 0);transform:skew(9.3deg);z-index:1}20%{clip:rect(0.3rem, 9999px, 0.5rem, 0);transform:skew(9.8deg);z-index:1}22%{clip:rect(0.6rem, 9999px, 4.5rem, 0);transform:skew(6.3deg);z-index:2}24%{clip:rect(3.6rem, 9999px, 4.5rem, 0);transform:skew(8.4deg);z-index:1}26%{clip:rect(3.2rem, 9999px, 1.5rem, 0);transform:skew(0.1deg);z-index:4}28%{clip:rect(1.7rem, 9999px, 5rem, 0);transform:skew(5.6deg);z-index:3}30%{clip:rect(2.4rem, 9999px, 2.5rem, 0);transform:skew(3.8deg);z-index:1}32%{clip:rect(1.8rem, 9999px, 2rem, 0);transform:skew(8deg);z-index:2}34%{clip:rect(3.7rem, 9999px, 2.5rem, 0);transform:skew(3.9deg);z-index:2}36%{clip:rect(2.6rem, 9999px, 3.5rem, 0);transform:skew(4.3deg);z-index:4}38%{clip:rect(2.8rem, 9999px, 5rem, 0);transform:skew(1.1deg);z-index:1}40%{clip:rect(3.2rem, 9999px, 3.5rem, 0);transform:skew(6.4deg);z-index:4}42%{clip:rect(1.8rem, 9999px, 5rem, 0);transform:skew(8.9deg);z-index:1}44%{clip:rect(3.9rem, 9999px, 3rem, 0);transform:skew(4.4deg);z-index:4}46%{clip:rect(0.6rem, 9999px, 2.5rem, 0);transform:skew(1.1deg);z-index:4}48%{clip:rect(3.5rem, 9999px, 3.5rem, 0);transform:skew(8.3deg);z-index:3}50%{clip:rect(3.6rem, 9999px, 0.5rem, 0);transform:skew(9.4deg);z-index:1}52%{clip:rect(2.1rem, 9999px, 1.5rem, 0);transform:skew(7.2deg);z-index:1}54%{clip:rect(2.2rem, 9999px, 2rem, 0);transform:skew(2.4deg);z-index:3}56%{clip:rect(3.1rem, 9999px, 2rem, 0);transform:skew(0.5deg);z-index:1}58%{clip:rect(1.6rem, 9999px, 3.5rem, 0);transform:skew(6.1deg);z-index:3}60%{clip:rect(3.7rem, 9999px, 3rem, 0);transform:skew(2.6deg);z-index:2}62%{clip:rect(2.8rem, 9999px, 1.5rem, 0);transform:skew(0.7deg);z-index:4}64%{clip:rect(0.6rem, 9999px, 2rem, 0);transform:skew(7.1deg);z-index:2}66%{clip:rect(0.9rem, 9999px, 2.5rem, 0);transform:skew(6.5deg);z-index:3}68%{clip:rect(2.6rem, 9999px, 2rem, 0);transform:skew(3.6deg);z-index:3}70%{clip:rect(1.1rem, 9999px, 3.5rem, 0);transform:skew(7.3deg);z-index:1}72%{clip:rect(2rem, 9999px, 2rem, 0);transform:skew(5.7deg);z-index:4}74%{clip:rect(3.8rem, 9999px, 1rem, 0);transform:skew(8.8deg);z-index:3}76%{clip:rect(1.2rem, 9999px, 2rem, 0);transform:skew(5.7deg);z-index:2}78%{clip:rect(0.1rem, 9999px, 5rem, 0);transform:skew(0.2deg);z-index:3}80%{clip:rect(1rem, 9999px, 2rem, 0);transform:skew(7.8deg);z-index:3}82%{clip:rect(3.1rem, 9999px, 3rem, 0);transform:skew(1.5deg);z-index:2}84%{clip:rect(3.4rem, 9999px, 3.5rem, 0);transform:skew(4.8deg);z-index:2}86%{clip:rect(3.4rem, 9999px, 3.5rem, 0);transform:skew(10deg);z-index:3}88%{clip:rect(3.1rem, 9999px, 5rem, 0);transform:skew(9.6deg);z-index:4}90%{clip:rect(1.4rem, 9999px, 4rem, 0);transform:skew(7.1deg);z-index:4}92%{clip:rect(2.6rem, 9999px, 3rem, 0);transform:skew(10deg);z-index:1}94%{clip:rect(2.7rem, 9999px, 3rem, 0);transform:skew(9.1deg);z-index:4}96%{clip:rect(0.7rem, 9999px, 2.5rem, 0);transform:skew(7.9deg);z-index:4}98%{clip:rect(1.2rem, 9999px, 0.5rem, 0);transform:skew(1deg);z-index:2}}@keyframes svelte-5qyb4t-glitch-anim2{0%{clip:rect(0.2rem, 99999px, 3rem, 0);transform:skew(4.6deg);transform:translateX(0.462962963rem)}0.6666666667%{clip:rect(0.18rem, 99999px, 3.4rem, 0);transform:skew(8.6deg);transform:translateX(0.0555555556rem)}1.3333333333%{clip:rect(0.12rem, 99999px, 6rem, 0);transform:skew(3.9deg);transform:translateX(0.3888888889rem)}2%{clip:rect(0.12rem, 99999px, 5.6rem, 0);transform:skew(12.4deg);transform:translateX(0.4259259259rem)}2.6666666667%{clip:rect(0.18rem, 99999px, 3.7rem, 0);transform:skew(0.3deg);transform:translateX(-0.1666666667rem)}3.3333333333%{clip:rect(0.2rem, 99999px, 9.6rem, 0);transform:skew(13.4deg);transform:translateX(0.2777777778rem)}4%{clip:rect(0.16rem, 99999px, 3.9rem, 0);transform:skew(3.7deg);transform:translateX(0.3518518519rem)}4.6666666667%{clip:rect(0.12rem, 99999px, 4.9rem, 0);transform:skew(14.2deg);transform:translateX(0.3888888889rem)}5.3333333333%{clip:rect(0.08rem, 99999px, 2.4rem, 0);transform:skew(4.9deg);transform:translateX(0.3333333333rem)}6%{clip:rect(0.18rem, 99999px, 2.7rem, 0);transform:skew(14.2deg);transform:translateX(0.2777777778rem)}6.6666666667%{clip:rect(0.2rem, 99999px, 9.7rem, 0);transform:skew(1.4deg);transform:translateX(0.4444444444rem)}7.3333333333%{clip:rect(0.12rem, 99999px, 5rem, 0);transform:skew(2.9deg);transform:translateX(0.4259259259rem)}8%{clip:rect(0.16rem, 99999px, 5.6rem, 0);transform:skew(6.6deg);transform:translateX(0.3333333333rem)}8.6666666667%{clip:rect(0.02rem, 99999px, 7.8rem, 0);transform:skew(11.1deg);transform:translateX(-0.1666666667rem)}9.3333333333%{clip:rect(0.08rem, 99999px, 3.3rem, 0);transform:skew(3.5deg);transform:translateX(0.3888888889rem)}10%{clip:rect(0.04rem, 99999px, 7.3rem, 0);transform:skew(1.5deg);transform:translateX(0.3518518519rem)}10.6666666667%{clip:rect(0.18rem, 99999px, 3.3rem, 0);transform:skew(14.1deg);transform:translateX(0.3518518519rem)}11.3333333333%{clip:rect(0.16rem, 99999px, 9.7rem, 0);transform:skew(12.3deg);transform:translateX(0.3888888889rem)}12%{clip:rect(0.2rem, 99999px, 0.2rem, 0);transform:skew(12.6deg);transform:translateX(0.4814814815rem)}12.6666666667%{clip:rect(0.06rem, 99999px, 9.9rem, 0);transform:skew(10.8deg);transform:translateX(0.2777777778rem)}13.3333333333%{clip:rect(0.04rem, 99999px, 3.5rem, 0);transform:skew(1.1deg);transform:translateX(0.462962963rem)}14%{clip:rect(0.14rem, 99999px, 1.9rem, 0);transform:skew(11.4deg);transform:translateX(0.0555555556rem)}14.6666666667%{clip:rect(0.16rem, 99999px, 4.5rem, 0);transform:skew(6.7deg);transform:translateX(0.3333333333rem)}15.3333333333%{clip:rect(0.08rem, 99999px, 3.5rem, 0);transform:skew(12.4deg);transform:translateX(0.3333333333rem)}16%{clip:rect(0.04rem, 99999px, 2.6rem, 0);transform:skew(13.3deg);transform:translateX(0.4259259259rem)}16.6666666667%{clip:rect(0.08rem, 99999px, 0.7rem, 0);transform:skew(9.7deg);transform:translateX(0.4814814815rem)}17.3333333333%{clip:rect(0.14rem, 99999px, 6.9rem, 0);transform:skew(13.1deg);transform:translateX(0.3888888889rem)}18%{clip:rect(0.14rem, 99999px, 5rem, 0);transform:skew(12.8deg);transform:translateX(0.462962963rem)}18.6666666667%{clip:rect(0.08rem, 99999px, 9.5rem, 0);transform:skew(0.8deg);transform:translateX(0.4444444444rem)}19.3333333333%{clip:rect(0.14rem, 99999px, 8.7rem, 0);transform:skew(10.4deg);transform:translateX(0.3888888889rem)}20%{clip:rect(0.1rem, 99999px, 6rem, 0);transform:skew(3.1deg);transform:translateX(0.3888888889rem)}20.6666666667%{clip:rect(0.18rem, 99999px, 8.8rem, 0);transform:skew(9.8deg);transform:translateX(0.2777777778rem)}21.3333333333%{clip:rect(0.2rem, 99999px, 9.7rem, 0);transform:skew(15deg);transform:translateX(0.3333333333rem)}22%{clip:rect(0.08rem, 99999px, 4rem, 0);transform:skew(5.7deg);transform:translateX(0.3888888889rem)}22.6666666667%{clip:rect(0.12rem, 99999px, 8.3rem, 0);transform:skew(4.2deg);transform:translateX(0.4444444444rem)}23.3333333333%{clip:rect(0.14rem, 99999px, 4rem, 0);transform:skew(4deg);transform:translateX(0.462962963rem)}24%{clip:rect(0.2rem, 99999px, 7.8rem, 0);transform:skew(3.1deg);transform:translateX(0.2777777778rem)}24.6666666667%{clip:rect(0.08rem, 99999px, 2.8rem, 0);transform:skew(6.1deg);transform:translateX(0.4444444444rem)}25.3333333333%{clip:rect(0.06rem, 99999px, 1.1rem, 0);transform:skew(1.1deg);transform:translateX(0.3888888889rem)}26%{clip:rect(0.02rem, 99999px, 4.3rem, 0);transform:skew(12.6deg);transform:translateX(0.3888888889rem)}26.6666666667%{clip:rect(0.16rem, 99999px, 9.6rem, 0);transform:skew(11.8deg);transform:translateX(0.462962963rem)}27.3333333333%{clip:rect(0.08rem, 99999px, 9.9rem, 0);transform:skew(6.2deg);transform:translateX(0.4444444444rem)}28%{clip:rect(0.2rem, 99999px, 6.2rem, 0);transform:skew(12.4deg);transform:translateX(0.4259259259rem)}28.6666666667%{clip:rect(0.16rem, 99999px, 3.4rem, 0);transform:skew(10.7deg);transform:translateX(0.4444444444rem)}29.3333333333%{clip:rect(0.02rem, 99999px, 3.9rem, 0);transform:skew(13deg);transform:translateX(0.462962963rem)}30%{clip:rect(0.1rem, 99999px, 1.3rem, 0);transform:skew(12.4deg);transform:translateX(0.0555555556rem)}30.6666666667%{clip:rect(0.2rem, 99999px, 0.5rem, 0);transform:skew(13.7deg);transform:translateX(0.2037037037rem)}31.3333333333%{clip:rect(0.2rem, 99999px, 4.7rem, 0);transform:skew(13.6deg);transform:translateX(-0.5rem)}32%{clip:rect(0.02rem, 99999px, 6.6rem, 0);transform:skew(5.7deg);transform:translateX(0.4259259259rem)}32.6666666667%{clip:rect(0.2rem, 99999px, 4.3rem, 0);transform:skew(6.5deg);transform:translateX(0.1666666667rem)}33.3333333333%{clip:rect(0.12rem, 99999px, 8.9rem, 0);transform:skew(10.9deg);transform:translateX(0.3518518519rem)}34%{clip:rect(0.12rem, 99999px, 2.9rem, 0);transform:skew(13.4deg);transform:translateX(0.3888888889rem)}34.6666666667%{clip:rect(0.06rem, 99999px, 9.9rem, 0);transform:skew(2.6deg);transform:translateX(0.3333333333rem)}35.3333333333%{clip:rect(0.08rem, 99999px, 3rem, 0);transform:skew(1.9deg);transform:translateX(0.3888888889rem)}36%{clip:rect(0.2rem, 99999px, 6rem, 0);transform:skew(12.6deg);transform:translateX(0.4259259259rem)}36.6666666667%{clip:rect(0.16rem, 99999px, 2.4rem, 0);transform:skew(8.1deg);transform:translateX(0.3888888889rem)}37.3333333333%{clip:rect(0.06rem, 99999px, 0.1rem, 0);transform:skew(13.7deg);transform:translateX(0.462962963rem)}38%{clip:rect(0.16rem, 99999px, 4.6rem, 0);transform:skew(4.5deg);transform:translateX(0.3333333333rem)}38.6666666667%{clip:rect(0.18rem, 99999px, 4.4rem, 0);transform:skew(1deg);transform:translateX(0.2777777778rem)}39.3333333333%{clip:rect(0.06rem, 99999px, 6.1rem, 0);transform:skew(6.6deg);transform:translateX(0.0555555556rem)}40%{clip:rect(0.16rem, 99999px, 4.9rem, 0);transform:skew(0.8deg);transform:translateX(0.1666666667rem)}40.6666666667%{clip:rect(0.08rem, 99999px, 8.4rem, 0);transform:skew(11deg);transform:translateX(0.4444444444rem)}41.3333333333%{clip:rect(0.06rem, 99999px, 2.4rem, 0);transform:skew(0.4deg);transform:translateX(0.4444444444rem)}42%{clip:rect(0.12rem, 99999px, 4.1rem, 0);transform:skew(0.1deg);transform:translateX(0.0555555556rem)}42.6666666667%{clip:rect(0.06rem, 99999px, 9.9rem, 0);transform:skew(8.8deg);transform:translateX(0.462962963rem)}43.3333333333%{clip:rect(0.02rem, 99999px, 0.8rem, 0);transform:skew(3.5deg);transform:translateX(0.1666666667rem)}44%{clip:rect(0.16rem, 99999px, 1.8rem, 0);transform:skew(13.2deg);transform:translateX(0.3518518519rem)}44.6666666667%{clip:rect(0.08rem, 99999px, 2.3rem, 0);transform:skew(11.1deg);transform:translateX(0.0555555556rem)}45.3333333333%{clip:rect(0.06rem, 99999px, 2.7rem, 0);transform:skew(7.2deg);transform:translateX(0.4259259259rem)}46%{clip:rect(0.16rem, 99999px, 3.7rem, 0);transform:skew(4.1deg);transform:translateX(0.3888888889rem)}46.6666666667%{clip:rect(0.18rem, 99999px, 2.3rem, 0);transform:skew(10.6deg);transform:translateX(0.3518518519rem)}47.3333333333%{clip:rect(0.1rem, 99999px, 3rem, 0);transform:skew(6.6deg);transform:translateX(0.2777777778rem)}48%{clip:rect(0.18rem, 99999px, 6.9rem, 0);transform:skew(6.9deg);transform:translateX(0.4259259259rem)}48.6666666667%{clip:rect(0.14rem, 99999px, 2.1rem, 0);transform:skew(1deg);transform:translateX(0.2777777778rem)}49.3333333333%{clip:rect(0.18rem, 99999px, 1.9rem, 0);transform:skew(9deg);transform:translateX(0.3333333333rem)}50%{clip:rect(0.06rem, 99999px, 5.9rem, 0);transform:skew(3.8deg);transform:translateX(0.3888888889rem)}50.6666666667%{clip:rect(0.2rem, 99999px, 1.4rem, 0);transform:skew(9.6deg);transform:translateX(0.3333333333rem)}51.3333333333%{clip:rect(0.04rem, 99999px, 1.2rem, 0);transform:skew(7.9deg);transform:translateX(0.3888888889rem)}52%{clip:rect(0.08rem, 99999px, 4rem, 0);transform:skew(13.5deg);transform:translateX(0.4259259259rem)}52.6666666667%{clip:rect(0.1rem, 99999px, 3rem, 0);transform:skew(1.5deg);transform:translateX(0.0555555556rem)}53.3333333333%{clip:rect(0.12rem, 99999px, 0.3rem, 0);transform:skew(11.1deg);transform:translateX(0.2777777778rem)}54%{clip:rect(0.12rem, 99999px, 0.6rem, 0);transform:skew(6.6deg);transform:translateX(0.3518518519rem)}54.6666666667%{clip:rect(0.12rem, 99999px, 7rem, 0);transform:skew(8.8deg);transform:translateX(0.4259259259rem)}55.3333333333%{clip:rect(0.04rem, 99999px, 8.1rem, 0);transform:skew(12.4deg);transform:translateX(0.3518518519rem)}56%{clip:rect(0.2rem, 99999px, 9.1rem, 0);transform:skew(6.9deg);transform:translateX(0.3888888889rem)}56.6666666667%{clip:rect(0.18rem, 99999px, 2.4rem, 0);transform:skew(13.8deg);transform:translateX(0.2777777778rem)}57.3333333333%{clip:rect(0.2rem, 99999px, 2.8rem, 0);transform:skew(7.8deg);transform:translateX(0.3888888889rem)}58%{clip:rect(0.1rem, 99999px, 8rem, 0);transform:skew(7.5deg);transform:translateX(0.0555555556rem)}58.6666666667%{clip:rect(0.14rem, 99999px, 7.9rem, 0);transform:skew(11.3deg);transform:translateX(0.3888888889rem)}59.3333333333%{clip:rect(0.1rem, 99999px, 6.4rem, 0);transform:skew(4.4deg);transform:translateX(-0.5rem)}60%{clip:rect(0.1rem, 99999px, 8.1rem, 0);transform:skew(8deg);transform:translateX(0.3888888889rem)}60.6666666667%{clip:rect(0.04rem, 99999px, 9rem, 0);transform:skew(4.4deg);transform:translateX(0.4259259259rem)}61.3333333333%{clip:rect(0.08rem, 99999px, 8.1rem, 0);transform:skew(3.1deg);transform:translateX(0.3888888889rem)}62%{clip:rect(0.1rem, 99999px, 4.9rem, 0);transform:skew(8.5deg);transform:translateX(0.462962963rem)}62.6666666667%{clip:rect(0.16rem, 99999px, 5.4rem, 0);transform:skew(10.6deg);transform:translateX(0.3333333333rem)}63.3333333333%{clip:rect(0.1rem, 99999px, 9.4rem, 0);transform:skew(6.9deg);transform:translateX(0.4259259259rem)}64%{clip:rect(0.08rem, 99999px, 6.3rem, 0);transform:skew(3.6deg);transform:translateX(0.4259259259rem)}64.6666666667%{clip:rect(0.06rem, 99999px, 3.3rem, 0);transform:skew(4deg);transform:translateX(0.4259259259rem)}65.3333333333%{clip:rect(0.08rem, 99999px, 8.6rem, 0);transform:skew(2.5deg);transform:translateX(0.4259259259rem)}66%{clip:rect(0.04rem, 99999px, 7rem, 0);transform:skew(1.7deg);transform:translateX(0.3888888889rem)}66.6666666667%{clip:rect(0.2rem, 99999px, 5.5rem, 0);transform:skew(7.2deg);transform:translateX(0.2777777778rem)}67.3333333333%{clip:rect(0.06rem, 99999px, 7.5rem, 0);transform:skew(1.2deg);transform:translateX(0.4444444444rem)}68%{clip:rect(0.02rem, 99999px, 2rem, 0);transform:skew(14.6deg);transform:translateX(0.462962963rem)}68.6666666667%{clip:rect(0.12rem, 99999px, 0.1rem, 0);transform:skew(3.9deg);transform:translateX(0.1666666667rem)}69.3333333333%{clip:rect(0.14rem, 99999px, 8.2rem, 0);transform:skew(8.7deg);transform:translateX(0.2777777778rem)}70%{clip:rect(0.16rem, 99999px, 6.5rem, 0);transform:skew(3.6deg);transform:translateX(0.1666666667rem)}70.6666666667%{clip:rect(0.18rem, 99999px, 0.5rem, 0);transform:skew(7.7deg);transform:translateX(0.2777777778rem)}71.3333333333%{clip:rect(0.08rem, 99999px, 2rem, 0);transform:skew(5.7deg);transform:translateX(0.1666666667rem)}72%{clip:rect(0.06rem, 99999px, 3.3rem, 0);transform:skew(6.9deg);transform:translateX(0.1666666667rem)}72.6666666667%{clip:rect(0.02rem, 99999px, 6.4rem, 0);transform:skew(3.9deg);transform:translateX(0.2777777778rem)}73.3333333333%{clip:rect(0.2rem, 99999px, 4.1rem, 0);transform:skew(5.7deg);transform:translateX(0.2777777778rem)}74%{clip:rect(0.02rem, 99999px, 1.9rem, 0);transform:skew(12deg);transform:translateX(0.3888888889rem)}74.6666666667%{clip:rect(0.06rem, 99999px, 6.4rem, 0);transform:skew(13.5deg);transform:translateX(0.4259259259rem)}75.3333333333%{clip:rect(0.02rem, 99999px, 4.2rem, 0);transform:skew(13.1deg);transform:translateX(0.4444444444rem)}76%{clip:rect(0.08rem, 99999px, 10rem, 0);transform:skew(12.6deg);transform:translateX(-0.1666666667rem)}76.6666666667%{clip:rect(0.14rem, 99999px, 0.4rem, 0);transform:skew(4.5deg);transform:translateX(-0.5rem)}77.3333333333%{clip:rect(0.06rem, 99999px, 7.3rem, 0);transform:skew(2.6deg);transform:translateX(0.4259259259rem)}78%{clip:rect(0.14rem, 99999px, 9.6rem, 0);transform:skew(8.3deg);transform:translateX(0.0555555556rem)}78.6666666667%{clip:rect(0.18rem, 99999px, 3.6rem, 0);transform:skew(1deg);transform:translateX(0rem)}79.3333333333%{clip:rect(0.04rem, 99999px, 4.4rem, 0);transform:skew(13deg);transform:translateX(0.2777777778rem)}80%{clip:rect(0.12rem, 99999px, 1.6rem, 0);transform:skew(2.4deg);transform:translateX(0.2777777778rem)}80.6666666667%{clip:rect(0.1rem, 99999px, 4.7rem, 0);transform:skew(7.6deg);transform:translateX(0.4259259259rem)}81.3333333333%{clip:rect(0.04rem, 99999px, 3.4rem, 0);transform:skew(8.9deg);transform:translateX(0.4259259259rem)}82%{clip:rect(0.16rem, 99999px, 9.6rem, 0);transform:skew(0.8deg);transform:translateX(0.4259259259rem)}82.6666666667%{clip:rect(0.14rem, 99999px, 0.9rem, 0);transform:skew(11.7deg);transform:translateX(0.4259259259rem)}83.3333333333%{clip:rect(0.1rem, 99999px, 6.5rem, 0);transform:skew(2.3deg);transform:translateX(0.4259259259rem)}84%{clip:rect(0.04rem, 99999px, 4.6rem, 0);transform:skew(3.5deg);transform:translateX(0.3888888889rem)}84.6666666667%{clip:rect(0.08rem, 99999px, 7.6rem, 0);transform:skew(4deg);transform:translateX(0.3888888889rem)}85.3333333333%{clip:rect(0.16rem, 99999px, 4.1rem, 0);transform:skew(0.5deg);transform:translateX(0.2777777778rem)}86%{clip:rect(0.02rem, 99999px, 5.4rem, 0);transform:skew(13.4deg);transform:translateX(-0.1666666667rem)}86.6666666667%{clip:rect(0.2rem, 99999px, 8.1rem, 0);transform:skew(5.4deg);transform:translateX(0.3333333333rem)}87.3333333333%{clip:rect(0.1rem, 99999px, 2.2rem, 0);transform:skew(5.2deg);transform:translateX(0.3333333333rem)}88%{clip:rect(0.18rem, 99999px, 6.3rem, 0);transform:skew(11.2deg);transform:translateX(-0.1666666667rem)}88.6666666667%{clip:rect(0.16rem, 99999px, 2.4rem, 0);transform:skew(7.2deg);transform:translateX(0.3888888889rem)}89.3333333333%{clip:rect(0.12rem, 99999px, 4.9rem, 0);transform:skew(12.9deg);transform:translateX(0.1666666667rem)}90%{clip:rect(0.2rem, 99999px, 2.7rem, 0);transform:skew(11.2deg);transform:translateX(0.2037037037rem)}90.6666666667%{clip:rect(0.2rem, 99999px, 8.8rem, 0);transform:skew(8.1deg);transform:translateX(0.1666666667rem)}91.3333333333%{clip:rect(0.16rem, 99999px, 2.9rem, 0);transform:skew(8.1deg);transform:translateX(0.4444444444rem)}92%{clip:rect(0.08rem, 99999px, 0.5rem, 0);transform:skew(2.4deg);transform:translateX(0.3518518519rem)}92.6666666667%{clip:rect(0.14rem, 99999px, 1.4rem, 0);transform:skew(12.4deg);transform:translateX(-0.1666666667rem)}93.3333333333%{clip:rect(0.2rem, 99999px, 0.6rem, 0);transform:skew(11.7deg);transform:translateX(0.4444444444rem)}94%{clip:rect(0.18rem, 99999px, 1.2rem, 0);transform:skew(1.4deg);transform:translateX(0.3333333333rem)}94.6666666667%{clip:rect(0.18rem, 99999px, 7.4rem, 0);transform:skew(14.9deg);transform:translateX(0.2777777778rem)}95.3333333333%{clip:rect(0.06rem, 99999px, 8.5rem, 0);transform:skew(0.4deg);transform:translateX(0.0555555556rem)}96%{clip:rect(0.2rem, 99999px, 9.6rem, 0);transform:skew(6.1deg);transform:translateX(0.3888888889rem)}96.6666666667%{clip:rect(0.06rem, 99999px, 0.5rem, 0);transform:skew(6.7deg);transform:translateX(0.3888888889rem)}97.3333333333%{clip:rect(0.2rem, 99999px, 2.4rem, 0);transform:skew(13.2deg);transform:translateX(0.2777777778rem)}98%{clip:rect(0.1rem, 99999px, 0.8rem, 0);transform:skew(11.5deg);transform:translateX(0.3518518519rem)}98.6666666667%{clip:rect(0.06rem, 99999px, 8.5rem, 0);transform:skew(6.3deg);transform:translateX(0.0555555556rem)}99.3333333333%{clip:rect(0.1rem, 99999px, 6.6rem, 0);transform:skew(11.9deg);transform:translateX(-0.1666666667rem)}}@keyframes svelte-5qyb4t-glitch-skew{0%{transform:skew(-1deg)}10%{transform:skew(1deg)}20%{transform:skew(-3deg)}30%{transform:skew(1deg)}40%{transform:skew(0deg)}50%{transform:skew(1deg)}60%{transform:skew(2deg)}70%{transform:skew(-2deg)}80%{transform:skew(0deg)}90%{transform:skew(-2deg)}}#bar.svelte-5qyb4t .logo.hover-effect-1.logo-behind-a.svelte-5qyb4t{color:white;transform:translateX(-0.5rem);color:#ffc800 !important;text-shadow:-2px 0 #ffc800, 2px 2px #ffc800;clip:rect(44px, 450px, 56px, 0);animation:svelte-5qyb4t-glitch-anim2 5s infinite linear alternate-reverse}#bar.svelte-5qyb4t .logo.hover-effect-1.logo-behind-b.svelte-5qyb4t{color:rgb(165, 49, 49) !important;z-index:1;transform:translateX(0.2rem);text-shadow:-2px 0 #aa10f2;clip:rect(44px, 450px, 56px, 0);animation:svelte-5qyb4t-glitch-anim 5s infinite linear alternate-reverse}#bar.svelte-5qyb4t .logo.logo-behind.svelte-5qyb4t{width:0px;height:0px;overflow:visible;pointer-events:none}#bar.svelte-5qyb4t .logo.logo-behind.svelte-5qyb4t:not(.hovered){display:none}#bar.svelte-5qyb4t #menus.svelte-5qyb4t{margin-left:auto;display:flex}#bar.svelte-5qyb4t #menus #menu.svelte-5qyb4t{height:10rem;display:flex;flex-direction:column;justify-content:space-between;margin-right:1rem}#bar.svelte-5qyb4t #menus #menu.svelte-5qyb4t .menu-item{font-weight:750;font-style:italic;width:fit-content}
-/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQmFyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUF3QmdCLGdDQUFRLENBQ3hCLEtBQUksQ0FBSyxJQUFJLENBQ2IsVUFBUyxDQUFLLElBQUUsQ0FDaEIsYUFBZSxDQUFDLElBQUssQ0FDbkIsT0FBTSxNQUNOLFNBQUssTUFDTCxLQUFJLEtBQ04sQ0FDQSxzQ0FDQyxVQUFXLENBQUUsS0FFYixDQUNBLHNDQUFXLENBS1gsU0FBSSxLQUF5QixDQUc3QixXQUFJLEtBQWEsQ0FLakIsTUFBSSxZQUFjLENBRWxCLGVBQUksS0FJSixtQkFDQyxnQ0FBYSxTQUNaLENBQUksaUNBSUosNkJBQ0EsS0FBRyxtRkFJSCwyQkFBWSxJQUFTLENBQUMsNkNBRXZCLHNCQUFhLGFBRVosV0FBYyxPQUFVLE9BQUssRUFJN0IsTUFFRixTQUFhLENBQUUsVUFBSSxhQUNsQixDQUNGLElBQ0MsU0FBWSxXQUFLIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkJhci5zdmVsdGUiXX0=*/`, "",{"version":3,"sources":["webpack://./src/components/Bar.svelte"],"names":[],"mappings":"AAwBgB,iCAChB,UAAa,CACb,eAAgB,CAChB,kBAAqB,CACnB,YAAM,CACN,cAAK,CACL,UACF,CACA,sCACC,gBAEA,CACA,uCAKA,cAA6B,CAG7B,gBAAiB,CAKjB,kBAAkB,CAElB,oBAIA,CAAA,mDACc,iBACR,CAAA,+CAIJ,sBACG,CAAA,8DAAA,0EAImB,CAAA,kCAEV,GAAA,mCAEiB,CAI7B,MAEF,iCACC,CACF,IACC,mCAAiB,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,KAAA,mCAAA,CAAA,CAAA,kCAAA,GAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,KAAA,mCAAA,CAAA,CAAA,sCAAA,GAAA,kCAAA,CAAA,uBAAA,CAAA,GAAA,oCAAA,CAAA,uBAAA,CAAA,GAAA,kCAAA,CAAA,uBAAA,CAAA,GAAA,kCAAA,CAAA,uBAAA,CAAA,GAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,gCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,gCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,gCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,CAAA,gCAAA,GAAA,oBAAA,CAAA,GAAA,oBAAA,CAAA,GAAA,oBAAA,CAAA,GAAA,oBAAA,CAAA,GAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,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","sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, `#bar.svelte-wshlq5.svelte-wshlq5{width:100%;margin-top:1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;width:100%}#bar.svelte-wshlq5 mark.svelte-wshlq5{background:black}#bar.svelte-wshlq5 .logo.svelte-wshlq5{font-size:4rem;margin-left:1rem;height:fit-content;text-decoration:none}#bar.svelte-wshlq5 .logo.logo-behind.svelte-wshlq5{position:absolute}#bar.svelte-wshlq5 .logo.hovered.svelte-wshlq5{color:black !important}#bar.svelte-wshlq5 .logo.hovered.hover-effect-0.svelte-wshlq5{animation:svelte-wshlq5-glitch-anim3 10s infinite linear alternate-reverse}@keyframes svelte-wshlq5-distort1{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0.5rem, 0rem)}25%{transform:translate(0.5rem, 1.5rem)}37.5%{transform:translate(0rem, 0.5rem)}50%{transform:translate(0.5rem, 0.5rem)}62.5%{transform:translate(0.5rem, 0rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0rem, 0.5rem)}100%{transform:translate(1.5rem, 0.5rem)}}@keyframes svelte-wshlq5-distort2{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0rem, 0.5rem)}25%{transform:translate(1.5rem, 0.5rem)}37.5%{transform:translate(1.5rem, 0rem)}50%{transform:translate(1.5rem, 0.5rem)}62.5%{transform:translate(0rem, 1.5rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0.5rem, 0rem)}100%{transform:translate(0.5rem, 0.5rem)}}@keyframes svelte-wshlq5-glitch-anim3{0%{clip:rect(1.4rem, 9999px, 3rem, 0);transform-origin:center}2%{clip:rect(0.4rem, 9999px, 3.5rem, 0);transform-origin:center}4%{clip:rect(3.6rem, 9999px, 1rem, 0);transform-origin:center}6%{clip:rect(1.3rem, 9999px, 3rem, 0);transform-origin:center}8%{clip:rect(1.6rem, 9999px, 4rem, 0);transform-origin:center}10%{clip:rect(3.9rem, 9999px, 1.5rem, 0);transform-origin:center}12%{clip:rect(1.3rem, 9999px, 2rem, 0);transform-origin:center}14%{clip:rect(0.4rem, 9999px, 3.5rem, 0);transform-origin:center}16%{clip:rect(1.5rem, 9999px, 4.5rem, 0);transform-origin:center}18%{clip:rect(2.6rem, 9999px, 1rem, 0);transform-origin:center}20%{clip:rect(2.2rem, 9999px, 4.5rem, 0);transform-origin:center}22%{clip:rect(2.3rem, 9999px, 3.5rem, 0);transform-origin:center}24%{clip:rect(0.1rem, 9999px, 2rem, 0);transform-origin:center}26%{clip:rect(1.9rem, 9999px, 1.5rem, 0);transform-origin:center}28%{clip:rect(0.8rem, 9999px, 0.5rem, 0);transform-origin:center}30%{clip:rect(1rem, 9999px, 5rem, 0);transform-origin:center}32%{clip:rect(1.5rem, 9999px, 5rem, 0);transform-origin:center}34%{clip:rect(1.5rem, 9999px, 0.5rem, 0);transform-origin:center}36%{clip:rect(1.1rem, 9999px, 2.5rem, 0);transform-origin:center}38%{clip:rect(1.3rem, 9999px, 4.5rem, 0);transform-origin:center}40%{clip:rect(1.4rem, 9999px, 1.5rem, 0);transform-origin:center}42%{clip:rect(2.4rem, 9999px, 0.5rem, 0);transform-origin:center}44%{clip:rect(2.7rem, 9999px, 0.5rem, 0);transform-origin:center}46%{clip:rect(3.3rem, 9999px, 5rem, 0);transform-origin:center}48%{clip:rect(1.1rem, 9999px, 0.5rem, 0);transform-origin:center}50%{clip:rect(0.6rem, 9999px, 4rem, 0);transform-origin:center}52%{clip:rect(2rem, 9999px, 1rem, 0);transform-origin:center}54%{clip:rect(2.1rem, 9999px, 2.5rem, 0);transform-origin:center}56%{clip:rect(3rem, 9999px, 1.5rem, 0);transform-origin:center}58%{clip:rect(2.2rem, 9999px, 3.5rem, 0);transform-origin:center}60%{clip:rect(3.8rem, 9999px, 1rem, 0);transform-origin:center}62%{clip:rect(3.2rem, 9999px, 3rem, 0);transform-origin:center}64%{clip:rect(1.5rem, 9999px, 4.5rem, 0);transform-origin:center}66%{clip:rect(0.8rem, 9999px, 2rem, 0);transform-origin:center}68%{clip:rect(0.1rem, 9999px, 5rem, 0);transform-origin:center}70%{clip:rect(0.4rem, 9999px, 0.5rem, 0);transform-origin:center}72%{clip:rect(0.7rem, 9999px, 3.5rem, 0);transform-origin:center}74%{clip:rect(1.6rem, 9999px, 5rem, 0);transform-origin:center}76%{clip:rect(1rem, 9999px, 2.5rem, 0);transform-origin:center}78%{clip:rect(0.9rem, 9999px, 3.5rem, 0);transform-origin:center}80%{clip:rect(0.4rem, 9999px, 2rem, 0);transform-origin:center}82%{clip:rect(0.3rem, 9999px, 0.5rem, 0);transform-origin:center}84%{clip:rect(3.2rem, 9999px, 0.5rem, 0);transform-origin:center}86%{clip:rect(3.1rem, 9999px, 3.5rem, 0);transform-origin:center}88%{clip:rect(1.6rem, 9999px, 1.5rem, 0);transform-origin:center}90%{clip:rect(1.3rem, 9999px, 0.5rem, 0);transform-origin:center}92%{clip:rect(3.5rem, 9999px, 3.5rem, 0);transform-origin:center}94%{clip:rect(1.2rem, 9999px, 1.5rem, 0);transform-origin:center}96%{clip:rect(2rem, 9999px, 0.5rem, 0);transform-origin:center}98%{clip:rect(3.2rem, 9999px, 1.5rem, 0);transform-origin:center}}@keyframes svelte-wshlq5-cooool{0%{color:red !important}2%{color:red !important}4%{color:red !important}6%{color:red !important}8%{color:red !important}10%{color:red !important}12%{color:red !important}14%{color:red !important}16%{color:red !important}18%{color:red !important}20%{color:red !important}22%{color:red !important}24%{color:red !important}26%{color:red !important}28%{color:red !important}30%{color:red !important}32%{color:red !important}34%{color:red !important}36%{color:red !important}38%{color:red !important}40%{color:red !important}42%{color:red !important}44%{color:red !important}46%{color:red !important}48%{color:red !important}50%{color:red !important}52%{color:red !important}54%{color:red !important}56%{color:red !important}58%{color:red !important}60%{color:red !important}62%{color:red !important}64%{color:red !important}66%{color:red !important}68%{color:red !important}70%{color:red !important}72%{color:red !important}74%{color:red !important}76%{color:red !important}78%{color:red !important}80%{color:red !important}82%{color:red !important}84%{color:red !important}86%{color:red !important}88%{color:red !important}90%{color:red !important}92%{color:red !important}94%{color:red !important}96%{color:red !important}98%{color:red !important}}#bar.svelte-wshlq5 .logo.hovered.hover-effect-0.logo-behind-a.svelte-wshlq5{color:#ffc800 !important;animation:svelte-wshlq5-distort1 300ms linear infinite, svelte-wshlq5-glitch-anim3 5s infinite linear alternate-reverse, svelte-wshlq5-cooool 5s infinite linear alternate-reverse}#bar.svelte-wshlq5 .logo.hovered.hover-effect-0.logo-behind-b.svelte-wshlq5{color:#aa10f2 !important;animation:svelte-wshlq5-distort2 300ms linear infinite, svelte-wshlq5-glitch-anim3 3s infinite linear alternate-reverse}#bar.svelte-wshlq5 .logo.hover-effect-1.svelte-wshlq5{animation:svelte-wshlq5-glitch-skew 1s infinite linear alternate-reverse}@keyframes svelte-wshlq5-glitch-anim{0%{clip:rect(3rem, 9999px, 1.5rem, 0);transform:skew(2.7deg);z-index:3}2%{clip:rect(1.9rem, 9999px, 4.5rem, 0);transform:skew(10deg);z-index:1}4%{clip:rect(2.5rem, 9999px, 1rem, 0);transform:skew(7.9deg);z-index:2}6%{clip:rect(1.6rem, 9999px, 1.5rem, 0);transform:skew(5.3deg);z-index:3}8%{clip:rect(2.4rem, 9999px, 4rem, 0);transform:skew(9.8deg);z-index:2}10%{clip:rect(1.2rem, 9999px, 0.5rem, 0);transform:skew(6.2deg);z-index:2}12%{clip:rect(2rem, 9999px, 1.5rem, 0);transform:skew(8.6deg);z-index:1}14%{clip:rect(3.9rem, 9999px, 5rem, 0);transform:skew(0.1deg);z-index:2}16%{clip:rect(3.8rem, 9999px, 3rem, 0);transform:skew(3.5deg);z-index:2}18%{clip:rect(0.2rem, 9999px, 1.5rem, 0);transform:skew(2.2deg);z-index:3}20%{clip:rect(1.9rem, 9999px, 1rem, 0);transform:skew(2.3deg);z-index:2}22%{clip:rect(2.8rem, 9999px, 0.5rem, 0);transform:skew(0.8deg);z-index:1}24%{clip:rect(0.5rem, 9999px, 1.5rem, 0);transform:skew(0.3deg);z-index:1}26%{clip:rect(1.9rem, 9999px, 1rem, 0);transform:skew(2.8deg);z-index:1}28%{clip:rect(1.2rem, 9999px, 3.5rem, 0);transform:skew(3.9deg);z-index:4}30%{clip:rect(3.5rem, 9999px, 0.5rem, 0);transform:skew(8.5deg);z-index:2}32%{clip:rect(0.8rem, 9999px, 3rem, 0);transform:skew(1.9deg);z-index:1}34%{clip:rect(2.9rem, 9999px, 5rem, 0);transform:skew(9.2deg);z-index:4}36%{clip:rect(0.7rem, 9999px, 2.5rem, 0);transform:skew(4.8deg);z-index:4}38%{clip:rect(4rem, 9999px, 5rem, 0);transform:skew(0.7deg);z-index:3}40%{clip:rect(2.4rem, 9999px, 1.5rem, 0);transform:skew(9.4deg);z-index:3}42%{clip:rect(2.2rem, 9999px, 0.5rem, 0);transform:skew(6.5deg);z-index:1}44%{clip:rect(2.6rem, 9999px, 3.5rem, 0);transform:skew(7.7deg);z-index:4}46%{clip:rect(1.4rem, 9999px, 1.5rem, 0);transform:skew(7.1deg);z-index:4}48%{clip:rect(1.3rem, 9999px, 5rem, 0);transform:skew(4.7deg);z-index:2}50%{clip:rect(2.2rem, 9999px, 4rem, 0);transform:skew(0.6deg);z-index:4}52%{clip:rect(3rem, 9999px, 4.5rem, 0);transform:skew(9.1deg);z-index:4}54%{clip:rect(0.7rem, 9999px, 1rem, 0);transform:skew(2.7deg);z-index:3}56%{clip:rect(4rem, 9999px, 5rem, 0);transform:skew(7.8deg);z-index:2}58%{clip:rect(3.6rem, 9999px, 1.5rem, 0);transform:skew(5.5deg);z-index:1}60%{clip:rect(1.5rem, 9999px, 2rem, 0);transform:skew(3.1deg);z-index:1}62%{clip:rect(3.8rem, 9999px, 3rem, 0);transform:skew(1.8deg);z-index:1}64%{clip:rect(3.2rem, 9999px, 5rem, 0);transform:skew(8.3deg);z-index:3}66%{clip:rect(0.6rem, 9999px, 1rem, 0);transform:skew(2deg);z-index:4}68%{clip:rect(2.5rem, 9999px, 3rem, 0);transform:skew(4.1deg);z-index:3}70%{clip:rect(1.2rem, 9999px, 2.5rem, 0);transform:skew(4.1deg);z-index:2}72%{clip:rect(3.8rem, 9999px, 2rem, 0);transform:skew(3.3deg);z-index:2}74%{clip:rect(2.3rem, 9999px, 4rem, 0);transform:skew(8.7deg);z-index:3}76%{clip:rect(0.6rem, 9999px, 0.5rem, 0);transform:skew(7deg);z-index:3}78%{clip:rect(1.7rem, 9999px, 2.5rem, 0);transform:skew(6.8deg);z-index:3}80%{clip:rect(0.7rem, 9999px, 1.5rem, 0);transform:skew(1.4deg);z-index:3}82%{clip:rect(2.8rem, 9999px, 4.5rem, 0);transform:skew(1.3deg);z-index:3}84%{clip:rect(0.5rem, 9999px, 1rem, 0);transform:skew(2.8deg);z-index:2}86%{clip:rect(3rem, 9999px, 3.5rem, 0);transform:skew(0.4deg);z-index:3}88%{clip:rect(2rem, 9999px, 3.5rem, 0);transform:skew(7.7deg);z-index:2}90%{clip:rect(0.5rem, 9999px, 4rem, 0);transform:skew(0.4deg);z-index:3}92%{clip:rect(0.5rem, 9999px, 3.5rem, 0);transform:skew(9.5deg);z-index:4}94%{clip:rect(0.2rem, 9999px, 1.5rem, 0);transform:skew(2.3deg);z-index:1}96%{clip:rect(2.5rem, 9999px, 4.5rem, 0);transform:skew(2deg);z-index:1}98%{clip:rect(1.1rem, 9999px, 1.5rem, 0);transform:skew(0.8deg);z-index:4}}@keyframes svelte-wshlq5-glitch-anim2{0%{clip:rect(0.14rem, 99999px, 1.5rem, 0);transform:skew(15deg);transform:translateX(0.4259259259rem)}0.6666666667%{clip:rect(0.12rem, 99999px, 7.2rem, 0);transform:skew(1.6deg);transform:translateX(0.3888888889rem)}1.3333333333%{clip:rect(0.02rem, 99999px, 8rem, 0);transform:skew(2.6deg);transform:translateX(0.462962963rem)}2%{clip:rect(0.2rem, 99999px, 8.5rem, 0);transform:skew(5.4deg);transform:translateX(0.2777777778rem)}2.6666666667%{clip:rect(0.08rem, 99999px, 3.6rem, 0);transform:skew(7.9deg);transform:translateX(0.3888888889rem)}3.3333333333%{clip:rect(0.1rem, 99999px, 3.6rem, 0);transform:skew(2.8deg);transform:translateX(0.1666666667rem)}4%{clip:rect(0.1rem, 99999px, 0.9rem, 0);transform:skew(2.7deg);transform:translateX(0.3518518519rem)}4.6666666667%{clip:rect(0.2rem, 99999px, 1.6rem, 0);transform:skew(8.3deg);transform:translateX(0.2777777778rem)}5.3333333333%{clip:rect(0.08rem, 99999px, 6.4rem, 0);transform:skew(0.2deg);transform:translateX(0.2777777778rem)}6%{clip:rect(0.04rem, 99999px, 7.3rem, 0);transform:skew(12.4deg);transform:translateX(0.4444444444rem)}6.6666666667%{clip:rect(0.04rem, 99999px, 1.2rem, 0);transform:skew(3.3deg);transform:translateX(0.2777777778rem)}7.3333333333%{clip:rect(0.14rem, 99999px, 5.1rem, 0);transform:skew(4.3deg);transform:translateX(0.2777777778rem)}8%{clip:rect(0.16rem, 99999px, 1.1rem, 0);transform:skew(9.1deg);transform:translateX(0.3518518519rem)}8.6666666667%{clip:rect(0.12rem, 99999px, 0.3rem, 0);transform:skew(9.4deg);transform:translateX(0.2777777778rem)}9.3333333333%{clip:rect(0.2rem, 99999px, 0.2rem, 0);transform:skew(9.2deg);transform:translateX(0.2777777778rem)}10%{clip:rect(0.08rem, 99999px, 1.7rem, 0);transform:skew(8.8deg);transform:translateX(-0.1666666667rem)}10.6666666667%{clip:rect(0.12rem, 99999px, 7.5rem, 0);transform:skew(7deg);transform:translateX(0.2777777778rem)}11.3333333333%{clip:rect(0.2rem, 99999px, 4.7rem, 0);transform:skew(12.5deg);transform:translateX(0.4259259259rem)}12%{clip:rect(0.06rem, 99999px, 6rem, 0);transform:skew(3.8deg);transform:translateX(0.3888888889rem)}12.6666666667%{clip:rect(0.14rem, 99999px, 5.9rem, 0);transform:skew(11.8deg);transform:translateX(0rem)}13.3333333333%{clip:rect(0.1rem, 99999px, 5.8rem, 0);transform:skew(10deg);transform:translateX(0.462962963rem)}14%{clip:rect(0.2rem, 99999px, 8.8rem, 0);transform:skew(2.7deg);transform:translateX(0.3333333333rem)}14.6666666667%{clip:rect(0.06rem, 99999px, 7.5rem, 0);transform:skew(4deg);transform:translateX(0.1666666667rem)}15.3333333333%{clip:rect(0.14rem, 99999px, 3rem, 0);transform:skew(13.2deg);transform:translateX(0.462962963rem)}16%{clip:rect(0.16rem, 99999px, 6rem, 0);transform:skew(2.5deg);transform:translateX(0.1666666667rem)}16.6666666667%{clip:rect(0.1rem, 99999px, 10rem, 0);transform:skew(4.1deg);transform:translateX(0.462962963rem)}17.3333333333%{clip:rect(0.04rem, 99999px, 9.1rem, 0);transform:skew(4.1deg);transform:translateX(0.3333333333rem)}18%{clip:rect(0.2rem, 99999px, 4.5rem, 0);transform:skew(11.4deg);transform:translateX(0.2037037037rem)}18.6666666667%{clip:rect(0.16rem, 99999px, 2.8rem, 0);transform:skew(11deg);transform:translateX(-0.5rem)}19.3333333333%{clip:rect(0.2rem, 99999px, 3.7rem, 0);transform:skew(0.1deg);transform:translateX(-0.1666666667rem)}20%{clip:rect(0.1rem, 99999px, 5.3rem, 0);transform:skew(5.8deg);transform:translateX(0rem)}20.6666666667%{clip:rect(0.02rem, 99999px, 0.7rem, 0);transform:skew(0.5deg);transform:translateX(0.2777777778rem)}21.3333333333%{clip:rect(0.06rem, 99999px, 8.3rem, 0);transform:skew(3.2deg);transform:translateX(0.2777777778rem)}22%{clip:rect(0.16rem, 99999px, 7.8rem, 0);transform:skew(9.4deg);transform:translateX(0.4259259259rem)}22.6666666667%{clip:rect(0.12rem, 99999px, 1.5rem, 0);transform:skew(5.6deg);transform:translateX(0.0555555556rem)}23.3333333333%{clip:rect(0.1rem, 99999px, 3.4rem, 0);transform:skew(8.4deg);transform:translateX(0.3888888889rem)}24%{clip:rect(0.16rem, 99999px, 0.3rem, 0);transform:skew(2.9deg);transform:translateX(0.4259259259rem)}24.6666666667%{clip:rect(0.12rem, 99999px, 5.9rem, 0);transform:skew(4.9deg);transform:translateX(0.3888888889rem)}25.3333333333%{clip:rect(0.02rem, 99999px, 2.8rem, 0);transform:skew(1.4deg);transform:translateX(-0.1666666667rem)}26%{clip:rect(0.06rem, 99999px, 4.3rem, 0);transform:skew(9.2deg);transform:translateX(0.3518518519rem)}26.6666666667%{clip:rect(0.1rem, 99999px, 9.8rem, 0);transform:skew(12.5deg);transform:translateX(0.3518518519rem)}27.3333333333%{clip:rect(0.1rem, 99999px, 7.4rem, 0);transform:skew(7.8deg);transform:translateX(0.4259259259rem)}28%{clip:rect(0.08rem, 99999px, 7.1rem, 0);transform:skew(7.6deg);transform:translateX(0.4259259259rem)}28.6666666667%{clip:rect(0.04rem, 99999px, 1.6rem, 0);transform:skew(4.2deg);transform:translateX(0.2777777778rem)}29.3333333333%{clip:rect(0.14rem, 99999px, 9.3rem, 0);transform:skew(8.4deg);transform:translateX(0.2037037037rem)}30%{clip:rect(0.2rem, 99999px, 4.3rem, 0);transform:skew(4.2deg);transform:translateX(0.1666666667rem)}30.6666666667%{clip:rect(0.1rem, 99999px, 5.9rem, 0);transform:skew(6.2deg);transform:translateX(-0.5rem)}31.3333333333%{clip:rect(0.18rem, 99999px, 1.1rem, 0);transform:skew(8.8deg);transform:translateX(0.1666666667rem)}32%{clip:rect(0.16rem, 99999px, 1.2rem, 0);transform:skew(7.4deg);transform:translateX(0.2777777778rem)}32.6666666667%{clip:rect(0.12rem, 99999px, 2.2rem, 0);transform:skew(2deg);transform:translateX(0.2777777778rem)}33.3333333333%{clip:rect(0.04rem, 99999px, 5.9rem, 0);transform:skew(2.4deg);transform:translateX(0.1666666667rem)}34%{clip:rect(0.08rem, 99999px, 4.4rem, 0);transform:skew(6.2deg);transform:translateX(0.3888888889rem)}34.6666666667%{clip:rect(0.1rem, 99999px, 6.5rem, 0);transform:skew(12.3deg);transform:translateX(0.3888888889rem)}35.3333333333%{clip:rect(0.2rem, 99999px, 7.7rem, 0);transform:skew(0.1deg);transform:translateX(0.4444444444rem)}36%{clip:rect(0.18rem, 99999px, 8rem, 0);transform:skew(13.3deg);transform:translateX(0.0555555556rem)}36.6666666667%{clip:rect(0.16rem, 99999px, 6.9rem, 0);transform:skew(11deg);transform:translateX(0.3888888889rem)}37.3333333333%{clip:rect(0.02rem, 99999px, 0.4rem, 0);transform:skew(2.4deg);transform:translateX(0rem)}38%{clip:rect(0.06rem, 99999px, 3.3rem, 0);transform:skew(6.6deg);transform:translateX(0.1666666667rem)}38.6666666667%{clip:rect(0.1rem, 99999px, 0.4rem, 0);transform:skew(10.3deg);transform:translateX(0.3518518519rem)}39.3333333333%{clip:rect(0.06rem, 99999px, 6.2rem, 0);transform:skew(9.4deg);transform:translateX(0.2777777778rem)}40%{clip:rect(0.06rem, 99999px, 4.3rem, 0);transform:skew(5.4deg);transform:translateX(0.3518518519rem)}40.6666666667%{clip:rect(0.12rem, 99999px, 2.9rem, 0);transform:skew(5.5deg);transform:translateX(0.3888888889rem)}41.3333333333%{clip:rect(0.1rem, 99999px, 4.3rem, 0);transform:skew(1.3deg);transform:translateX(0.2777777778rem)}42%{clip:rect(0.1rem, 99999px, 1.4rem, 0);transform:skew(7.9deg);transform:translateX(0.2777777778rem)}42.6666666667%{clip:rect(0.06rem, 99999px, 3.6rem, 0);transform:skew(11.4deg);transform:translateX(0.3518518519rem)}43.3333333333%{clip:rect(0.08rem, 99999px, 0.9rem, 0);transform:skew(8.5deg);transform:translateX(0.2777777778rem)}44%{clip:rect(0.14rem, 99999px, 4.2rem, 0);transform:skew(7.9deg);transform:translateX(0.3888888889rem)}44.6666666667%{clip:rect(0.2rem, 99999px, 5.2rem, 0);transform:skew(8.6deg);transform:translateX(0.2777777778rem)}45.3333333333%{clip:rect(0.06rem, 99999px, 2.6rem, 0);transform:skew(7.2deg);transform:translateX(0.4444444444rem)}46%{clip:rect(0.04rem, 99999px, 3.4rem, 0);transform:skew(2.8deg);transform:translateX(0.3888888889rem)}46.6666666667%{clip:rect(0.18rem, 99999px, 0.7rem, 0);transform:skew(4.5deg);transform:translateX(0.2777777778rem)}47.3333333333%{clip:rect(0.12rem, 99999px, 1.4rem, 0);transform:skew(1.5deg);transform:translateX(0.3888888889rem)}48%{clip:rect(0.2rem, 99999px, 0.7rem, 0);transform:skew(14.8deg);transform:translateX(0.3888888889rem)}48.6666666667%{clip:rect(0.02rem, 99999px, 1.5rem, 0);transform:skew(10.6deg);transform:translateX(0.0555555556rem)}49.3333333333%{clip:rect(0.16rem, 99999px, 8.7rem, 0);transform:skew(4.4deg);transform:translateX(0.4259259259rem)}50%{clip:rect(0.04rem, 99999px, 1rem, 0);transform:skew(10.5deg);transform:translateX(0.4259259259rem)}50.6666666667%{clip:rect(0.06rem, 99999px, 3.9rem, 0);transform:skew(10.4deg);transform:translateX(0.2777777778rem)}51.3333333333%{clip:rect(0.06rem, 99999px, 6.9rem, 0);transform:skew(4.9deg);transform:translateX(0.3518518519rem)}52%{clip:rect(0.12rem, 99999px, 5.6rem, 0);transform:skew(7.4deg);transform:translateX(-0.1666666667rem)}52.6666666667%{clip:rect(0.18rem, 99999px, 1.2rem, 0);transform:skew(10.8deg);transform:translateX(0.2777777778rem)}53.3333333333%{clip:rect(0.02rem, 99999px, 4rem, 0);transform:skew(4.4deg);transform:translateX(0.0555555556rem)}54%{clip:rect(0.12rem, 99999px, 1.2rem, 0);transform:skew(6.1deg);transform:translateX(0.2777777778rem)}54.6666666667%{clip:rect(0.02rem, 99999px, 0.2rem, 0);transform:skew(1.4deg);transform:translateX(0.3888888889rem)}55.3333333333%{clip:rect(0.18rem, 99999px, 5.4rem, 0);transform:skew(9.7deg);transform:translateX(0.1666666667rem)}56%{clip:rect(0.18rem, 99999px, 9.2rem, 0);transform:skew(0.5deg);transform:translateX(0.462962963rem)}56.6666666667%{clip:rect(0.14rem, 99999px, 0.4rem, 0);transform:skew(13deg);transform:translateX(0.4259259259rem)}57.3333333333%{clip:rect(0.08rem, 99999px, 2.2rem, 0);transform:skew(7.6deg);transform:translateX(0.3888888889rem)}58%{clip:rect(0.2rem, 99999px, 0.8rem, 0);transform:skew(12.8deg);transform:translateX(0.4444444444rem)}58.6666666667%{clip:rect(0.14rem, 99999px, 6.5rem, 0);transform:skew(11.8deg);transform:translateX(0.3888888889rem)}59.3333333333%{clip:rect(0.1rem, 99999px, 7.8rem, 0);transform:skew(3.8deg);transform:translateX(0.3333333333rem)}60%{clip:rect(0.02rem, 99999px, 7.5rem, 0);transform:skew(12.5deg);transform:translateX(0.1666666667rem)}60.6666666667%{clip:rect(0.1rem, 99999px, 3rem, 0);transform:skew(12.6deg);transform:translateX(0.1666666667rem)}61.3333333333%{clip:rect(0.18rem, 99999px, 3rem, 0);transform:skew(6.3deg);transform:translateX(0.462962963rem)}62%{clip:rect(0.16rem, 99999px, 9.2rem, 0);transform:skew(2.1deg);transform:translateX(0.0555555556rem)}62.6666666667%{clip:rect(0.14rem, 99999px, 7.6rem, 0);transform:skew(2.9deg);transform:translateX(0.4259259259rem)}63.3333333333%{clip:rect(0.02rem, 99999px, 8rem, 0);transform:skew(9.5deg);transform:translateX(0.2037037037rem)}64%{clip:rect(0.18rem, 99999px, 4.8rem, 0);transform:skew(0.7deg);transform:translateX(0.4259259259rem)}64.6666666667%{clip:rect(0.08rem, 99999px, 3.6rem, 0);transform:skew(14deg);transform:translateX(0.4259259259rem)}65.3333333333%{clip:rect(0.08rem, 99999px, 6.5rem, 0);transform:skew(6.1deg);transform:translateX(0.462962963rem)}66%{clip:rect(0.18rem, 99999px, 3.1rem, 0);transform:skew(11.5deg);transform:translateX(0.4814814815rem)}66.6666666667%{clip:rect(0.08rem, 99999px, 4.7rem, 0);transform:skew(12.8deg);transform:translateX(0.4259259259rem)}67.3333333333%{clip:rect(0.04rem, 99999px, 5.2rem, 0);transform:skew(2.4deg);transform:translateX(0.3518518519rem)}68%{clip:rect(0.08rem, 99999px, 1.2rem, 0);transform:skew(1.5deg);transform:translateX(0.1666666667rem)}68.6666666667%{clip:rect(0.2rem, 99999px, 1.9rem, 0);transform:skew(7.9deg);transform:translateX(0.2777777778rem)}69.3333333333%{clip:rect(0.08rem, 99999px, 4.2rem, 0);transform:skew(5.2deg);transform:translateX(0.2777777778rem)}70%{clip:rect(0.16rem, 99999px, 0.6rem, 0);transform:skew(2.6deg);transform:translateX(0.2777777778rem)}70.6666666667%{clip:rect(0.18rem, 99999px, 7rem, 0);transform:skew(10.6deg);transform:translateX(0.3518518519rem)}71.3333333333%{clip:rect(0.06rem, 99999px, 3.2rem, 0);transform:skew(4.5deg);transform:translateX(0.1666666667rem)}72%{clip:rect(0.2rem, 99999px, 9.2rem, 0);transform:skew(2.6deg);transform:translateX(0.2777777778rem)}72.6666666667%{clip:rect(0.06rem, 99999px, 2.9rem, 0);transform:skew(0.8deg);transform:translateX(0.3518518519rem)}73.3333333333%{clip:rect(0.14rem, 99999px, 4.8rem, 0);transform:skew(3.1deg);transform:translateX(0.3518518519rem)}74%{clip:rect(0.08rem, 99999px, 7.1rem, 0);transform:skew(9deg);transform:translateX(0.462962963rem)}74.6666666667%{clip:rect(0.16rem, 99999px, 9.5rem, 0);transform:skew(1.7deg);transform:translateX(0.2777777778rem)}75.3333333333%{clip:rect(0.02rem, 99999px, 2.6rem, 0);transform:skew(6.7deg);transform:translateX(0.2777777778rem)}76%{clip:rect(0.08rem, 99999px, 8.5rem, 0);transform:skew(10.2deg);transform:translateX(0.4444444444rem)}76.6666666667%{clip:rect(0.18rem, 99999px, 1.7rem, 0);transform:skew(5.2deg);transform:translateX(0.4259259259rem)}77.3333333333%{clip:rect(0.12rem, 99999px, 3.1rem, 0);transform:skew(5.5deg);transform:translateX(-0.5rem)}78%{clip:rect(0.1rem, 99999px, 8.2rem, 0);transform:skew(5.6deg);transform:translateX(0.3888888889rem)}78.6666666667%{clip:rect(0.16rem, 99999px, 1.4rem, 0);transform:skew(12.4deg);transform:translateX(0.2777777778rem)}79.3333333333%{clip:rect(0.14rem, 99999px, 9.5rem, 0);transform:skew(9.1deg);transform:translateX(0.1666666667rem)}80%{clip:rect(0.02rem, 99999px, 9.4rem, 0);transform:skew(11.8deg);transform:translateX(0.2777777778rem)}80.6666666667%{clip:rect(0.18rem, 99999px, 3.9rem, 0);transform:skew(4.7deg);transform:translateX(0.1666666667rem)}81.3333333333%{clip:rect(0.18rem, 99999px, 3.2rem, 0);transform:skew(2deg);transform:translateX(0.462962963rem)}82%{clip:rect(0.14rem, 99999px, 1.9rem, 0);transform:skew(1.7deg);transform:translateX(0.462962963rem)}82.6666666667%{clip:rect(0.18rem, 99999px, 8.8rem, 0);transform:skew(5.9deg);transform:translateX(0.4814814815rem)}83.3333333333%{clip:rect(0.08rem, 99999px, 1.5rem, 0);transform:skew(13.1deg);transform:translateX(-0.5rem)}84%{clip:rect(0.04rem, 99999px, 4.9rem, 0);transform:skew(13.4deg);transform:translateX(0.3518518519rem)}84.6666666667%{clip:rect(0.14rem, 99999px, 7.8rem, 0);transform:skew(13.9deg);transform:translateX(0.3888888889rem)}85.3333333333%{clip:rect(0.1rem, 99999px, 4.1rem, 0);transform:skew(14.8deg);transform:translateX(0.1666666667rem)}86%{clip:rect(0.2rem, 99999px, 8.6rem, 0);transform:skew(6.9deg);transform:translateX(0.2777777778rem)}86.6666666667%{clip:rect(0.14rem, 99999px, 1.6rem, 0);transform:skew(9.1deg);transform:translateX(-0.1666666667rem)}87.3333333333%{clip:rect(0.14rem, 99999px, 1.7rem, 0);transform:skew(8.6deg);transform:translateX(0.2037037037rem)}88%{clip:rect(0.1rem, 99999px, 8.4rem, 0);transform:skew(6.2deg);transform:translateX(0.3518518519rem)}88.6666666667%{clip:rect(0.1rem, 99999px, 7.8rem, 0);transform:skew(4.1deg);transform:translateX(0.1666666667rem)}89.3333333333%{clip:rect(0.14rem, 99999px, 2.2rem, 0);transform:skew(6.6deg);transform:translateX(0.3888888889rem)}90%{clip:rect(0.18rem, 99999px, 4.6rem, 0);transform:skew(13.5deg);transform:translateX(0.4444444444rem)}90.6666666667%{clip:rect(0.08rem, 99999px, 3.3rem, 0);transform:skew(10.3deg);transform:translateX(0.1666666667rem)}91.3333333333%{clip:rect(0.14rem, 99999px, 3.4rem, 0);transform:skew(9.3deg);transform:translateX(0.2777777778rem)}92%{clip:rect(0.04rem, 99999px, 9.2rem, 0);transform:skew(11.5deg);transform:translateX(0.3888888889rem)}92.6666666667%{clip:rect(0.14rem, 99999px, 0.7rem, 0);transform:skew(7.2deg);transform:translateX(0.462962963rem)}93.3333333333%{clip:rect(0.04rem, 99999px, 3.5rem, 0);transform:skew(13.7deg);transform:translateX(0.3888888889rem)}94%{clip:rect(0.08rem, 99999px, 6.8rem, 0);transform:skew(4.7deg);transform:translateX(0.3888888889rem)}94.6666666667%{clip:rect(0.08rem, 99999px, 6rem, 0);transform:skew(13.3deg);transform:translateX(0.4814814815rem)}95.3333333333%{clip:rect(0.2rem, 99999px, 4.8rem, 0);transform:skew(13.5deg);transform:translateX(0.4444444444rem)}96%{clip:rect(0.16rem, 99999px, 4.3rem, 0);transform:skew(2.7deg);transform:translateX(0.2777777778rem)}96.6666666667%{clip:rect(0.02rem, 99999px, 7.3rem, 0);transform:skew(4.8deg);transform:translateX(0.2777777778rem)}97.3333333333%{clip:rect(0.04rem, 99999px, 3.9rem, 0);transform:skew(10.6deg);transform:translateX(0.3888888889rem)}98%{clip:rect(0.06rem, 99999px, 6.2rem, 0);transform:skew(7.9deg);transform:translateX(0.1666666667rem)}98.6666666667%{clip:rect(0.12rem, 99999px, 9.6rem, 0);transform:skew(13.6deg);transform:translateX(0.3518518519rem)}99.3333333333%{clip:rect(0.02rem, 99999px, 0.7rem, 0);transform:skew(3.3deg);transform:translateX(0.0555555556rem)}}@keyframes svelte-wshlq5-glitch-skew{0%{transform:skew(1deg)}10%{transform:skew(0deg)}20%{transform:skew(1deg)}30%{transform:skew(-2deg)}40%{transform:skew(-1deg)}50%{transform:skew(-4deg)}60%{transform:skew(-3deg)}70%{transform:skew(5deg)}80%{transform:skew(-1deg)}90%{transform:skew(-1deg)}}#bar.svelte-wshlq5 .logo.hover-effect-1.logo-behind-a.svelte-wshlq5{color:white;transform:translateX(-0.5rem);color:#ffc800 !important;text-shadow:-2px 0 #ffc800, 2px 2px #ffc800;clip:rect(44px, 450px, 56px, 0);animation:svelte-wshlq5-glitch-anim2 5s infinite linear alternate-reverse}#bar.svelte-wshlq5 .logo.hover-effect-1.logo-behind-b.svelte-wshlq5{color:rgb(165, 49, 49) !important;z-index:1;transform:translateX(0.2rem);text-shadow:-2px 0 #aa10f2;clip:rect(44px, 450px, 56px, 0);animation:svelte-wshlq5-glitch-anim 5s infinite linear alternate-reverse}#bar.svelte-wshlq5 .logo.logo-behind.svelte-wshlq5{width:0px;height:0px;overflow:visible;pointer-events:none}#bar.svelte-wshlq5 .logo.logo-behind.svelte-wshlq5:not(.hovered){display:none}#bar.svelte-wshlq5 #menus.svelte-wshlq5{margin-left:auto;display:flex}#bar.svelte-wshlq5 #menus #menu.svelte-wshlq5{height:10rem;display:flex;flex-direction:column;justify-content:space-between;margin-right:1rem}#bar.svelte-wshlq5 #menus #menu.svelte-wshlq5 .menu-item{font-weight:750;font-style:italic;width:fit-content}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQmFyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUF3QmdCLGdDQUFRLENBQ3hCLEtBQUksQ0FBSyxJQUFJLENBQ2IsVUFBUyxDQUFLLElBQUUsQ0FDaEIsYUFBZSxDQUFDLElBQUssQ0FDbkIsT0FBTSxNQUNOLFNBQUssTUFDTCxLQUFJLEtBQ04sQ0FDQSxzQ0FDQyxVQUFXLENBQUUsS0FFYixDQUNBLHNDQUFXLENBS1gsU0FBSSxLQUF5QixDQUc3QixXQUFJLEtBQWEsQ0FLakIsTUFBSSxZQUFjLENBRWxCLGVBQUksS0FJSixtQkFDQyxnQ0FBYSxTQUNaLENBQUksaUNBSUosNkJBQ0EsS0FBRyxtRkFJSCwyQkFBWSxJQUFTLENBQUMsNkNBRXZCLHNCQUFhLGFBRVosV0FBYyxPQUFVLE9BQUssRUFJN0IsTUFFRixTQUFhLENBQUUsVUFBSSxhQUNsQixDQUNGLElBQ0MsU0FBWSxXQUFLIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkJhci5zdmVsdGUiXX0=*/`, "",{"version":3,"sources":["webpack://./src/components/Bar.svelte"],"names":[],"mappings":"AAwBgB,iCAChB,UAAa,CACb,eAAgB,CAChB,kBAAqB,CACnB,YAAM,CACN,cAAK,CACL,UACF,CACA,sCACC,gBAEA,CACA,uCAKA,cAA6B,CAG7B,gBAAiB,CAKjB,kBAAkB,CAElB,oBAIA,CAAA,mDACc,iBACR,CAAA,+CAIJ,sBACG,CAAA,8DAAA,0EAImB,CAAA,kCAEV,GAAA,mCAEiB,CAI7B,MAEF,iCACC,CACF,IACC,mCAAiB,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,KAAA,mCAAA,CAAA,CAAA,kCAAA,GAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,IAAA,mCAAA,CAAA,MAAA,iCAAA,CAAA,KAAA,mCAAA,CAAA,CAAA,sCAAA,GAAA,kCAAA,CAAA,uBAAA,CAAA,GAAA,oCAAA,CAAA,uBAAA,CAAA,GAAA,kCAAA,CAAA,uBAAA,CAAA,GAAA,kCAAA,CAAA,uBAAA,CAAA,GAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,gCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,gCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,IAAA,kCAAA,CAAA,uBAAA,CAAA,IAAA,oCAAA,CAAA,uBAAA,CAAA,CAAA,gCAAA,GAAA,oBAAA,CAAA,GAAA,oBAAA,CAAA,GAAA,oBAAA,CAAA,GAAA,oBAAA,CAAA,GAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,oBAAA,CAAA,IAAA,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","sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
 
 /***/ }),
 
-/***/ 284:
+/***/ 63:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -101,7 +101,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#bar.svelte-1pmkho9.svelte-1pmkho9{wid
 
 /***/ }),
 
-/***/ 597:
+/***/ 25:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -149,7 +149,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.menu-item.svelte-1cm23t2{font-weight:
 
 /***/ }),
 
-/***/ 591:
+/***/ 37:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -173,7 +173,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `main.svelte-z790iu *{user-select:none}
 
 /***/ }),
 
-/***/ 472:
+/***/ 598:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -221,7 +221,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `main.svelte-mmp2ko *{color:black;font-
 
 /***/ }),
 
-/***/ 800:
+/***/ 911:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -1025,11 +1025,6 @@ module.exports = "export default \"#version 300 es\\nprecision highp float;\\npr
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/publicPath */
-/******/ 	(() => {
-/******/ 		__webpack_require__.p = "/";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/nonce */
@@ -5965,14 +5960,14 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 
 	video0 = new Video_svelte({
 			props: {
-				src: `/images/generative_mograph/OUT (2).mp4`
+				src: window.GIT_LFS_PREPEND + `/images/generative_mograph/OUT (2).mp4`
 			},
 			$$inline: true
 		});
 
 	video1 = new Video_svelte({
 			props: {
-				src: `/images/generative_mograph/OUT (3).mp4`
+				src: window.GIT_LFS_PREPEND + `/images/generative_mograph/OUT (3).mp4`
 			},
 			$$inline: true
 		});
@@ -6172,122 +6167,122 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 			t115 = space();
 			p15 = dom_element("p");
 			p15.textContent = "Hope you enjoyed reading this and feel free to send me stuff you’ve made on discord! :)";
-			add_location(strong, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 12, 9, 517);
-			add_location(h1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 12, 8, 513);
-			add_location(header, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 12, 0, 505);
+			add_location(strong, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 13, 9, 622);
+			add_location(h1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 13, 8, 618);
+			add_location(header, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 13, 0, 610);
 			attr_dev(div0, "class", "date");
-			add_location(div0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 13, 0, 556);
-			add_location(br0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 21, 0, 669);
-			add_location(br1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 22, 0, 676);
+			add_location(div0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 14, 0, 661);
+			add_location(br0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 22, 0, 774);
+			add_location(br1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 23, 0, 781);
 			attr_dev(a0, "href", "https://en.wikipedia.org/wiki/Lightmap");
 			attr_dev(a0, "rel", "nofollow");
-			add_location(a0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 23, 4, 734);
+			add_location(a0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 24, 4, 839);
 			attr_dev(a1, "href", "https://www.pbr-book.org/3ed-2018/Light_Transport_III_Bidirectional_Methods/Bidirectional_Path_Tracing");
 			attr_dev(a1, "rel", "nofollow");
-			add_location(a1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 27, 2, 824);
-			add_location(p0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 23, 0, 681);
-			add_location(p1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 32, 0, 1131);
-			add_location(br2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 33, 0, 1211);
-			add_location(br3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 34, 0, 1216);
+			add_location(a1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 28, 2, 929);
+			add_location(p0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 24, 0, 786);
+			add_location(p1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 33, 0, 1236);
+			add_location(br2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 34, 0, 1316);
+			add_location(br3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 35, 0, 1321);
 			attr_dev(a2, "href", "https://en.wikipedia.org/wiki/Mandelbox");
-			add_location(a2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 49, 0, 1664);
+			add_location(a2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 50, 0, 1794);
 			set_style(div1, "margin-left", "auto");
 			set_style(div1, "margin-right", "auto");
 			set_style(div1, "margin-top", "0.5rem");
-			add_location(div1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 48, 0, 1576);
-			add_location(br4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 51, 0, 1764);
+			add_location(div1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 49, 0, 1706);
+			add_location(br4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 52, 0, 1894);
 			attr_dev(a3, "href", "https://en.wikipedia.org/wiki/Implicit_surface");
 			attr_dev(a3, "rel", "nofollow");
-			add_location(a3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 52, 0, 1845);
-			add_location(p2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 52, 0, 1769);
-			add_location(br5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 59, 0, 2121);
-			add_location(br6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 60, 0, 2126);
-			if (!src_url_equal(img.src, img_src_value = `/blog/lyc-sketch.gif`)) attr_dev(img, "src", img_src_value);
-			add_location(img, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 61, 0, 2131);
+			add_location(a3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 53, 0, 1975);
+			add_location(p2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 53, 0, 1899);
+			add_location(br5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 60, 0, 2251);
+			add_location(br6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 61, 0, 2256);
+			if (!src_url_equal(img.src, img_src_value = window.GIT_LFS_PREPEND + `/blog/lyc-sketch.gif`)) attr_dev(img, "src", img_src_value);
+			add_location(img, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 62, 0, 2261);
 			attr_dev(a4, "href", "https://www.deviantart.com/lyc");
-			add_location(a4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 63, 24, 2266);
+			add_location(a4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 64, 24, 2421);
 			set_style(div2, "margin-left", "auto");
 			set_style(div2, "margin-right", "auto");
 			set_style(div2, "margin-top", "0.5rem");
-			add_location(div2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 62, 0, 2168);
-			add_location(br7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 65, 0, 2325);
-			add_location(p3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 66, 0, 2330);
+			add_location(div2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 63, 0, 2323);
+			add_location(br7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 66, 0, 2480);
+			add_location(p3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 67, 0, 2485);
 			attr_dev(a5, "href", "https://web.archive.org/web/20040131013212/http://lycium.cfxweb.net/");
 			attr_dev(a5, "rel", "nofollow");
-			add_location(a5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 68, 4, 2564);
-			add_location(p4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 68, 0, 2470);
-			add_location(br8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 72, 0, 2735);
-			add_location(hr0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 74, 0, 2766);
+			add_location(a5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 69, 4, 2719);
+			add_location(p4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 69, 0, 2625);
+			add_location(br8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 73, 0, 2890);
+			add_location(hr0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 75, 0, 2921);
 			attr_dev(a6, "href", "https://cs.dartmouth.edu/wjarosz/publications/jarosz12theory.html");
-			add_location(a6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 76, 7, 2789);
-			add_location(br9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 76, 7, 2983);
+			add_location(a6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 77, 7, 2944);
+			add_location(br9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 77, 7, 3138);
 			attr_dev(a7, "href", "https://en.wikipedia.org/wiki/Irradiance");
-			add_location(a7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 77, 8, 2997);
-			add_location(ol0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 75, 0, 2775);
-			add_location(hr1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 79, 0, 3231);
+			add_location(a7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 78, 8, 3152);
+			add_location(ol0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 76, 0, 2930);
+			add_location(hr1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 80, 0, 3386);
 			attr_dev(div3, "class", "footnotes");
-			add_location(div3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 73, 0, 2740);
-			add_location(p5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 81, 0, 3245);
-			add_location(br10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 82, 0, 3390);
-			add_location(br11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 83, 0, 3395);
+			add_location(div3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 74, 0, 2895);
+			add_location(p5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 82, 0, 3400);
+			add_location(br10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 83, 0, 3545);
+			add_location(br11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 84, 0, 3550);
 			set_style(div4, "margin-left", "auto");
 			set_style(div4, "margin-right", "auto");
 			set_style(div4, "margin-top", "0.5rem");
-			add_location(div4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 86, 0, 3536);
-			add_location(br12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 89, 0, 3681);
-			add_location(br13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 90, 0, 3686);
-			add_location(p6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 91, 0, 3691);
-			add_location(li0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 93, 0, 3727);
-			add_location(li1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 94, 0, 3808);
-			add_location(li2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 95, 0, 3902);
-			add_location(li3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 96, 0, 3990);
-			add_location(ol1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 92, 0, 3722);
-			add_location(p7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 98, 0, 4117);
+			add_location(div4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 87, 0, 3716);
+			add_location(br12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 90, 0, 3861);
+			add_location(br13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 91, 0, 3866);
+			add_location(p6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 92, 0, 3871);
+			add_location(li0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 94, 0, 3907);
+			add_location(li1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 95, 0, 3988);
+			add_location(li2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 96, 0, 4082);
+			add_location(li3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 97, 0, 4170);
+			add_location(ol1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 93, 0, 3902);
+			add_location(p7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 99, 0, 4297);
 			attr_dev(pre0, "class", "language-glsl");
-			add_location(pre0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 99, 0, 4167);
-			add_location(p8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 143, 0, 10555);
-			add_location(br14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 144, 0, 10583);
+			add_location(pre0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 100, 0, 4347);
+			add_location(p8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 144, 0, 10735);
+			add_location(br14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 145, 0, 10763);
 			attr_dev(pre1, "class", "language-undefined");
-			add_location(pre1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 145, 0, 10588);
+			add_location(pre1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 146, 0, 10768);
 			attr_dev(a8, "href", "https://www.khronos.org/opengl/wiki/Shader#Execution_and_invocations");
 			attr_dev(a8, "rel", "nofollow");
-			add_location(a8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 147, 3, 10786);
+			add_location(a8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 148, 3, 10966);
 			attr_dev(a9, "href", "https://www.khronos.org/opengl/wiki/Memory_Model#Ensuring_visibility");
 			attr_dev(a9, "rel", "nofollow");
-			add_location(a9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 152, 3, 11060);
-			add_location(li4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 147, 0, 10746);
-			add_location(li5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 157, 0, 11236);
-			add_location(li6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 159, 0, 11454);
-			add_location(ul, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 146, 0, 10741);
+			add_location(a9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 153, 3, 11240);
+			add_location(li4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 148, 0, 10926);
+			add_location(li5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 158, 0, 11416);
+			add_location(li6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 160, 0, 11634);
+			add_location(ul, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 147, 0, 10921);
 			attr_dev(a10, "href", "https://www.khronos.org/opengl/wiki/Type_Qualifier_(GLSL)");
 			attr_dev(a10, "rel", "nofollow");
-			add_location(a10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 162, 0, 11587);
-			add_location(p9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 162, 0, 11567);
-			add_location(br15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 166, 0, 11697);
-			add_location(br16, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 167, 0, 11704);
+			add_location(a10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 163, 0, 11767);
+			add_location(p9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 163, 0, 11747);
+			add_location(br15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 167, 0, 11877);
+			add_location(br16, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 168, 0, 11884);
 			attr_dev(a11, "href", "https://www.shadertoy.com/view/4dX3zl");
-			add_location(a11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 171, 22, 11830);
-			add_location(p10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 168, 0, 11711);
-			add_location(p11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 172, 0, 11917);
+			add_location(a11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 172, 22, 12010);
+			add_location(p10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 169, 0, 11891);
+			add_location(p11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 173, 0, 12097);
 			attr_dev(pre2, "class", "language-glsl");
-			add_location(pre2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 173, 0, 11965);
+			add_location(pre2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 174, 0, 12145);
 			attr_dev(a12, "href", "https://en.wikipedia.org/wiki/Linearizability");
 			attr_dev(a12, "rel", "nofollow");
-			add_location(a12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 198, 2, 19247);
+			add_location(a12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 199, 2, 19427);
 			attr_dev(a13, "href", "https://en.wikipedia.org/wiki/Race_condition");
 			attr_dev(a13, "rel", "nofollow");
-			add_location(a13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 201, 0, 19390);
-			add_location(p12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 198, 0, 19238);
+			add_location(a13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 202, 0, 19570);
+			add_location(p12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 199, 0, 19418);
 			attr_dev(a14, "href", "https://registry.khronos.org/OpenGL/extensions/NV/NV_shader_atomic_float.txt");
 			attr_dev(a14, "rel", "nofollow");
-			add_location(a14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 205, 0, 19568);
+			add_location(a14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 206, 0, 19748);
 			attr_dev(a15, "href", "https://en.wikipedia.org/wiki/Compare-and-swap");
 			attr_dev(a15, "rel", "nofollow");
-			add_location(a15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 209, 4, 19704);
-			add_location(p13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 205, 0, 19486);
-			add_location(p14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 213, 0, 19817);
-			add_location(p15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 214, 0, 19875);
-			add_location(article, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 20, 0, 659);
+			add_location(a15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 210, 4, 19884);
+			add_location(p13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 206, 0, 19666);
+			add_location(p14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 214, 0, 19997);
+			add_location(p15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 215, 0, 20055);
+			add_location(article, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 21, 0, 764);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -6578,11 +6573,8 @@ class _2023_08_18_forward_pathtracing_in_comp_shader extends SvelteComponentDev 
 }
 
 /* harmony default export */ const _2023_08_18_forward_pathtracing_in_comp_shader_svelte = (_2023_08_18_forward_pathtracing_in_comp_shader);
-;// CONCATENATED MODULE: ./public/blog/vorpol_dawn_by_technochroma.jpg
-const vorpol_dawn_by_technochroma_namespaceObject = __webpack_require__.p + "256ac53d3de321bfd317.jpg";
 ;// CONCATENATED MODULE: ./src/components/blog/2023_08_17_flame_fractals_in_comp_shader.svelte
 /* src\components\blog\2023_08_17_flame_fractals_in_comp_shader.svelte generated by Svelte v4.2.0 */
-
 
 
 
@@ -7305,235 +7297,235 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 			t184 = space();
 			p19 = dom_element("p");
 			p19.textContent = "Thanks for reading and I’d love to see what you make!";
-			add_location(strong0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 13, 0, 447);
-			add_location(h1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 13, 0, 443);
-			add_location(header, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 13, 0, 435);
+			add_location(strong0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 12, 4, 362);
+			add_location(h1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 12, 4, 358);
+			add_location(header, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 12, 0, 350);
 			attr_dev(div0, "class", "date");
-			add_location(div0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 14, 0, 486);
-			add_location(br0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 21, 0, 589);
-			add_location(br1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 22, 0, 594);
-			add_location(strong1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 23, 4, 603);
-			add_location(h20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 23, 0, 599);
+			add_location(div0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 13, 0, 401);
+			add_location(br0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 20, 0, 504);
+			add_location(br1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 21, 0, 509);
+			add_location(strong1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 22, 4, 518);
+			add_location(h20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 22, 0, 514);
 			attr_dev(a0, "href", "https://en.wikipedia.org/wiki/Fractal_flame");
 			attr_dev(a0, "rel", "nofollow");
-			add_location(a0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 24, 3, 641);
+			add_location(a0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 23, 3, 556);
 			attr_dev(a1, "href", "https://en.wikipedia.org/wiki/Scott_Draves");
 			attr_dev(a1, "rel", "nofollow");
-			add_location(a1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 28, 23, 838);
+			add_location(a1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 27, 24, 753);
 			attr_dev(a2, "href", "https://flam3.com/flame_draves.pdf");
 			attr_dev(a2, "rel", "nofollow");
-			add_location(a2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 31, 0, 933);
+			add_location(a2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 30, 4, 848);
 			attr_dev(a3, "href", "https://maths-people.anu.edu.au/~john/Assets/Research%20Papers/fractals_self-similarity.pdf");
 			attr_dev(a3, "rel", "nofollow");
-			add_location(a3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 32, 0, 1038);
+			add_location(a3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 31, 0, 953);
 			attr_dev(a4, "href", "https://maths-people.anu.edu.au/~john/Assets/Research%20Papers/fractals_self-similarity.pdf");
 			attr_dev(a4, "rel", "nofollow");
-			add_location(a4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 35, 4, 1213);
-			add_location(p0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 24, 0, 638);
+			add_location(a4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 34, 4, 1128);
+			add_location(p0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 23, 0, 553);
 			attr_dev(a5, "href", "https://github.com/bezo97/IFSRenderer");
 			attr_dev(a5, "rel", "nofollow");
-			add_location(a5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 40, 0, 1444);
+			add_location(a5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 39, 0, 1359);
 			attr_dev(a6, "href", "https://www.chaoticafractals.com");
 			attr_dev(a6, "rel", "nofollow");
-			add_location(a6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 43, 5, 1519);
+			add_location(a6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 42, 5, 1434);
 			attr_dev(a7, "href", "https://github.com/3Dickulus/FragM");
 			attr_dev(a7, "rel", "nofollow");
-			add_location(a7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 46, 4, 1588);
-			add_location(p1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 39, 0, 1370);
-			add_location(br2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 50, 0, 1683);
-			add_location(br3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 51, 0, 1688);
-			if (!src_url_equal(img.src, img_src_value = vorpol_dawn_by_technochroma_namespaceObject)) attr_dev(img, "src", img_src_value);
-			add_location(img, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 53, 0, 1698);
+			add_location(a7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 45, 4, 1503);
+			add_location(p1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 38, 0, 1285);
+			add_location(br2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 49, 0, 1598);
+			add_location(br3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 50, 0, 1603);
+			if (!src_url_equal(img.src, img_src_value = window.GIT_LFS_PREPEND + '/blog/vorpol_dawn_by_technochroma.jpg')) attr_dev(img, "src", img_src_value);
+			add_location(img, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 52, 0, 1613);
 			attr_dev(a8, "href", "https://www.deviantart.com/technochroma/art/Vorpol-Dawn-714213981");
-			add_location(a8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 55, 0, 1803);
+			add_location(a8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 54, 2, 1766);
 			attr_dev(a9, "href", "https://www.technochroma.art");
-			add_location(a9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 55, 34, 1898);
+			add_location(a9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 54, 30, 1861);
 			set_style(div1, "margin-left", "auto");
 			set_style(div1, "margin-right", "auto");
 			set_style(div1, "margin-top", "0.5rem");
-			add_location(div1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 54, 0, 1729);
-			add_location(br4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 57, 0, 1961);
+			add_location(div1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 53, 0, 1692);
+			add_location(br4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 56, 0, 1924);
 			attr_dev(a10, "href", "https://en.wikipedia.org/wiki/Demoscene");
 			attr_dev(a10, "rel", "nofollow");
-			add_location(a10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 58, 53, 2021);
+			add_location(a10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 57, 51, 1984);
 			attr_dev(a11, "href", "https://files.scene.org/view/parties/2019/assembly19/4k/terrarium_by_eos.zip");
 			attr_dev(a11, "rel", "nofollow");
-			add_location(a11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 61, 0, 2166);
-			add_location(p2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 58, 0, 1966);
-			add_location(br5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 65, 0, 2287);
-			add_location(br6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 66, 0, 2292);
+			add_location(a11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 60, 4, 2129);
+			add_location(p2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 57, 0, 1929);
+			add_location(br5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 64, 0, 2250);
+			add_location(br6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 65, 0, 2255);
 			attr_dev(iframe0, "title", "Youtube video");
 			if (!src_url_equal(iframe0.src, iframe0_src_value = `https://www.youtube.com/embed/xLN3mTRlugs?rel=0&modestbranding=1`)) attr_dev(iframe0, "src", iframe0_src_value);
 			attr_dev(iframe0, "frameborder", "0");
 			attr_dev(iframe0, "allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
 			iframe0.allowFullscreen = true;
-			add_location(iframe0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 69, 2, 2339);
-			add_location(div2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 68, 2, 2329);
+			add_location(iframe0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 68, 4, 2302);
+			add_location(div2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 67, 0, 2292);
 			attr_dev(div3, "class", "video-container");
-			add_location(div3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 67, 0, 2297);
+			add_location(div3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 66, 0, 2260);
 			attr_dev(a12, "href", "https://www.pouet.net/prod.php?which=82417");
-			add_location(a12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 73, 0, 2654);
+			add_location(a12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 72, 0, 2617);
 			attr_dev(a13, "href", "https://www.pouet.net/groups.php?which=12701");
-			add_location(a13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 73, 69, 2724);
+			add_location(a13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 72, 0, 2687);
 			set_style(div4, "margin-left", "auto");
 			set_style(div4, "margin-right", "auto");
 			set_style(div4, "margin-top", "0.5rem");
-			add_location(div4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 72, 0, 2580);
-			add_location(br7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 75, 0, 2794);
-			add_location(br8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 76, 0, 2799);
+			add_location(div4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 71, 0, 2543);
+			add_location(br7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 74, 0, 2757);
+			add_location(br8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 75, 0, 2762);
 			attr_dev(a14, "href", "https://github.com/demoscene-source-archive/terrarium/blob/master/src/shaders/fragment.glsl");
 			attr_dev(a14, "rel", "nofollow");
-			add_location(a14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 77, 0, 2853);
-			add_location(p3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 77, 0, 2804);
-			add_location(p4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 81, 0, 2996);
-			add_location(li0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 83, 0, 3069);
-			add_location(em0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 84, 0, 3195);
-			add_location(li1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 84, 0, 3164);
-			add_location(li2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 85, 0, 3231);
-			add_location(li3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 87, 0, 3303);
-			add_location(em1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 88, 0, 3408);
-			add_location(li4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 88, 0, 3341);
-			add_location(li5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 89, 0, 3427);
-			add_location(ul0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 86, 7, 3298);
-			add_location(li6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 86, 0, 3268);
-			add_location(li7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 91, 0, 3515);
-			add_location(ul1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 82, 0, 3064);
-			add_location(br9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 93, 0, 3592);
-			add_location(p5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 94, 0, 3597);
-			add_location(br10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 95, 0, 3656);
-			add_location(br11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 96, 0, 3661);
+			add_location(a14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 76, 49, 2816);
+			add_location(p3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 76, 0, 2767);
+			add_location(p4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 80, 0, 2959);
+			add_location(li0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 82, 0, 3032);
+			add_location(em0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 83, 16, 3158);
+			add_location(li1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 83, 0, 3127);
+			add_location(li2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 84, 0, 3194);
+			add_location(li3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 86, 0, 3266);
+			add_location(em1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 87, 59, 3371);
+			add_location(li4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 87, 0, 3304);
+			add_location(li5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 88, 0, 3390);
+			add_location(ul0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 85, 0, 3261);
+			add_location(li6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 85, 0, 3231);
+			add_location(li7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 90, 0, 3478);
+			add_location(ul1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 81, 0, 3027);
+			add_location(br9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 92, 0, 3555);
+			add_location(p5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 93, 0, 3560);
+			add_location(br10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 94, 0, 3619);
+			add_location(br11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 95, 0, 3624);
 			attr_dev(iframe1, "title", "Youtube video");
 			if (!src_url_equal(iframe1.src, iframe1_src_value = `https://www.youtube.com/embed/kbKtFN71Lfs?rel=0&modestbranding=1`)) attr_dev(iframe1, "src", iframe1_src_value);
 			attr_dev(iframe1, "frameborder", "0");
 			attr_dev(iframe1, "allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
 			iframe1.allowFullscreen = true;
-			add_location(iframe1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 99, 4, 3708);
-			add_location(div5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 98, 1, 3698);
+			add_location(iframe1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 98, 4, 3671);
+			add_location(div5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 97, 0, 3661);
 			attr_dev(div6, "class", "video-container");
-			add_location(div6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 97, 0, 3666);
-			add_location(br12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 102, 0, 3983);
-			add_location(br13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 103, 0, 3988);
+			add_location(div6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 96, 0, 3629);
+			add_location(br12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 101, 0, 3946);
+			add_location(br13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 102, 0, 3951);
 			attr_dev(a15, "href", "https://en.wikipedia.org/wiki/Chaos_game");
 			attr_dev(a15, "rel", "nofollow");
-			add_location(a15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 104, 34, 4027);
+			add_location(a15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 103, 30, 3990);
 			attr_dev(a16, "href", "https://en.wikipedia.org/wiki/Iterated_function_system");
 			attr_dev(a16, "rel", "nofollow");
-			add_location(a16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 107, 24, 4181);
-			add_location(p6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 104, 0, 3993);
+			add_location(a16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 106, 41, 4144);
+			add_location(p6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 103, 0, 3956);
 			attr_dev(a17, "href", "https://en.wikipedia.org/wiki/Tone_mapping");
 			attr_dev(a17, "rel", "nofollow");
-			add_location(a17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 113, 0, 4347);
-			add_location(li8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 113, 0, 4343);
-			add_location(li9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 114, 0, 4476);
-			add_location(ul2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 112, 0, 4338);
+			add_location(a17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 112, 2, 4310);
+			add_location(li8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 112, 0, 4306);
+			add_location(li9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 113, 0, 4439);
+			add_location(ul2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 111, 0, 4301);
 			attr_dev(a18, "href", "https://flam3.com/flame_draves.pdf");
 			attr_dev(a18, "rel", "nofollow");
-			add_location(a18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 116, 12, 4668);
-			add_location(p7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 116, 0, 4626);
-			add_location(br14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 120, 0, 4854);
-			add_location(br15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 121, 0, 4859);
-			add_location(strong2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 122, 4, 4868);
-			add_location(h21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 122, 0, 4864);
+			add_location(a18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 115, 11, 4631);
+			add_location(p7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 115, 0, 4589);
+			add_location(br14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 119, 0, 4817);
+			add_location(br15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 120, 0, 4822);
+			add_location(strong2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 121, 4, 4831);
+			add_location(h21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 121, 0, 4827);
 			attr_dev(pre0, "class", "language-glsl");
-			add_location(pre0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 123, 0, 4900);
-			add_location(br16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 188, 0, 18370);
+			add_location(pre0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 122, 0, 4863);
+			add_location(br16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 187, 0, 18333);
 			attr_dev(pre1, "class", "language-glsl");
-			add_location(pre1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 189, 0, 18375);
+			add_location(pre1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 188, 0, 18338);
 			attr_dev(a19, "href", "https://en.wikipedia.org/wiki/Linearizability");
 			attr_dev(a19, "rel", "nofollow");
-			add_location(a19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 190, 6, 18863);
+			add_location(a19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 189, 9, 18826);
 			attr_dev(a20, "href", "https://en.wikipedia.org/wiki/Race_condition");
 			attr_dev(a20, "rel", "nofollow");
-			add_location(a20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 193, 1, 19006);
-			add_location(p8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 190, 0, 18854);
-			add_location(br17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 197, 0, 19102);
+			add_location(a20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 192, 26, 18969);
+			add_location(p8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 189, 0, 18817);
+			add_location(br17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 196, 0, 19065);
 			attr_dev(pre2, "class", "language-glsl");
-			add_location(pre2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 198, 0, 19107);
+			add_location(pre2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 197, 0, 19070);
 			attr_dev(a21, "href", "https://www.khronos.org/opengl/wiki/Shader#Execution_and_invocations");
 			attr_dev(a21, "rel", "nofollow");
-			add_location(a21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 200, 4, 19632);
+			add_location(a21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 199, 3, 19595);
 			attr_dev(a22, "href", "https://www.khronos.org/opengl/wiki/Memory_Model#Ensuring_visibility");
 			attr_dev(a22, "rel", "nofollow");
-			add_location(a22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 205, 0, 19906);
-			add_location(li10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 200, 0, 19592);
-			add_location(li11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 210, 0, 20082);
-			add_location(li12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 212, 0, 20300);
-			add_location(ul3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 199, 0, 19587);
+			add_location(a22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 204, 9, 19869);
+			add_location(li10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 199, 0, 19555);
+			add_location(li11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 209, 0, 20045);
+			add_location(li12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 211, 0, 20263);
+			add_location(ul3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 198, 0, 19550);
 			attr_dev(a23, "href", "https://www.khronos.org/opengl/wiki/Type_Qualifier_(GLSL)");
 			attr_dev(a23, "rel", "nofollow");
-			add_location(a23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 215, 6, 20433);
-			add_location(p9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 215, 0, 20413);
-			add_location(br18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 219, 0, 20543);
-			add_location(strong3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 220, 0, 20552);
-			add_location(h22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 220, 0, 20548);
+			add_location(a23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 214, 8, 20396);
+			add_location(p9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 214, 0, 20376);
+			add_location(br18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 218, 0, 20506);
+			add_location(strong3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 219, 4, 20515);
+			add_location(h22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 219, 0, 20511);
 			attr_dev(pre3, "class", "language-glsl");
-			add_location(pre3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 221, 0, 20590);
-			add_location(br19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 237, 0, 26275);
-			add_location(p10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 238, 0, 26280);
+			add_location(pre3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 220, 0, 20553);
+			add_location(br19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 236, 0, 26238);
+			add_location(p10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 237, 0, 26243);
 			attr_dev(a24, "href", "https://en.wikipedia.org/wiki/Affine_transformation");
 			attr_dev(a24, "rel", "nofollow");
-			add_location(a24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 239, 20, 26382);
-			add_location(p11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 239, 0, 26321);
+			add_location(a24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 238, 25, 26345);
+			add_location(p11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 238, 0, 26284);
 			attr_dev(a25, "href", "https://en.wikipedia.org/wiki/Inversive_geometry");
 			attr_dev(a25, "rel", "nofollow");
-			add_location(a25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 243, 3, 26521);
-			add_location(code, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 246, 0, 26624);
+			add_location(a25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 242, 3, 26484);
+			add_location(code, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 245, 1, 26587);
 			attr_dev(a26, "href", "https://en.wikipedia.org/wiki/M%C3%B6bius_transformation");
 			attr_dev(a26, "rel", "nofollow");
-			add_location(a26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 246, 0, 26673);
+			add_location(a26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 245, 1, 26636);
 			attr_dev(a27, "href", "https://en.wikipedia.org/wiki/Conformal_map");
 			attr_dev(a27, "rel", "nofollow");
-			add_location(a27, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 250, 56, 26867);
-			add_location(p12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 243, 0, 26518);
-			add_location(br20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 254, 0, 27001);
+			add_location(a27, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 249, 0, 26830);
+			add_location(p12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 242, 0, 26481);
+			add_location(br20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 253, 0, 26964);
 			attr_dev(iframe2, "title", "Youtube video");
 			if (!src_url_equal(iframe2.src, iframe2_src_value = `https://www.youtube.com/embed/IAPf1ZYfm-s?rel=0&modestbranding=1`)) attr_dev(iframe2, "src", iframe2_src_value);
 			attr_dev(iframe2, "frameborder", "0");
 			attr_dev(iframe2, "allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
 			iframe2.allowFullscreen = true;
-			add_location(iframe2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 257, 1, 27048);
-			add_location(div7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 256, 0, 27038);
+			add_location(iframe2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 256, 0, 27011);
+			add_location(div7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 255, 1, 27001);
 			attr_dev(div8, "class", "video-container");
-			add_location(div8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 255, 0, 27006);
-			add_location(br21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 260, 0, 27289);
-			add_location(br22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 261, 0, 27294);
+			add_location(div8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 254, 0, 26969);
+			add_location(br21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 259, 0, 27252);
+			add_location(br22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 260, 0, 27257);
 			attr_dev(a28, "href", "https://github.com/bezo97/IFSRenderer");
 			attr_dev(a28, "rel", "nofollow");
-			add_location(a28, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 262, 1, 27302);
+			add_location(a28, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 261, 3, 27265);
 			attr_dev(a29, "href", "https://github.com/bezo97/IFSTransforms/tree/3ad08c70a1149dbc946baca68708a3beb05f2e9f/Transforms");
 			attr_dev(a29, "rel", "nofollow");
-			add_location(a29, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 262, 82, 27383);
-			add_location(p13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 262, 0, 27299);
-			add_location(br23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 266, 0, 27582);
-			add_location(strong4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 267, 3, 27591);
-			add_location(h23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 267, 0, 27587);
+			add_location(a29, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 261, 21, 27346);
+			add_location(p13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 261, 0, 27262);
+			add_location(br23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 265, 0, 27545);
+			add_location(strong4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 266, 0, 27554);
+			add_location(h23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 266, 0, 27550);
 			attr_dev(a30, "href", "https://flam3.com/flame_draves.pdf");
 			attr_dev(a30, "rel", "nofollow");
-			add_location(a30, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 268, 29, 27676);
-			add_location(p14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 268, 0, 27635);
-			add_location(p15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 272, 0, 27902);
+			add_location(a30, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 267, 7, 27639);
+			add_location(p14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 267, 0, 27598);
+			add_location(p15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 271, 0, 27865);
 			attr_dev(a31, "href", "https://64.github.io/tonemapping/");
 			attr_dev(a31, "rel", "nofollow");
-			add_location(a31, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 273, 3, 28069);
-			add_location(p16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 273, 0, 27947);
+			add_location(a31, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 272, 71, 28032);
+			add_location(p16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 272, 0, 27910);
 			attr_dev(a32, "href", "https://www-old.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf");
 			attr_dev(a32, "rel", "nofollow");
-			add_location(a32, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 277, 53, 28261);
-			add_location(p17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 277, 0, 28161);
-			add_location(br24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 283, 2, 28603);
+			add_location(a32, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 276, 0, 28224);
+			add_location(p17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 276, 0, 28124);
+			add_location(br24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 282, 1, 28566);
 			attr_dev(pre4, "class", "language-glsl");
-			add_location(pre4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 284, 1, 28608);
-			add_location(strong5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32695);
-			add_location(h24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32691);
+			add_location(pre4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 284, 1, 28571);
+			add_location(strong5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32658);
+			add_location(h24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32654);
 			attr_dev(a33, "href", "https://www.pouet.net/prod.php?which=82417");
 			attr_dev(a33, "rel", "nofollow");
-			add_location(a33, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32735);
-			add_location(p18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32732);
-			add_location(br25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32989);
+			add_location(a33, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32698);
+			add_location(p18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32695);
+			add_location(br25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32952);
 			attr_dev(pre5, "class", "language-glsl");
-			add_location(pre5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32994);
-			add_location(br26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 35065);
-			add_location(p19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 35070);
+			add_location(pre5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32957);
+			add_location(br26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 35028);
+			add_location(p19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 35033);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -8011,7 +8003,6 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_instance($$self, $$pro
 	$$self.$capture_state = () => ({
 		onDestroy: onDestroy,
 		onMount: onMount,
-		technochroma_art: vorpol_dawn_by_technochroma_namespaceObject,
 		Video: Video_svelte,
 		date,
 		title,
@@ -8403,29 +8394,29 @@ function Bar_svelte_create_fragment(ctx) {
 			create_component(link4.$$.fragment);
 			t11 = space();
 			create_component(link5.$$.fragment);
-			attr_dev(mark, "class", "svelte-5qyb4t");
-			add_location(mark, Bar_svelte_file, -1, 36025);
+			attr_dev(mark, "class", "svelte-wshlq5");
+			add_location(mark, Bar_svelte_file, -1, 36016);
 			attr_dev(a0, "href", "/");
-			attr_dev(a0, "class", a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[1] + " svelte-5qyb4t");
-			add_location(a0, Bar_svelte_file, -1, 35955);
+			attr_dev(a0, "class", a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[1] + " svelte-wshlq5");
+			add_location(a0, Bar_svelte_file, -1, 35946);
 			attr_dev(a1, "href", "/");
-			attr_dev(a1, "class", a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[1] + " svelte-5qyb4t");
-			add_location(a1, Bar_svelte_file, -1, 36060);
+			attr_dev(a1, "class", a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[1] + " svelte-wshlq5");
+			add_location(a1, Bar_svelte_file, -1, 36051);
 			attr_dev(a2, "href", "/");
-			attr_dev(a2, "class", a2_class_value = "logo " + /*hovered_class*/ ctx[1] + " svelte-5qyb4t");
-			add_location(a2, Bar_svelte_file, -1, 36146);
+			attr_dev(a2, "class", a2_class_value = "logo " + /*hovered_class*/ ctx[1] + " svelte-wshlq5");
+			add_location(a2, Bar_svelte_file, -1, 36137);
 			attr_dev(div0, "id", "menu");
-			attr_dev(div0, "class", "svelte-5qyb4t");
-			add_location(div0, Bar_svelte_file, -1, 36250);
+			attr_dev(div0, "class", "svelte-wshlq5");
+			add_location(div0, Bar_svelte_file, -1, 36241);
 			attr_dev(div1, "id", "menu");
-			attr_dev(div1, "class", "svelte-5qyb4t");
-			add_location(div1, Bar_svelte_file, -1, 36542);
+			attr_dev(div1, "class", "svelte-wshlq5");
+			add_location(div1, Bar_svelte_file, -1, 36533);
 			attr_dev(div2, "id", "menus");
-			attr_dev(div2, "class", "svelte-5qyb4t");
-			add_location(div2, Bar_svelte_file, -1, 36231);
+			attr_dev(div2, "class", "svelte-wshlq5");
+			add_location(div2, Bar_svelte_file, -1, 36222);
 			attr_dev(nav, "id", "bar");
-			attr_dev(nav, "class", "svelte-5qyb4t");
-			add_location(nav, Bar_svelte_file, -1, 35939);
+			attr_dev(nav, "class", "svelte-wshlq5");
+			add_location(nav, Bar_svelte_file, -1, 35930);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -8465,15 +8456,15 @@ function Bar_svelte_create_fragment(ctx) {
 			current = true;
 		},
 		p: function update(ctx, [dirty]) {
-			if (!current || dirty & /*hovered_class*/ 2 && a0_class_value !== (a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[1] + " svelte-5qyb4t")) {
+			if (!current || dirty & /*hovered_class*/ 2 && a0_class_value !== (a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[1] + " svelte-wshlq5")) {
 				attr_dev(a0, "class", a0_class_value);
 			}
 
-			if (!current || dirty & /*hovered_class*/ 2 && a1_class_value !== (a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[1] + " svelte-5qyb4t")) {
+			if (!current || dirty & /*hovered_class*/ 2 && a1_class_value !== (a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[1] + " svelte-wshlq5")) {
 				attr_dev(a1, "class", a1_class_value);
 			}
 
-			if (!current || dirty & /*hovered_class*/ 2 && a2_class_value !== (a2_class_value = "logo " + /*hovered_class*/ ctx[1] + " svelte-5qyb4t")) {
+			if (!current || dirty & /*hovered_class*/ 2 && a2_class_value !== (a2_class_value = "logo " + /*hovered_class*/ ctx[1] + " svelte-wshlq5")) {
 				attr_dev(a2, "class", a2_class_value);
 			}
 
@@ -8631,9 +8622,9 @@ class Bar extends SvelteComponentDev {
 // EXTERNAL MODULE: ./public/brightness_6_FILL0_wght400_GRAD0_opsz48.svg
 var brightness_6_FILL0_wght400_GRAD0_opsz48 = __webpack_require__(567);
 var brightness_6_FILL0_wght400_GRAD0_opsz48_default = /*#__PURE__*/__webpack_require__.n(brightness_6_FILL0_wght400_GRAD0_opsz48);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Footer.svelte.10.css!./src/components/Footer.svelte
-var Footer_svelte = __webpack_require__(284);
-;// CONCATENATED MODULE: ./src/components/Footer.svelte.10.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Footer.svelte.10.css!./src/components/Footer.svelte
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Footer.svelte.9.css!./src/components/Footer.svelte
+var Footer_svelte = __webpack_require__(63);
+;// CONCATENATED MODULE: ./src/components/Footer.svelte.9.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Footer.svelte.9.css!./src/components/Footer.svelte
 
       
       
@@ -10373,9 +10364,9 @@ function calcSeekLimit(containerWidth, targetRowHeight) {
   }
 }
 
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Gallery.svelte.9.css!./src/components/Gallery.svelte
-var Gallery_svelte = __webpack_require__(597);
-;// CONCATENATED MODULE: ./src/components/Gallery.svelte.9.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Gallery.svelte.9.css!./src/components/Gallery.svelte
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Gallery.svelte.10.css!./src/components/Gallery.svelte
+var Gallery_svelte = __webpack_require__(25);
+;// CONCATENATED MODULE: ./src/components/Gallery.svelte.10.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Gallery.svelte.10.css!./src/components/Gallery.svelte
 
       
       
@@ -13176,9 +13167,9 @@ class ProjectsPage extends SvelteComponentDev {
 
 /* harmony default export */ const src_components_projectsPage_svelte = (ProjectsPage);
 
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/aboutPage.svelte.5.css!./src/components/aboutPage.svelte
-var aboutPage_svelte = __webpack_require__(472);
-;// CONCATENATED MODULE: ./src/components/aboutPage.svelte.5.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/aboutPage.svelte.5.css!./src/components/aboutPage.svelte
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/aboutPage.svelte.4.css!./src/components/aboutPage.svelte
+var aboutPage_svelte = __webpack_require__(598);
+;// CONCATENATED MODULE: ./src/components/aboutPage.svelte.4.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/aboutPage.svelte.4.css!./src/components/aboutPage.svelte
 
       
       
@@ -17709,9 +17700,9 @@ class VertexBuffer {
     }
 }
 
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Splash.svelte.4.css!./src/components/Splash.svelte
-var Splash_svelte = __webpack_require__(591);
-;// CONCATENATED MODULE: ./src/components/Splash.svelte.4.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Splash.svelte.4.css!./src/components/Splash.svelte
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Splash.svelte.6.css!./src/components/Splash.svelte
+var Splash_svelte = __webpack_require__(37);
+;// CONCATENATED MODULE: ./src/components/Splash.svelte.6.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/Splash.svelte.6.css!./src/components/Splash.svelte
 
       
       
@@ -18191,9 +18182,9 @@ class Splash extends SvelteComponentDev {
 
 /* harmony default export */ const src_components_Splash_svelte = (Splash);
 
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/blogPage.svelte.6.css!./src/components/blogPage.svelte
-var blogPage_svelte = __webpack_require__(800);
-;// CONCATENATED MODULE: ./src/components/blogPage.svelte.6.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/blogPage.svelte.6.css!./src/components/blogPage.svelte
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/blogPage.svelte.5.css!./src/components/blogPage.svelte
+var blogPage_svelte = __webpack_require__(911);
+;// CONCATENATED MODULE: ./src/components/blogPage.svelte.5.css!=!./node_modules/svelte-loader/index.js?cssPath=D:/Programming/Web Development/wrighter.design/src/components/blogPage.svelte.5.css!./src/components/blogPage.svelte
 
       
       
