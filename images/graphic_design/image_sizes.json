@@ -110,31 +110,6 @@
             "height": 4000,
             "has_thumb": true
         },
-        "502.png": {
-            "width": 2480,
-            "height": 2208,
-            "has_thumb": true
-        },
-        "505-01.png": {
-            "width": 1920,
-            "height": 1080,
-            "has_thumb": true
-        },
-        "506-out.png": {
-            "width": 1920,
-            "height": 1080,
-            "has_thumb": true
-        },
-        "509.png": {
-            "width": 2309,
-            "height": 2250,
-            "has_thumb": true
-        },
-        "542.png": {
-            "width": 2500,
-            "height": 2503,
-            "has_thumb": true
-        },
         "555.png": {
             "width": 2319,
             "height": 3000,
@@ -143,16 +118,6 @@
         "583-\u043e\u0443\u0442.png": {
             "width": 1500,
             "height": 1500,
-            "has_thumb": true
-        },
-        "587.png": {
-            "width": 1620,
-            "height": 1080,
-            "has_thumb": true
-        },
-        "588.png": {
-            "width": 3240,
-            "height": 2160,
             "has_thumb": true
         },
         "591.png": {
@@ -185,11 +150,6 @@
             "height": 3168,
             "has_thumb": true
         },
-        "938.png": {
-            "width": 2825,
-            "height": 2959,
-            "has_thumb": true
-        },
         "940.png": {
             "width": 2495,
             "height": 3230,
@@ -198,11 +158,6 @@
         "995_out.png": {
             "width": 4416,
             "height": 6092,
-            "has_thumb": true
-        },
-        "nextversion952-in.png": {
-            "width": 6000,
-            "height": 3486,
             "has_thumb": true
         }
     }

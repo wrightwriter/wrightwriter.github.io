@@ -1,0 +1,29 @@
+{
+    "media_sizes": {
+        "3lSyRh.jpg": {
+            "width": 800,
+            "height": 450,
+            "has_thumb": false
+        },
+        "581-v1.png": {
+            "width": 1155,
+            "height": 825,
+            "has_thumb": false
+        },
+        "746-rc-a.png": {
+            "width": 1280,
+            "height": 720,
+            "has_thumb": false
+        },
+        "download.png": {
+            "width": 2560,
+            "height": 1440,
+            "has_thumb": true
+        },
+        "unknown2.png": {
+            "width": 1104,
+            "height": 816,
+            "has_thumb": false
+        }
+    }
+}

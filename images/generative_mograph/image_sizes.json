@@ -1,0 +1,159 @@
+{
+    "media_sizes": {
+        "123.gif": {
+            "width": 512,
+            "height": 512,
+            "has_thumb": false
+        },
+        "126.gif": {
+            "width": 256,
+            "height": 256,
+            "has_thumb": false
+        },
+        "129.gif": {
+            "width": 400,
+            "height": 400,
+            "has_thumb": false
+        },
+        "166.mp4": {
+            "width": 640,
+            "height": 400,
+            "has_thumb": false
+        },
+        "1XTPsDi.mp4": {
+            "width": 960,
+            "height": 536,
+            "has_thumb": false
+        },
+        "capture (51).mp4": {
+            "width": 1000,
+            "height": 1000,
+            "has_thumb": false
+        },
+        "capture (59).webm": {
+            "width": 1000,
+            "height": 1000,
+            "has_thumb": false
+        },
+        "capture (60).mp4": {
+            "width": 1100,
+            "height": 700,
+            "has_thumb": false
+        },
+        "capture (61).mp4": {
+            "width": 1100,
+            "height": 900,
+            "has_thumb": false
+        },
+        "capture (71).mp4": {
+            "width": 800,
+            "height": 450,
+            "has_thumb": false
+        },
+        "capture - 2021-01-25T215853.813.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-02-04T235908.915.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-02-06T155448.767.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-02-15T183608.531.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-02-22T191650.873.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-02-23T135750.665.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-02-23T161035.355.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-02-23T161035.355.webm": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-02-24T174055.362.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "capture - 2021-04-01T215056.436.mp4": {
+            "width": 640,
+            "height": 360,
+            "has_thumb": false
+        },
+        "chrome_foG6RANRoM.mp4": {
+            "width": 874,
+            "height": 488,
+            "has_thumb": false
+        },
+        "chrome_ibz88JN1To.mp4": {
+            "width": 792,
+            "height": 438,
+            "has_thumb": false
+        },
+        "chrome_RazqupSsRS.mp4": {
+            "width": 794,
+            "height": 440,
+            "has_thumb": false
+        },
+        "chrome_UDlKJV4jdZ.mp4": {
+            "width": 784,
+            "height": 438,
+            "has_thumb": false
+        },
+        "chrome_xOHw6iea45.mp4": {
+            "width": 798,
+            "height": 442,
+            "has_thumb": false
+        },
+        "OUT (1).mp4": {
+            "width": 900,
+            "height": 900,
+            "has_thumb": false
+        },
+        "OUT (2).mp4": {
+            "width": 900,
+            "height": 900,
+            "has_thumb": false
+        },
+        "OUT (3).mp4": {
+            "width": 900,
+            "height": 900,
+            "has_thumb": false
+        },
+        "pOiFoUR.mp4": {
+            "width": 960,
+            "height": 960,
+            "has_thumb": false
+        },
+        "soDroUS.gif": {
+            "width": 500,
+            "height": 500,
+            "has_thumb": false
+        },
+        "WQC0rBl.mp4": {
+            "width": 960,
+            "height": 960,
+            "has_thumb": false
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "media_sizes": {
+        "1033.png": {
+            "width": 1920,
+            "height": 1480,
+            "has_thumb": true
+        },
+        "1124-2.png": {
+            "width": 1920,
+            "height": 2680,
+            "has_thumb": true
+        },
+        "302-o.png": {
+            "width": 447,
+            "height": 373,
+            "has_thumb": false
+        }
+    }
+}

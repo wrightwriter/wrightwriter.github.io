@@ -10,8 +10,20 @@
   src: url("./Petrona-Italic-VariableFont_wght.ttf") format("truetype");
   font-style: italic;
 }
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: url("./JetBrainsMono-Regular.ttf") format("truetype");
+}
+
+/* @import url("./prism-gruvbox-dark.css"); */
+@import url("./prism-coy-without-shadows.css");
 
 
+code * {
+  font-family: "JetBrains Mono";
+}
 * {
   -webkit-tap-highlight-color: transparent;
   --main-max-width: 40rem;

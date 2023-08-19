@@ -2,8 +2,12 @@ import os
 import json
 import pathlib
 from pathlib import Path
+import sys
 
 from PIL import Image
+
+sys.stdout.reconfigure(encoding='utf-8')
+
 
 THRESHOLD_PIXELS = 1_500_000
 
@@ -25,15 +29,18 @@ def generate_thumbnail(image_path, filename, width, height):
     pixel_count = width * height
 
     if pixel_count > THRESHOLD_PIXELS:
-        ratio = THRESHOLD_PIXELS / pixel_count
-        img = Image.open(image_path)
-        img = img.convert('RGB')
-        print("w/h " + str(width) + " " + str(height))
-        print("pixel count " + str(pixel_count))
-        print("ratio " + str(ratio))
-        img.thumbnail((width * ratio, height * ratio))
         thumbnail_path = str(folder_path) + '/_thumb_' + os.path.splitext(filename)[0] + '.jpg'
-        img.save(thumbnail_path, format='JPEG')
+        if not Path(thumbnail_path).exists():
+            ratio = THRESHOLD_PIXELS / pixel_count
+            img = Image.open(image_path)
+            img = img.convert('RGB')
+            # print("w/h " + str(width) + " " + str(height))
+            # print("pixel count " + str(pixel_count))
+            # print("ratio " + str(ratio))
+            img.thumbnail((width * ratio, height * ratio))
+            img.save(thumbnail_path, format='JPEG')
+        else:
+            print("--------------- THUMB ALREADY EXISTS")
         return thumbnail_path
     else:
         return None
@@ -70,7 +77,7 @@ def process_folders(root_folder):
             generate_json_file(root, media_sizes)
 
 # Get the directory where the script is located
-script_dir = pathlib.Path().absolute()
+script_dir = Path(__file__).resolve().parent
 # script_dir = os.getcwd()
 print(script_dir)
 
