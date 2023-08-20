@@ -21,6 +21,8 @@
 @import url("./prism-coy-without-shadows.css");
 
 
+
+
 code * {
   font-family: "JetBrains Mono";
 }
@@ -29,6 +31,8 @@ code * {
   --main-max-width: 40rem;
   --text-font-weight: 500;
   --link-font-weight: 800;
+  --accent-light: orange;
+  --accent-dark: white;
 }
 
 body {
@@ -40,7 +44,7 @@ body {
   margin: 0px;
   width: 100%;
   height: 100%;
-  background: white;
+  background: var(--accent-light);
   /* filter: invert() hue-rotate(2.14rad) saturate(0.5); */
 
 }
