@@ -615,7 +615,7 @@ module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 -960 960
 /***/ ((module) => {
 
 "use strict";
-module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\n\\n#ifndef SPECTRAL\\n#define SPECTRAL\\n\\nconst int SPECTRAL_SIZE = 38;\\nconst float SPECTRAL_GAMMA = 2.4;\\nconst float SPECTRAL_EPSILON = 0.0001;\\n\\nfloat spectral_uncompand(float x) {\\n  return (x < 0.04045) ? x / 12.92 : pow((x + 0.055) / 1.055, SPECTRAL_GAMMA);\\n}\\n\\nfloat spectral_compand(float x) {\\n  return (x < 0.0031308) ? x * 12.92 : 1.055 * pow(x, 1.0 / SPECTRAL_GAMMA) - 0.055;\\n}\\n\\nvec3 spectral_srgb_to_linear(vec3 srgb) {\\n    return vec3(spectral_uncompand(srgb[0]), spectral_uncompand(srgb[1]), spectral_uncompand(srgb[2]));\\n}\\n\\nvec3 spectral_linear_to_srgb(vec3 lrgb) {\\n    return clamp(vec3(spectral_compand(lrgb[0]), spectral_compand(lrgb[1]), spectral_compand(lrgb[2])), 0.0, 1.0);\\n}\\n\\nvoid spectral_upsampling(vec3 lrgb, out float w, out float c, out float m, out float y, out float r, out float g, out float b) {\\n    w = min(lrgb.r, min(lrgb.g, lrgb.b));\\n\\n    lrgb -= w;\\n\\n    c = min(lrgb.g, lrgb.b);\\n    m = min(lrgb.r, lrgb.b);\\n    y = min(lrgb.r, lrgb.g);\\n    r = min(max(0., lrgb.r - lrgb.b), max(0., lrgb.r - lrgb.g));\\n    g = min(max(0., lrgb.g - lrgb.b), max(0., lrgb.g - lrgb.r));\\n    b = min(max(0., lrgb.b - lrgb.g), max(0., lrgb.b - lrgb.r));\\n}\\n\\nvoid spectral_linear_to_reflectance(vec3 lrgb, inout float R[SPECTRAL_SIZE]) {\\n    float w, c, m, y, r, g, b;\\n    \\n    spectral_upsampling(lrgb, w, c, m, y, r, g, b);\\n    \\n     R[0] = max(SPECTRAL_EPSILON, w + c * 0.96853629 + m * 0.51567122 + y * 0.02055257 + r * 0.03147571 + g * 0.49108579 + b * 0.97901834);\\n     R[1] = max(SPECTRAL_EPSILON, w + c * 0.96855103 + m * 0.54015520 + y * 0.02059936 + r * 0.03146636 + g * 0.46944057 + b * 0.97901649);\\n     R[2] = max(SPECTRAL_EPSILON, w + c * 0.96859338 + m * 0.62645502 + y * 0.02062723 + r * 0.03140624 + g * 0.40165780 + b * 0.97901118);\\n     R[3] = max(SPECTRAL_EPSILON, w + c * 0.96877345 + m * 0.75595012 + y * 0.02073387 + r * 0.03119611 + g * 0.24490420 + b * 0.97892146);\\n     R[4] = max(SPECTRAL_EPSILON, w + c * 0.96942204 + m * 0.92826996 + y * 0.02114202 + r * 0.03053888 + g * 0.06826880 + b * 0.97858555);\\n     R[5] = max(SPECTRAL_EPSILON, w + c * 0.97143709 + m * 0.97223624 + y * 0.02233154 + r * 0.02856855 + g * 0.02732883 + b * 0.97743705);\\n     R[6] = max(SPECTRAL_EPSILON, w + c * 0.97541862 + m * 0.98616174 + y * 0.02556857 + r * 0.02459485 + g * 0.01360600 + b * 0.97428075);\\n     R[7] = max(SPECTRAL_EPSILON, w + c * 0.98074186 + m * 0.98955255 + y * 0.03330189 + r * 0.01929520 + g * 0.01000187 + b * 0.96663223);\\n     R[8] = max(SPECTRAL_EPSILON, w + c * 0.98580992 + m * 0.98676237 + y * 0.05185294 + r * 0.01423112 + g * 0.01284127 + b * 0.94822893);\\n     R[9] = max(SPECTRAL_EPSILON, w + c * 0.98971194 + m * 0.97312575 + y * 0.10087639 + r * 0.01033111 + g * 0.02636635 + b * 0.89937713);\\n    R[10] = max(SPECTRAL_EPSILON, w + c * 0.99238027 + m * 0.91944277 + y * 0.24000413 + r * 0.00765876 + g * 0.07058713 + b * 0.76070164);\\n    R[11] = max(SPECTRAL_EPSILON, w + c * 0.99409844 + m * 0.32564851 + y * 0.53589066 + r * 0.00593693 + g * 0.70421692 + b * 0.46420440);\\n    R[12] = max(SPECTRAL_EPSILON, w + c * 0.99517200 + m * 0.13820628 + y * 0.79874659 + r * 0.00485616 + g * 0.85473994 + b * 0.20123039);\\n    R[13] = max(SPECTRAL_EPSILON, w + c * 0.99576545 + m * 0.05015143 + y * 0.91186529 + r * 0.00426186 + g * 0.95081565 + b * 0.08808402);\\n    R[14] = max(SPECTRAL_EPSILON, w + c * 0.99593552 + m * 0.02912336 + y * 0.95399623 + r * 0.00409039 + g * 0.97170370 + b * 0.04592894);\\n    R[15] = max(SPECTRAL_EPSILON, w + c * 0.99564041 + m * 0.02421691 + y * 0.97137099 + r * 0.00438375 + g * 0.97651888 + b * 0.02860373);\\n    R[16] = max(SPECTRAL_EPSILON, w + c * 0.99464769 + m * 0.02660696 + y * 0.97939505 + r * 0.00537525 + g * 0.97429245 + b * 0.02060067);\\n    R[17] = max(SPECTRAL_EPSILON, w + c * 0.99229579 + m * 0.03407586 + y * 0.98345207 + r * 0.00772962 + g * 0.97012917 + b * 0.01656701);\\n    R[18] = max(SPECTRAL_EPSILON, w + c * 0.98638762 + m * 0.04835936 + y * 0.98553736 + r * 0.01366120 + g * 0.94258630 + b * 0.01451549);\\n    R[19] = max(SPECTRAL_EPSILON, w + c * 0.96829712 + m * 0.00011720 + y * 0.98648905 + r * 0.03181352 + g * 0.99989207 + b * 0.01357964);\\n    R[20] = max(SPECTRAL_EPSILON, w + c * 0.89228016 + m * 0.00008554 + y * 0.98674535 + r * 0.10791525 + g * 0.99989891 + b * 0.01331243);\\n    R[21] = max(SPECTRAL_EPSILON, w + c * 0.53740239 + m * 0.85267882 + y * 0.98657555 + r * 0.46249516 + g * 0.13823139 + b * 0.01347661);\\n    R[22] = max(SPECTRAL_EPSILON, w + c * 0.15360445 + m * 0.93188793 + y * 0.98611877 + r * 0.84604333 + g * 0.06968113 + b * 0.01387181);\\n    R[23] = max(SPECTRAL_EPSILON, w + c * 0.05705719 + m * 0.94810268 + y * 0.98559942 + r * 0.94275572 + g * 0.05628787 + b * 0.01435472);\\n    R[24] = max(SPECTRAL_EPSILON, w + c * 0.03126539 + m * 0.94200977 + y * 0.98507063 + r * 0.96860996 + g * 0.06111561 + b * 0.01479836);\\n    R[25] = max(SPECTRAL_EPSILON, w + c * 0.02205445 + m * 0.91478045 + y * 0.98460039 + r * 0.97783966 + g * 0.08987709 + b * 0.01515250);\\n    R[26] = max(SPECTRAL_EPSILON, w + c * 0.01802271 + m * 0.87065445 + y * 0.98425301 + r * 0.98187757 + g * 0.13656016 + b * 0.01540513);\\n    R[27] = max(SPECTRAL_EPSILON, w + c * 0.01613460 + m * 0.78827548 + y * 0.98403909 + r * 0.98377315 + g * 0.22169624 + b * 0.01557233);\\n    R[28] = max(SPECTRAL_EPSILON, w + c * 0.01520947 + m * 0.65738359 + y * 0.98388535 + r * 0.98470202 + g * 0.32176956 + b * 0.01565710);\\n    R[29] = max(SPECTRAL_EPSILON, w + c * 0.01475977 + m * 0.59909403 + y * 0.98376116 + r * 0.98515481 + g * 0.36157329 + b * 0.01571025);\\n    R[30] = max(SPECTRAL_EPSILON, w + c * 0.01454263 + m * 0.56817268 + y * 0.98368246 + r * 0.98537114 + g * 0.48361920 + b * 0.01571916);\\n    R[31] = max(SPECTRAL_EPSILON, w + c * 0.01444459 + m * 0.54031997 + y * 0.98365023 + r * 0.98546685 + g * 0.46488579 + b * 0.01572133);\\n    R[32] = max(SPECTRAL_EPSILON, w + c * 0.01439897 + m * 0.52110241 + y * 0.98361309 + r * 0.98550011 + g * 0.47440306 + b * 0.01572502);\\n    R[33] = max(SPECTRAL_EPSILON, w + c * 0.01437620 + m * 0.51041094 + y * 0.98357259 + r * 0.98551031 + g * 0.48576990 + b * 0.01571717);\\n    R[34] = max(SPECTRAL_EPSILON, w + c * 0.01436343 + m * 0.50526577 + y * 0.98353856 + r * 0.98550741 + g * 0.49267971 + b * 0.01571905);\\n    R[35] = max(SPECTRAL_EPSILON, w + c * 0.01435687 + m * 0.50255080 + y * 0.98351247 + r * 0.98551323 + g * 0.49625685 + b * 0.01571059);\\n    R[36] = max(SPECTRAL_EPSILON, w + c * 0.01435370 + m * 0.50126452 + y * 0.98350101 + r * 0.98551563 + g * 0.49807754 + b * 0.01569728);\\n    R[37] = max(SPECTRAL_EPSILON, w + c * 0.01435408 + m * 0.50083021 + y * 0.98350852 + r * 0.98551547 + g * 0.49889859 + b * 0.01570020);\\n}\\n\\nvec3 spectral_xyz_to_srgb(vec3 xyz) {\\n    mat3 XYZ_RGB;\\n\\n    XYZ_RGB[0] = vec3( 3.24306333, -1.53837619, -0.49893282);\\n    XYZ_RGB[1] = vec3(-0.96896309,  1.87542451,  0.04154303);\\n    XYZ_RGB[2] = vec3( 0.05568392, -0.20417438,  1.05799454);\\n    \\n    float r = dot(XYZ_RGB[0], xyz);\\n    float g = dot(XYZ_RGB[1], xyz);\\n    float b = dot(XYZ_RGB[2], xyz);\\n\\n    return spectral_linear_to_srgb(vec3(r, g, b));\\n}\\n\\nvec3 spectral_reflectance_to_xyz(float R[SPECTRAL_SIZE]) {\\n    vec3 xyz = vec3(0.0);\\n    \\n    xyz +=  R[0] * vec3(0.00006469, 0.00000184, 0.00030502);\\n    xyz +=  R[1] * vec3(0.00021941, 0.00000621, 0.00103681);\\n    xyz +=  R[2] * vec3(0.00112057, 0.00003101, 0.00531314);\\n    xyz +=  R[3] * vec3(0.00376661, 0.00010475, 0.01795439);\\n    xyz +=  R[4] * vec3(0.01188055, 0.00035364, 0.05707758);\\n    xyz +=  R[5] * vec3(0.02328644, 0.00095147, 0.11365162);\\n    xyz +=  R[6] * vec3(0.03455942, 0.00228226, 0.17335873);\\n    xyz +=  R[7] * vec3(0.03722379, 0.00420733, 0.19620658);\\n    xyz +=  R[8] * vec3(0.03241838, 0.00668880, 0.18608237);\\n    xyz +=  R[9] * vec3(0.02123321, 0.00988840, 0.13995048);\\n    xyz += R[10] * vec3(0.01049099, 0.01524945, 0.08917453);\\n    xyz += R[11] * vec3(0.00329584, 0.02141831, 0.04789621);\\n    xyz += R[12] * vec3(0.00050704, 0.03342293, 0.02814563);\\n    xyz += R[13] * vec3(0.00094867, 0.05131001, 0.01613766);\\n    xyz += R[14] * vec3(0.00627372, 0.07040208, 0.00775910);\\n    xyz += R[15] * vec3(0.01686462, 0.08783871, 0.00429615);\\n    xyz += R[16] * vec3(0.02868965, 0.09424905, 0.00200551);\\n    xyz += R[17] * vec3(0.04267481, 0.09795667, 0.00086147);\\n    xyz += R[18] * vec3(0.05625475, 0.09415219, 0.00036904);\\n    xyz += R[19] * vec3(0.06947040, 0.08678102, 0.00019143);\\n    xyz += R[20] * vec3(0.08305315, 0.07885653, 0.00014956);\\n    xyz += R[21] * vec3(0.08612610, 0.06352670, 0.00009231);\\n    xyz += R[22] * vec3(0.09046614, 0.05374142, 0.00006813);\\n    xyz += R[23] * vec3(0.08500387, 0.04264606, 0.00002883);\\n    xyz += R[24] * vec3(0.07090667, 0.03161735, 0.00001577);\\n    xyz += R[25] * vec3(0.05062889, 0.02088521, 0.00000394);\\n    xyz += R[26] * vec3(0.03547396, 0.01386011, 0.00000158);\\n    xyz += R[27] * vec3(0.02146821, 0.00810264, 0.00000000);\\n    xyz += R[28] * vec3(0.01251646, 0.00463010, 0.00000000);\\n    xyz += R[29] * vec3(0.00680458, 0.00249138, 0.00000000);\\n    xyz += R[30] * vec3(0.00346457, 0.00125930, 0.00000000);\\n    xyz += R[31] * vec3(0.00149761, 0.00054165, 0.00000000);\\n    xyz += R[32] * vec3(0.00076970, 0.00027795, 0.00000000);\\n    xyz += R[33] * vec3(0.00040737, 0.00014711, 0.00000000);\\n    xyz += R[34] * vec3(0.00016901, 0.00006103, 0.00000000);\\n    xyz += R[35] * vec3(0.00009522, 0.00003439, 0.00000000);\\n    xyz += R[36] * vec3(0.00004903, 0.00001771, 0.00000000);\\n    xyz += R[37] * vec3(0.00002000, 0.00000722, 0.00000000);\\n\\n    return xyz;\\n}\\n\\nfloat spectral_linear_to_concentration(float l1, float l2, float t) {\\n    float t1 = l1 * pow(1.0 - t, 2.0);\\n    float t2 = l2 * pow(t, 2.0);\\n\\n    return t2 / (t1 + t2);\\n}\\n\\nvec3 spectral_mix(vec3 color1, vec3 color2, float t) {\\n    vec3 lrgb1 = spectral_srgb_to_linear(color1);\\n    vec3 lrgb2 = spectral_srgb_to_linear(color2);\\n\\n    float R1[SPECTRAL_SIZE];\\n    float R2[SPECTRAL_SIZE];\\n\\n    spectral_linear_to_reflectance(lrgb1, R1);\\n    spectral_linear_to_reflectance(lrgb2, R2);\\n\\n    float l1 = spectral_reflectance_to_xyz(R1)[1];\\n    float l2 = spectral_reflectance_to_xyz(R2)[1];\\n\\n    t = spectral_linear_to_concentration(l1, l2, t);\\n\\n    float R[SPECTRAL_SIZE];\\n\\n    for (int i = 0; i < SPECTRAL_SIZE; i++) {\\n      float KS = (1.0 - t) * (pow(1.0 - R1[i], 2.0) / (2.0 * R1[i])) + t * (pow(1.0 - R2[i], 2.0) / (2.0 * R2[i]));\\n      float KM = 1.0 + KS - sqrt(pow(KS, 2.0) + 2.0 * KS);\\n\\n      //Saunderson correction\\n      // let S = ((1.0 - K1) * (1.0 - K2) * KM) / (1.0 - K2 * KM);\\n\\n      R[i] = KM;\\n    }\\n\\n    return spectral_xyz_to_srgb(spectral_reflectance_to_xyz(R));\\n}\\n\\nvec4 spectral_mix(vec4 color1, vec4 color2, float t) {\\n    return vec4(spectral_mix(color1.rgb, color2.rgb, t), mix(color1.a, color2.a, t));\\n}\\n\\n#endif\\n\\nvec3 mul3( in mat3 m, in vec3 v ){return vec3(dot(v,m[0]),dot(v,m[1]),dot(v,m[2]));}\\n\\nvec3 mul3( in vec3 v, in mat3 m ){return mul3(m,v);}\\n\\nvec3 srgb2oklab(vec3 c) {\\n    \\n    mat3 m1 = mat3(\\n        0.4122214708,0.5363325363,0.0514459929,\\n        0.2119034982,0.6806995451,0.1073969566,\\n        0.0883024619,0.2817188376,0.6299787005\\n    );\\n    \\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = pow(lms,vec3(1./3.));\\n\\n    mat3 m2 = mat3(\\n        +0.2104542553,+0.7936177850,-0.0040720468,\\n        +1.9779984951,-2.4285922050,+0.4505937099,\\n        +0.0259040371,+0.7827717662,-0.8086757660\\n    );\\n    \\n    return mul3(m2,lms);\\n}\\n\\nvec3 oklab2srgb(vec3 c)\\n{\\n    mat3 m1 = mat3(\\n        1.0000000000,+0.3963377774,+0.2158037573,\\n        1.0000000000,-0.1055613458,-0.0638541728,\\n        1.0000000000,-0.0894841775,-1.2914855480\\n    );\\n\\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = lms * lms * lms;\\n  \\n    mat3 m2 = mat3(\\n        +4.0767416621,-3.3077115913,+0.2309699292,\\n        -1.2684380046,+2.6097574011,-0.3413193965,\\n        -0.0041960863,-0.7034186147,+1.7076147010\\n    );\\n    return mul3(m2,lms);\\n}\\n\\nvec3 lab2lch( in vec3 c ){return vec3(c.x,sqrt((c.y*c.y) + (c.z * c.z)),atan(c.z,c.y));}\\n\\nvec3 lch2lab( in vec3 c ){return vec3(c.x,c.y*cos(c.z),c.y*sin(c.z));}\\n\\nvec3 srgb_to_oklch( in vec3 c ) { return lab2lch(srgb2oklab(c)); }\\nvec3 oklch_to_srgb( in vec3 c ) { return oklab2srgb(lch2lab(c)); }\\n\\nfloat luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }\\n\\nfloat luma(vec4 color) { return dot(color.rgb, vec3(0.299, 0.587, 0.114)); }\\n\\nvec4 rgb2cmyki(in vec3 c) { float k = max(max(c.r, c.g), c.b); return min(vec4(c.rgb / k, k), 1.0); }\\n\\nvec3 cmyki2rgb(in vec4 c) { return c.rgb * c.a; }\\n\\nvec3 lerpHSV(in vec3 hsv1, in vec3 hsv2, in float rate)\\n{\\n    float hue = (mod(mod((hsv2.x-hsv1.x), 1.) + 1.5, 1.)-0.5)*rate + hsv1.x;\\n    return vec3(hue, mix(hsv1.yz, hsv2.yz, rate));\\n}\\n\\nvec3 hsv2rgb(vec3 c)\\n{\\n    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nvec3 rgb2hsv(vec3 c)\\n{\\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\\n\\n    float d = q.x - min(q.w, q.y);\\n    float e = 1.0e-10;\\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\\n}\\n\\nvec3 hsv2rgbSmooth( in vec3 hsv )\\n{\\n    vec3 rgb = clamp( abs(mod(hsv.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );\\n\\n    rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing\\n\\n    return hsv.z * mix( vec3(1.0), rgb, hsv.y);\\n}\\n\\nvec3 hueShift(vec3 col, vec3 hsv){\\n    vec3 h = rgb2hsv(col);\\n    h.x += hsv.x;\\n\\n    h.y *= hsv.y;\\n    h.z *= hsv.z;\\n\\n    return hsv2rgbSmooth(h);\\n}\\n\\nvec4 blend_brushstroke(vec4 col, vec4 stroke, int blending_colour_space){\\n  // col.xyz = mix(col.xyz, stroke.xyz, stroke.w); \\n  \\n  int mode = blending_colour_space;\\n  \\n  if(stroke.w > 0.00000001){\\n    // float interpolant = stroke.w;\\n    stroke.xyz = stroke.xyz/max(stroke.w,0.001);\\n    \\n    if(mode == 0){\\n      col.xyz = spectral_mix(col.xyz, clamp(stroke.xyz,0.00001,0.99999), stroke.w);\\n      if(stroke.w > 0.99999)\\n        col.xyz = stroke.xyz;\\n    } else if(mode == 1){\\n      col.xyz = srgb_to_oklch( col.xyz );\\n      stroke.xyz = srgb_to_oklch( stroke.xyz );\\n      col.xy = mix(col.xy, stroke.xy,stroke.w);\\n      float tau = acos(-1.) * 2.;\\n      float h_a = stroke.z;\\n      float h_b = stroke.z + tau;\\n      float dist_a = abs(col.z - h_a);\\n      float dist_b = abs(col.z - h_b);\\n      if(dist_a < dist_b){\\n        col.z = mix(col.z, h_a, stroke.w);\\n      } else {\\n        col.z = mix(col.z, h_b, stroke.w);\\n      }\\n      col.z = mod(col.z, tau);\\n      // col.z = max(col.z)\\n      // if(isnan(col.z)){\\n      //   col.z = 1.;\\n      // }\\n\\n      col.xyz = oklch_to_srgb( col.xyz );\\n      col.xyz = clamp(col.xyz,0.,1.);\\n    } else {\\n      col.xyz = mix(col.xyz, stroke.xyz, stroke.w);\\n    }\\n    col.w = max(col.w, stroke.w);\\n  }\\n\\n  return col; \\n}\\n\\nuniform sampler2D fb_a;\\nuniform sampler2D fb_b;\\n\\nin vec2 uv;\\nout vec4 col;\\n\\nvec3[] pal = vec3[](\\n    vec3(0.8,0.5,0.),\\n    vec3(0.2,0.6,0.4),\\n    vec3(1.0,0.0,0.7),\\n    // vec3(1.0,1.0,0.5),\\n    vec3(0,0,0.2)\\n);\\n\\nvec3 mix_oklch(vec3 col_a, vec3 col_b, float a){\\n  // return mix(col_a,col_b,a);\\n  float tau = 3.14159265359 * 2.;\\n  float col_b_h_1 = col_b.z;\\n  float col_b_h_2 = col_b.z + tau;\\n  float dist_a = abs(col_a.z - col_b_h_1);\\n  float dist_b = abs(col_a.z - col_b_h_2);\\n  // if(dist_a < dist_b){\\n  //   col_a.z = mix(col_a.z, col_b_h_1, a);\\n  // } else {\\n  //   col_a.z = mix(col_a.z, col_b_h_2, a);\\n  // }\\n  col_a.z = mix(col_a.z,col_b.z,a);\\n\\n  col_a.x = mix(col_a.x, col_b.x, a);\\n  col_a.y = mix(col_a.y, col_b.y, a);\\n  // col_a.z = mod(col_a.z, tau);\\n  return col_a;\\n}\\n\\nvoid main() {\\n  \\n  // vec2 u = (uv + 1.)*0.5;\\n  // u = u - 0.5\\n  vec2 u = (gl_FragCoord.xy - 0.5*R)/min(R.x,R.y);\\n  \\n  vec4 tex_this_prev_frame = texture(fb_a, gl_FragCoord.xy/R);\\n  vec4 tex_lines_prev_frame = texture(fb_b, gl_FragCoord.xy/R);\\n\\n  // col = vec4(u.xyxy);\\n  col = vec4(1,0.,0.,0.);\\n  \\n  vec2 mouse_pos = vec2(mouse_pos_x, mouse_pos_y);\\n  \\n  \\n\\n  float T = time;\\n  // T = 0.;\\n  \\n\\n  for(float i = 0.; i < 6.; i++){\\n    float m = T*0.5+ sin(i + T*0.5);\\n\\n    vec2 q = vec2(\\n      sin(i + m*sin(i)),\\n      cos(i + m*cos(i))\\n    )*sin(i);\\n    q *= 0.5;\\n    vec2 v_from_mouse = (q - mouse_pos);\\n    q += normalize(v_from_mouse) * smoothstep(0.5,0.,length(v_from_mouse))*ptr_pressure;\\n\\n    float d = length(q - u);\\n    \\n    float interp = sin(i*0.5)*10.5 + 0.5 + T*0.1;\\n    interp = fract(interp);\\n    int idx = int(interp * float(pal.length())*0.9999);\\n    int idx_next = idx + 1;\\n    if(idx_next >= pal.length()){\\n      idx_next = 0;\\n    }\\n    interp = fract(interp*float(pal.length())*0.9999);\\n\\n    vec3 c_a = pal[idx];\\n    vec3 c_b = pal[idx_next];\\n    \\n    vec3 c = mix_oklch(\\n      srgb_to_oklch(c_a),\\n      srgb_to_oklch(c_b),\\n      interp\\n    );\\n    // col += smoothstep(0.4,0.,d);\\n    // col.xyz = mix(col.xyz,c,d);\\n    col.xyz = mix_oklch(\\n      col.xyz, \\n      c, \\n      smoothstep(0.6 + sin(i*0.6 + 1.5 + m)*0.2,0.,d)\\n    );\\n  }\\n\\n  if ( dot(tex_lines_prev_frame.xyz,tex_lines_prev_frame.xyz) < 0.5 ) { \\n    col.rgb -= tex_lines_prev_frame.rgb; \\n    col.xy = clamp(col.xy,vec2(0.), vec2(1));\\n    // col.z = clamp(col.z,vec2(0.), vec2(1));\\n    col.z = mod(col.z, 3.14 * 2.0);\\n  }\\n  col.xyz = oklch_to_srgb( col.xyz );\\n  col.xyz = clamp(col.xyz,0.,1.);\\n    \\n  col.w = 1.;\\n}    \\n\\n  \\n  \\n\\t\\t \";";
+module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n  float dark_mode;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\n\\n#ifndef SPECTRAL\\n#define SPECTRAL\\n\\nconst int SPECTRAL_SIZE = 38;\\nconst float SPECTRAL_GAMMA = 2.4;\\nconst float SPECTRAL_EPSILON = 0.0001;\\n\\nfloat spectral_uncompand(float x) {\\n  return (x < 0.04045) ? x / 12.92 : pow((x + 0.055) / 1.055, SPECTRAL_GAMMA);\\n}\\n\\nfloat spectral_compand(float x) {\\n  return (x < 0.0031308) ? x * 12.92 : 1.055 * pow(x, 1.0 / SPECTRAL_GAMMA) - 0.055;\\n}\\n\\nvec3 spectral_srgb_to_linear(vec3 srgb) {\\n    return vec3(spectral_uncompand(srgb[0]), spectral_uncompand(srgb[1]), spectral_uncompand(srgb[2]));\\n}\\n\\nvec3 spectral_linear_to_srgb(vec3 lrgb) {\\n    return clamp(vec3(spectral_compand(lrgb[0]), spectral_compand(lrgb[1]), spectral_compand(lrgb[2])), 0.0, 1.0);\\n}\\n\\nvoid spectral_upsampling(vec3 lrgb, out float w, out float c, out float m, out float y, out float r, out float g, out float b) {\\n    w = min(lrgb.r, min(lrgb.g, lrgb.b));\\n\\n    lrgb -= w;\\n\\n    c = min(lrgb.g, lrgb.b);\\n    m = min(lrgb.r, lrgb.b);\\n    y = min(lrgb.r, lrgb.g);\\n    r = min(max(0., lrgb.r - lrgb.b), max(0., lrgb.r - lrgb.g));\\n    g = min(max(0., lrgb.g - lrgb.b), max(0., lrgb.g - lrgb.r));\\n    b = min(max(0., lrgb.b - lrgb.g), max(0., lrgb.b - lrgb.r));\\n}\\n\\nvoid spectral_linear_to_reflectance(vec3 lrgb, inout float R[SPECTRAL_SIZE]) {\\n    float w, c, m, y, r, g, b;\\n    \\n    spectral_upsampling(lrgb, w, c, m, y, r, g, b);\\n    \\n     R[0] = max(SPECTRAL_EPSILON, w + c * 0.96853629 + m * 0.51567122 + y * 0.02055257 + r * 0.03147571 + g * 0.49108579 + b * 0.97901834);\\n     R[1] = max(SPECTRAL_EPSILON, w + c * 0.96855103 + m * 0.54015520 + y * 0.02059936 + r * 0.03146636 + g * 0.46944057 + b * 0.97901649);\\n     R[2] = max(SPECTRAL_EPSILON, w + c * 0.96859338 + m * 0.62645502 + y * 0.02062723 + r * 0.03140624 + g * 0.40165780 + b * 0.97901118);\\n     R[3] = max(SPECTRAL_EPSILON, w + c * 0.96877345 + m * 0.75595012 + y * 0.02073387 + r * 0.03119611 + g * 0.24490420 + b * 0.97892146);\\n     R[4] = max(SPECTRAL_EPSILON, w + c * 0.96942204 + m * 0.92826996 + y * 0.02114202 + r * 0.03053888 + g * 0.06826880 + b * 0.97858555);\\n     R[5] = max(SPECTRAL_EPSILON, w + c * 0.97143709 + m * 0.97223624 + y * 0.02233154 + r * 0.02856855 + g * 0.02732883 + b * 0.97743705);\\n     R[6] = max(SPECTRAL_EPSILON, w + c * 0.97541862 + m * 0.98616174 + y * 0.02556857 + r * 0.02459485 + g * 0.01360600 + b * 0.97428075);\\n     R[7] = max(SPECTRAL_EPSILON, w + c * 0.98074186 + m * 0.98955255 + y * 0.03330189 + r * 0.01929520 + g * 0.01000187 + b * 0.96663223);\\n     R[8] = max(SPECTRAL_EPSILON, w + c * 0.98580992 + m * 0.98676237 + y * 0.05185294 + r * 0.01423112 + g * 0.01284127 + b * 0.94822893);\\n     R[9] = max(SPECTRAL_EPSILON, w + c * 0.98971194 + m * 0.97312575 + y * 0.10087639 + r * 0.01033111 + g * 0.02636635 + b * 0.89937713);\\n    R[10] = max(SPECTRAL_EPSILON, w + c * 0.99238027 + m * 0.91944277 + y * 0.24000413 + r * 0.00765876 + g * 0.07058713 + b * 0.76070164);\\n    R[11] = max(SPECTRAL_EPSILON, w + c * 0.99409844 + m * 0.32564851 + y * 0.53589066 + r * 0.00593693 + g * 0.70421692 + b * 0.46420440);\\n    R[12] = max(SPECTRAL_EPSILON, w + c * 0.99517200 + m * 0.13820628 + y * 0.79874659 + r * 0.00485616 + g * 0.85473994 + b * 0.20123039);\\n    R[13] = max(SPECTRAL_EPSILON, w + c * 0.99576545 + m * 0.05015143 + y * 0.91186529 + r * 0.00426186 + g * 0.95081565 + b * 0.08808402);\\n    R[14] = max(SPECTRAL_EPSILON, w + c * 0.99593552 + m * 0.02912336 + y * 0.95399623 + r * 0.00409039 + g * 0.97170370 + b * 0.04592894);\\n    R[15] = max(SPECTRAL_EPSILON, w + c * 0.99564041 + m * 0.02421691 + y * 0.97137099 + r * 0.00438375 + g * 0.97651888 + b * 0.02860373);\\n    R[16] = max(SPECTRAL_EPSILON, w + c * 0.99464769 + m * 0.02660696 + y * 0.97939505 + r * 0.00537525 + g * 0.97429245 + b * 0.02060067);\\n    R[17] = max(SPECTRAL_EPSILON, w + c * 0.99229579 + m * 0.03407586 + y * 0.98345207 + r * 0.00772962 + g * 0.97012917 + b * 0.01656701);\\n    R[18] = max(SPECTRAL_EPSILON, w + c * 0.98638762 + m * 0.04835936 + y * 0.98553736 + r * 0.01366120 + g * 0.94258630 + b * 0.01451549);\\n    R[19] = max(SPECTRAL_EPSILON, w + c * 0.96829712 + m * 0.00011720 + y * 0.98648905 + r * 0.03181352 + g * 0.99989207 + b * 0.01357964);\\n    R[20] = max(SPECTRAL_EPSILON, w + c * 0.89228016 + m * 0.00008554 + y * 0.98674535 + r * 0.10791525 + g * 0.99989891 + b * 0.01331243);\\n    R[21] = max(SPECTRAL_EPSILON, w + c * 0.53740239 + m * 0.85267882 + y * 0.98657555 + r * 0.46249516 + g * 0.13823139 + b * 0.01347661);\\n    R[22] = max(SPECTRAL_EPSILON, w + c * 0.15360445 + m * 0.93188793 + y * 0.98611877 + r * 0.84604333 + g * 0.06968113 + b * 0.01387181);\\n    R[23] = max(SPECTRAL_EPSILON, w + c * 0.05705719 + m * 0.94810268 + y * 0.98559942 + r * 0.94275572 + g * 0.05628787 + b * 0.01435472);\\n    R[24] = max(SPECTRAL_EPSILON, w + c * 0.03126539 + m * 0.94200977 + y * 0.98507063 + r * 0.96860996 + g * 0.06111561 + b * 0.01479836);\\n    R[25] = max(SPECTRAL_EPSILON, w + c * 0.02205445 + m * 0.91478045 + y * 0.98460039 + r * 0.97783966 + g * 0.08987709 + b * 0.01515250);\\n    R[26] = max(SPECTRAL_EPSILON, w + c * 0.01802271 + m * 0.87065445 + y * 0.98425301 + r * 0.98187757 + g * 0.13656016 + b * 0.01540513);\\n    R[27] = max(SPECTRAL_EPSILON, w + c * 0.01613460 + m * 0.78827548 + y * 0.98403909 + r * 0.98377315 + g * 0.22169624 + b * 0.01557233);\\n    R[28] = max(SPECTRAL_EPSILON, w + c * 0.01520947 + m * 0.65738359 + y * 0.98388535 + r * 0.98470202 + g * 0.32176956 + b * 0.01565710);\\n    R[29] = max(SPECTRAL_EPSILON, w + c * 0.01475977 + m * 0.59909403 + y * 0.98376116 + r * 0.98515481 + g * 0.36157329 + b * 0.01571025);\\n    R[30] = max(SPECTRAL_EPSILON, w + c * 0.01454263 + m * 0.56817268 + y * 0.98368246 + r * 0.98537114 + g * 0.48361920 + b * 0.01571916);\\n    R[31] = max(SPECTRAL_EPSILON, w + c * 0.01444459 + m * 0.54031997 + y * 0.98365023 + r * 0.98546685 + g * 0.46488579 + b * 0.01572133);\\n    R[32] = max(SPECTRAL_EPSILON, w + c * 0.01439897 + m * 0.52110241 + y * 0.98361309 + r * 0.98550011 + g * 0.47440306 + b * 0.01572502);\\n    R[33] = max(SPECTRAL_EPSILON, w + c * 0.01437620 + m * 0.51041094 + y * 0.98357259 + r * 0.98551031 + g * 0.48576990 + b * 0.01571717);\\n    R[34] = max(SPECTRAL_EPSILON, w + c * 0.01436343 + m * 0.50526577 + y * 0.98353856 + r * 0.98550741 + g * 0.49267971 + b * 0.01571905);\\n    R[35] = max(SPECTRAL_EPSILON, w + c * 0.01435687 + m * 0.50255080 + y * 0.98351247 + r * 0.98551323 + g * 0.49625685 + b * 0.01571059);\\n    R[36] = max(SPECTRAL_EPSILON, w + c * 0.01435370 + m * 0.50126452 + y * 0.98350101 + r * 0.98551563 + g * 0.49807754 + b * 0.01569728);\\n    R[37] = max(SPECTRAL_EPSILON, w + c * 0.01435408 + m * 0.50083021 + y * 0.98350852 + r * 0.98551547 + g * 0.49889859 + b * 0.01570020);\\n}\\n\\nvec3 spectral_xyz_to_srgb(vec3 xyz) {\\n    mat3 XYZ_RGB;\\n\\n    XYZ_RGB[0] = vec3( 3.24306333, -1.53837619, -0.49893282);\\n    XYZ_RGB[1] = vec3(-0.96896309,  1.87542451,  0.04154303);\\n    XYZ_RGB[2] = vec3( 0.05568392, -0.20417438,  1.05799454);\\n    \\n    float r = dot(XYZ_RGB[0], xyz);\\n    float g = dot(XYZ_RGB[1], xyz);\\n    float b = dot(XYZ_RGB[2], xyz);\\n\\n    return spectral_linear_to_srgb(vec3(r, g, b));\\n}\\n\\nvec3 spectral_reflectance_to_xyz(float R[SPECTRAL_SIZE]) {\\n    vec3 xyz = vec3(0.0);\\n    \\n    xyz +=  R[0] * vec3(0.00006469, 0.00000184, 0.00030502);\\n    xyz +=  R[1] * vec3(0.00021941, 0.00000621, 0.00103681);\\n    xyz +=  R[2] * vec3(0.00112057, 0.00003101, 0.00531314);\\n    xyz +=  R[3] * vec3(0.00376661, 0.00010475, 0.01795439);\\n    xyz +=  R[4] * vec3(0.01188055, 0.00035364, 0.05707758);\\n    xyz +=  R[5] * vec3(0.02328644, 0.00095147, 0.11365162);\\n    xyz +=  R[6] * vec3(0.03455942, 0.00228226, 0.17335873);\\n    xyz +=  R[7] * vec3(0.03722379, 0.00420733, 0.19620658);\\n    xyz +=  R[8] * vec3(0.03241838, 0.00668880, 0.18608237);\\n    xyz +=  R[9] * vec3(0.02123321, 0.00988840, 0.13995048);\\n    xyz += R[10] * vec3(0.01049099, 0.01524945, 0.08917453);\\n    xyz += R[11] * vec3(0.00329584, 0.02141831, 0.04789621);\\n    xyz += R[12] * vec3(0.00050704, 0.03342293, 0.02814563);\\n    xyz += R[13] * vec3(0.00094867, 0.05131001, 0.01613766);\\n    xyz += R[14] * vec3(0.00627372, 0.07040208, 0.00775910);\\n    xyz += R[15] * vec3(0.01686462, 0.08783871, 0.00429615);\\n    xyz += R[16] * vec3(0.02868965, 0.09424905, 0.00200551);\\n    xyz += R[17] * vec3(0.04267481, 0.09795667, 0.00086147);\\n    xyz += R[18] * vec3(0.05625475, 0.09415219, 0.00036904);\\n    xyz += R[19] * vec3(0.06947040, 0.08678102, 0.00019143);\\n    xyz += R[20] * vec3(0.08305315, 0.07885653, 0.00014956);\\n    xyz += R[21] * vec3(0.08612610, 0.06352670, 0.00009231);\\n    xyz += R[22] * vec3(0.09046614, 0.05374142, 0.00006813);\\n    xyz += R[23] * vec3(0.08500387, 0.04264606, 0.00002883);\\n    xyz += R[24] * vec3(0.07090667, 0.03161735, 0.00001577);\\n    xyz += R[25] * vec3(0.05062889, 0.02088521, 0.00000394);\\n    xyz += R[26] * vec3(0.03547396, 0.01386011, 0.00000158);\\n    xyz += R[27] * vec3(0.02146821, 0.00810264, 0.00000000);\\n    xyz += R[28] * vec3(0.01251646, 0.00463010, 0.00000000);\\n    xyz += R[29] * vec3(0.00680458, 0.00249138, 0.00000000);\\n    xyz += R[30] * vec3(0.00346457, 0.00125930, 0.00000000);\\n    xyz += R[31] * vec3(0.00149761, 0.00054165, 0.00000000);\\n    xyz += R[32] * vec3(0.00076970, 0.00027795, 0.00000000);\\n    xyz += R[33] * vec3(0.00040737, 0.00014711, 0.00000000);\\n    xyz += R[34] * vec3(0.00016901, 0.00006103, 0.00000000);\\n    xyz += R[35] * vec3(0.00009522, 0.00003439, 0.00000000);\\n    xyz += R[36] * vec3(0.00004903, 0.00001771, 0.00000000);\\n    xyz += R[37] * vec3(0.00002000, 0.00000722, 0.00000000);\\n\\n    return xyz;\\n}\\n\\nfloat spectral_linear_to_concentration(float l1, float l2, float t) {\\n    float t1 = l1 * pow(1.0 - t, 2.0);\\n    float t2 = l2 * pow(t, 2.0);\\n\\n    return t2 / (t1 + t2);\\n}\\n\\nvec3 spectral_mix(vec3 color1, vec3 color2, float t) {\\n    vec3 lrgb1 = spectral_srgb_to_linear(color1);\\n    vec3 lrgb2 = spectral_srgb_to_linear(color2);\\n\\n    float R1[SPECTRAL_SIZE];\\n    float R2[SPECTRAL_SIZE];\\n\\n    spectral_linear_to_reflectance(lrgb1, R1);\\n    spectral_linear_to_reflectance(lrgb2, R2);\\n\\n    float l1 = spectral_reflectance_to_xyz(R1)[1];\\n    float l2 = spectral_reflectance_to_xyz(R2)[1];\\n\\n    t = spectral_linear_to_concentration(l1, l2, t);\\n\\n    float R[SPECTRAL_SIZE];\\n\\n    for (int i = 0; i < SPECTRAL_SIZE; i++) {\\n      float KS = (1.0 - t) * (pow(1.0 - R1[i], 2.0) / (2.0 * R1[i])) + t * (pow(1.0 - R2[i], 2.0) / (2.0 * R2[i]));\\n      float KM = 1.0 + KS - sqrt(pow(KS, 2.0) + 2.0 * KS);\\n\\n      //Saunderson correction\\n      // let S = ((1.0 - K1) * (1.0 - K2) * KM) / (1.0 - K2 * KM);\\n\\n      R[i] = KM;\\n    }\\n\\n    return spectral_xyz_to_srgb(spectral_reflectance_to_xyz(R));\\n}\\n\\nvec4 spectral_mix(vec4 color1, vec4 color2, float t) {\\n    return vec4(spectral_mix(color1.rgb, color2.rgb, t), mix(color1.a, color2.a, t));\\n}\\n\\n#endif\\n\\nvec3 mul3( in mat3 m, in vec3 v ){return vec3(dot(v,m[0]),dot(v,m[1]),dot(v,m[2]));}\\n\\nvec3 mul3( in vec3 v, in mat3 m ){return mul3(m,v);}\\n\\nvec3 srgb2oklab(vec3 c) {\\n    \\n    mat3 m1 = mat3(\\n        0.4122214708,0.5363325363,0.0514459929,\\n        0.2119034982,0.6806995451,0.1073969566,\\n        0.0883024619,0.2817188376,0.6299787005\\n    );\\n    \\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = pow(lms,vec3(1./3.));\\n\\n    mat3 m2 = mat3(\\n        +0.2104542553,+0.7936177850,-0.0040720468,\\n        +1.9779984951,-2.4285922050,+0.4505937099,\\n        +0.0259040371,+0.7827717662,-0.8086757660\\n    );\\n    \\n    return mul3(m2,lms);\\n}\\n\\nvec3 oklab2srgb(vec3 c)\\n{\\n    mat3 m1 = mat3(\\n        1.0000000000,+0.3963377774,+0.2158037573,\\n        1.0000000000,-0.1055613458,-0.0638541728,\\n        1.0000000000,-0.0894841775,-1.2914855480\\n    );\\n\\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = lms * lms * lms;\\n  \\n    mat3 m2 = mat3(\\n        +4.0767416621,-3.3077115913,+0.2309699292,\\n        -1.2684380046,+2.6097574011,-0.3413193965,\\n        -0.0041960863,-0.7034186147,+1.7076147010\\n    );\\n    return mul3(m2,lms);\\n}\\n\\nvec3 lab2lch( in vec3 c ){return vec3(c.x,sqrt((c.y*c.y) + (c.z * c.z)),atan(c.z,c.y));}\\n\\nvec3 lch2lab( in vec3 c ){return vec3(c.x,c.y*cos(c.z),c.y*sin(c.z));}\\n\\nvec3 srgb_to_oklch( in vec3 c ) { return lab2lch(srgb2oklab(c)); }\\nvec3 oklch_to_srgb( in vec3 c ) { return oklab2srgb(lch2lab(c)); }\\n\\nfloat luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }\\n\\nfloat luma(vec4 color) { return dot(color.rgb, vec3(0.299, 0.587, 0.114)); }\\n\\nvec4 rgb2cmyki(in vec3 c) { float k = max(max(c.r, c.g), c.b); return min(vec4(c.rgb / k, k), 1.0); }\\n\\nvec3 cmyki2rgb(in vec4 c) { return c.rgb * c.a; }\\n\\nvec3 lerpHSV(in vec3 hsv1, in vec3 hsv2, in float rate)\\n{\\n    float hue = (mod(mod((hsv2.x-hsv1.x), 1.) + 1.5, 1.)-0.5)*rate + hsv1.x;\\n    return vec3(hue, mix(hsv1.yz, hsv2.yz, rate));\\n}\\n\\nvec3 hsv2rgb(vec3 c)\\n{\\n    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nvec3 rgb2hsv(vec3 c)\\n{\\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\\n\\n    float d = q.x - min(q.w, q.y);\\n    float e = 1.0e-10;\\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\\n}\\n\\nvec3 hsv2rgbSmooth( in vec3 hsv )\\n{\\n    vec3 rgb = clamp( abs(mod(hsv.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );\\n\\n    rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing\\n\\n    return hsv.z * mix( vec3(1.0), rgb, hsv.y);\\n}\\n\\nvec3 hueShift(vec3 col, vec3 hsv){\\n    vec3 h = rgb2hsv(col);\\n    h.x += hsv.x;\\n\\n    h.y *= hsv.y;\\n    h.z *= hsv.z;\\n\\n    return hsv2rgbSmooth(h);\\n}\\n\\nvec4 blend_brushstroke(vec4 col, vec4 stroke, int blending_colour_space){\\n  // col.xyz = mix(col.xyz, stroke.xyz, stroke.w); \\n  \\n  int mode = blending_colour_space;\\n  \\n  if(stroke.w > 0.00000001){\\n    // float interpolant = stroke.w;\\n    stroke.xyz = stroke.xyz/max(stroke.w,0.001);\\n    \\n    if(mode == 0){\\n      col.xyz = spectral_mix(col.xyz, clamp(stroke.xyz,0.00001,0.99999), stroke.w);\\n      if(stroke.w > 0.99999)\\n        col.xyz = stroke.xyz;\\n    } else if(mode == 1){\\n      col.xyz = srgb_to_oklch( col.xyz );\\n      stroke.xyz = srgb_to_oklch( stroke.xyz );\\n      col.xy = mix(col.xy, stroke.xy,stroke.w);\\n      float tau = acos(-1.) * 2.;\\n      float h_a = stroke.z;\\n      float h_b = stroke.z + tau;\\n      float dist_a = abs(col.z - h_a);\\n      float dist_b = abs(col.z - h_b);\\n      if(dist_a < dist_b){\\n        col.z = mix(col.z, h_a, stroke.w);\\n      } else {\\n        col.z = mix(col.z, h_b, stroke.w);\\n      }\\n      col.z = mod(col.z, tau);\\n      // col.z = max(col.z)\\n      // if(isnan(col.z)){\\n      //   col.z = 1.;\\n      // }\\n\\n      col.xyz = oklch_to_srgb( col.xyz );\\n      col.xyz = clamp(col.xyz,0.,1.);\\n    } else {\\n      col.xyz = mix(col.xyz, stroke.xyz, stroke.w);\\n    }\\n    col.w = max(col.w, stroke.w);\\n  }\\n\\n  return col; \\n}\\n\\nuniform sampler2D fb_a;\\nuniform sampler2D fb_b;\\n\\nin vec2 uv;\\nout vec4 col;\\n\\nvec3[] pal = vec3[](\\n    vec3(0.8,0.5,0.),\\n    vec3(0.2,0.6,0.4),\\n    vec3(1.0,0.0,0.7),\\n    // vec3(1.0,1.0,0.5),\\n    vec3(0,0,0.2)\\n);\\n\\nvec3 mix_oklch(vec3 col_a, vec3 col_b, float a){\\n  // return mix(col_a,col_b,a);\\n  float tau = 3.14159265359 * 2.;\\n  float col_b_h_1 = col_b.z;\\n  float col_b_h_2 = col_b.z + tau;\\n  float dist_a = abs(col_a.z - col_b_h_1);\\n  float dist_b = abs(col_a.z - col_b_h_2);\\n  // if(dist_a < dist_b){\\n  //   col_a.z = mix(col_a.z, col_b_h_1, a);\\n  // } else {\\n  //   col_a.z = mix(col_a.z, col_b_h_2, a);\\n  // }\\n  col_a.z = mix(col_a.z,col_b.z,a);\\n\\n  col_a.x = mix(col_a.x, col_b.x, a);\\n  col_a.y = mix(col_a.y, col_b.y, a);\\n  // col_a.z = mod(col_a.z, tau);\\n  return col_a;\\n}\\n\\nvoid main() {\\n  \\n  // vec2 u = (uv + 1.)*0.5;\\n  // u = u - 0.5\\n  vec2 u = (gl_FragCoord.xy - 0.5*R)/min(R.x,R.y);\\n  \\n  vec4 tex_this_prev_frame = texture(fb_a, gl_FragCoord.xy/R);\\n  vec4 tex_lines_prev_frame = texture(fb_b, gl_FragCoord.xy/R);\\n\\n  // col = vec4(u.xyxy);\\n  if(dark_mode > 0.5){\\n    col = vec4(0,0.,0.,0.);\\n  } else{\\n    col = vec4(1,0.,0.,0.);\\n  }\\n  \\n  vec2 mouse_pos = vec2(mouse_pos_x, mouse_pos_y);\\n  \\n  \\n\\n  float T = time;\\n  // T = 0.;\\n  \\n\\n  for(float i = 0.; i < 6.; i++){\\n    float m = T*0.5+ sin(i + T*0.5);\\n\\n    vec2 q = vec2(\\n      sin(i + m*sin(i)),\\n      cos(i + m*cos(i))\\n    )*sin(i);\\n    q *= 0.5;\\n    vec2 v_from_mouse = (q - mouse_pos);\\n    q += normalize(v_from_mouse) * smoothstep(0.5,0.,length(v_from_mouse))*ptr_pressure;\\n\\n    float d = length(q - u);\\n    \\n    float interp = sin(i*0.5)*10.5 + 0.5 + T*0.1;\\n    interp = fract(interp);\\n    int idx = int(interp * float(pal.length())*0.9999);\\n    int idx_next = idx + 1;\\n    if(idx_next >= pal.length()){\\n      idx_next = 0;\\n    }\\n    interp = fract(interp*float(pal.length())*0.9999);\\n\\n    vec3 c_a = pal[idx];\\n    vec3 c_b = pal[idx_next];\\n    \\n    vec3 c = mix_oklch(\\n      srgb_to_oklch(c_a),\\n      srgb_to_oklch(c_b),\\n      interp\\n    );\\n    // col += smoothstep(0.4,0.,d);\\n    // col.xyz = mix(col.xyz,c,d);\\n    col.xyz = mix_oklch(\\n      col.xyz, \\n      c, \\n      smoothstep(0.6 + sin(i*0.6 + 1.5 + m)*0.2,0.,d)\\n    );\\n  }\\n\\n  if ( dot(tex_lines_prev_frame.xyz,tex_lines_prev_frame.xyz) < 0.9 ) { \\n    col.rgb -= tex_lines_prev_frame.rgb; \\n    col.xy = clamp(col.xy,vec2(0.), vec2(1));\\n    // col.z = clamp(col.z,vec2(0.), vec2(1));\\n    col.z = mod(col.z, 3.14 * 2.0);\\n  }\\n  col.xyz = oklch_to_srgb( col.xyz );\\n  col.xyz = clamp(col.xyz,0.,1.);\\n    \\n  col.w = 1.;\\n}    \\n\\n  \\n  \\n\\t\\t \";";
 
 /***/ }),
 
@@ -623,7 +623,7 @@ module.exports = "export default \"#version 300 es\\nprecision highp float;\\npr
 /***/ ((module) => {
 
 "use strict";
-module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\n\\n#ifndef SPECTRAL\\n#define SPECTRAL\\n\\nconst int SPECTRAL_SIZE = 38;\\nconst float SPECTRAL_GAMMA = 2.4;\\nconst float SPECTRAL_EPSILON = 0.0001;\\n\\nfloat spectral_uncompand(float x) {\\n  return (x < 0.04045) ? x / 12.92 : pow((x + 0.055) / 1.055, SPECTRAL_GAMMA);\\n}\\n\\nfloat spectral_compand(float x) {\\n  return (x < 0.0031308) ? x * 12.92 : 1.055 * pow(x, 1.0 / SPECTRAL_GAMMA) - 0.055;\\n}\\n\\nvec3 spectral_srgb_to_linear(vec3 srgb) {\\n    return vec3(spectral_uncompand(srgb[0]), spectral_uncompand(srgb[1]), spectral_uncompand(srgb[2]));\\n}\\n\\nvec3 spectral_linear_to_srgb(vec3 lrgb) {\\n    return clamp(vec3(spectral_compand(lrgb[0]), spectral_compand(lrgb[1]), spectral_compand(lrgb[2])), 0.0, 1.0);\\n}\\n\\nvoid spectral_upsampling(vec3 lrgb, out float w, out float c, out float m, out float y, out float r, out float g, out float b) {\\n    w = min(lrgb.r, min(lrgb.g, lrgb.b));\\n\\n    lrgb -= w;\\n\\n    c = min(lrgb.g, lrgb.b);\\n    m = min(lrgb.r, lrgb.b);\\n    y = min(lrgb.r, lrgb.g);\\n    r = min(max(0., lrgb.r - lrgb.b), max(0., lrgb.r - lrgb.g));\\n    g = min(max(0., lrgb.g - lrgb.b), max(0., lrgb.g - lrgb.r));\\n    b = min(max(0., lrgb.b - lrgb.g), max(0., lrgb.b - lrgb.r));\\n}\\n\\nvoid spectral_linear_to_reflectance(vec3 lrgb, inout float R[SPECTRAL_SIZE]) {\\n    float w, c, m, y, r, g, b;\\n    \\n    spectral_upsampling(lrgb, w, c, m, y, r, g, b);\\n    \\n     R[0] = max(SPECTRAL_EPSILON, w + c * 0.96853629 + m * 0.51567122 + y * 0.02055257 + r * 0.03147571 + g * 0.49108579 + b * 0.97901834);\\n     R[1] = max(SPECTRAL_EPSILON, w + c * 0.96855103 + m * 0.54015520 + y * 0.02059936 + r * 0.03146636 + g * 0.46944057 + b * 0.97901649);\\n     R[2] = max(SPECTRAL_EPSILON, w + c * 0.96859338 + m * 0.62645502 + y * 0.02062723 + r * 0.03140624 + g * 0.40165780 + b * 0.97901118);\\n     R[3] = max(SPECTRAL_EPSILON, w + c * 0.96877345 + m * 0.75595012 + y * 0.02073387 + r * 0.03119611 + g * 0.24490420 + b * 0.97892146);\\n     R[4] = max(SPECTRAL_EPSILON, w + c * 0.96942204 + m * 0.92826996 + y * 0.02114202 + r * 0.03053888 + g * 0.06826880 + b * 0.97858555);\\n     R[5] = max(SPECTRAL_EPSILON, w + c * 0.97143709 + m * 0.97223624 + y * 0.02233154 + r * 0.02856855 + g * 0.02732883 + b * 0.97743705);\\n     R[6] = max(SPECTRAL_EPSILON, w + c * 0.97541862 + m * 0.98616174 + y * 0.02556857 + r * 0.02459485 + g * 0.01360600 + b * 0.97428075);\\n     R[7] = max(SPECTRAL_EPSILON, w + c * 0.98074186 + m * 0.98955255 + y * 0.03330189 + r * 0.01929520 + g * 0.01000187 + b * 0.96663223);\\n     R[8] = max(SPECTRAL_EPSILON, w + c * 0.98580992 + m * 0.98676237 + y * 0.05185294 + r * 0.01423112 + g * 0.01284127 + b * 0.94822893);\\n     R[9] = max(SPECTRAL_EPSILON, w + c * 0.98971194 + m * 0.97312575 + y * 0.10087639 + r * 0.01033111 + g * 0.02636635 + b * 0.89937713);\\n    R[10] = max(SPECTRAL_EPSILON, w + c * 0.99238027 + m * 0.91944277 + y * 0.24000413 + r * 0.00765876 + g * 0.07058713 + b * 0.76070164);\\n    R[11] = max(SPECTRAL_EPSILON, w + c * 0.99409844 + m * 0.32564851 + y * 0.53589066 + r * 0.00593693 + g * 0.70421692 + b * 0.46420440);\\n    R[12] = max(SPECTRAL_EPSILON, w + c * 0.99517200 + m * 0.13820628 + y * 0.79874659 + r * 0.00485616 + g * 0.85473994 + b * 0.20123039);\\n    R[13] = max(SPECTRAL_EPSILON, w + c * 0.99576545 + m * 0.05015143 + y * 0.91186529 + r * 0.00426186 + g * 0.95081565 + b * 0.08808402);\\n    R[14] = max(SPECTRAL_EPSILON, w + c * 0.99593552 + m * 0.02912336 + y * 0.95399623 + r * 0.00409039 + g * 0.97170370 + b * 0.04592894);\\n    R[15] = max(SPECTRAL_EPSILON, w + c * 0.99564041 + m * 0.02421691 + y * 0.97137099 + r * 0.00438375 + g * 0.97651888 + b * 0.02860373);\\n    R[16] = max(SPECTRAL_EPSILON, w + c * 0.99464769 + m * 0.02660696 + y * 0.97939505 + r * 0.00537525 + g * 0.97429245 + b * 0.02060067);\\n    R[17] = max(SPECTRAL_EPSILON, w + c * 0.99229579 + m * 0.03407586 + y * 0.98345207 + r * 0.00772962 + g * 0.97012917 + b * 0.01656701);\\n    R[18] = max(SPECTRAL_EPSILON, w + c * 0.98638762 + m * 0.04835936 + y * 0.98553736 + r * 0.01366120 + g * 0.94258630 + b * 0.01451549);\\n    R[19] = max(SPECTRAL_EPSILON, w + c * 0.96829712 + m * 0.00011720 + y * 0.98648905 + r * 0.03181352 + g * 0.99989207 + b * 0.01357964);\\n    R[20] = max(SPECTRAL_EPSILON, w + c * 0.89228016 + m * 0.00008554 + y * 0.98674535 + r * 0.10791525 + g * 0.99989891 + b * 0.01331243);\\n    R[21] = max(SPECTRAL_EPSILON, w + c * 0.53740239 + m * 0.85267882 + y * 0.98657555 + r * 0.46249516 + g * 0.13823139 + b * 0.01347661);\\n    R[22] = max(SPECTRAL_EPSILON, w + c * 0.15360445 + m * 0.93188793 + y * 0.98611877 + r * 0.84604333 + g * 0.06968113 + b * 0.01387181);\\n    R[23] = max(SPECTRAL_EPSILON, w + c * 0.05705719 + m * 0.94810268 + y * 0.98559942 + r * 0.94275572 + g * 0.05628787 + b * 0.01435472);\\n    R[24] = max(SPECTRAL_EPSILON, w + c * 0.03126539 + m * 0.94200977 + y * 0.98507063 + r * 0.96860996 + g * 0.06111561 + b * 0.01479836);\\n    R[25] = max(SPECTRAL_EPSILON, w + c * 0.02205445 + m * 0.91478045 + y * 0.98460039 + r * 0.97783966 + g * 0.08987709 + b * 0.01515250);\\n    R[26] = max(SPECTRAL_EPSILON, w + c * 0.01802271 + m * 0.87065445 + y * 0.98425301 + r * 0.98187757 + g * 0.13656016 + b * 0.01540513);\\n    R[27] = max(SPECTRAL_EPSILON, w + c * 0.01613460 + m * 0.78827548 + y * 0.98403909 + r * 0.98377315 + g * 0.22169624 + b * 0.01557233);\\n    R[28] = max(SPECTRAL_EPSILON, w + c * 0.01520947 + m * 0.65738359 + y * 0.98388535 + r * 0.98470202 + g * 0.32176956 + b * 0.01565710);\\n    R[29] = max(SPECTRAL_EPSILON, w + c * 0.01475977 + m * 0.59909403 + y * 0.98376116 + r * 0.98515481 + g * 0.36157329 + b * 0.01571025);\\n    R[30] = max(SPECTRAL_EPSILON, w + c * 0.01454263 + m * 0.56817268 + y * 0.98368246 + r * 0.98537114 + g * 0.48361920 + b * 0.01571916);\\n    R[31] = max(SPECTRAL_EPSILON, w + c * 0.01444459 + m * 0.54031997 + y * 0.98365023 + r * 0.98546685 + g * 0.46488579 + b * 0.01572133);\\n    R[32] = max(SPECTRAL_EPSILON, w + c * 0.01439897 + m * 0.52110241 + y * 0.98361309 + r * 0.98550011 + g * 0.47440306 + b * 0.01572502);\\n    R[33] = max(SPECTRAL_EPSILON, w + c * 0.01437620 + m * 0.51041094 + y * 0.98357259 + r * 0.98551031 + g * 0.48576990 + b * 0.01571717);\\n    R[34] = max(SPECTRAL_EPSILON, w + c * 0.01436343 + m * 0.50526577 + y * 0.98353856 + r * 0.98550741 + g * 0.49267971 + b * 0.01571905);\\n    R[35] = max(SPECTRAL_EPSILON, w + c * 0.01435687 + m * 0.50255080 + y * 0.98351247 + r * 0.98551323 + g * 0.49625685 + b * 0.01571059);\\n    R[36] = max(SPECTRAL_EPSILON, w + c * 0.01435370 + m * 0.50126452 + y * 0.98350101 + r * 0.98551563 + g * 0.49807754 + b * 0.01569728);\\n    R[37] = max(SPECTRAL_EPSILON, w + c * 0.01435408 + m * 0.50083021 + y * 0.98350852 + r * 0.98551547 + g * 0.49889859 + b * 0.01570020);\\n}\\n\\nvec3 spectral_xyz_to_srgb(vec3 xyz) {\\n    mat3 XYZ_RGB;\\n\\n    XYZ_RGB[0] = vec3( 3.24306333, -1.53837619, -0.49893282);\\n    XYZ_RGB[1] = vec3(-0.96896309,  1.87542451,  0.04154303);\\n    XYZ_RGB[2] = vec3( 0.05568392, -0.20417438,  1.05799454);\\n    \\n    float r = dot(XYZ_RGB[0], xyz);\\n    float g = dot(XYZ_RGB[1], xyz);\\n    float b = dot(XYZ_RGB[2], xyz);\\n\\n    return spectral_linear_to_srgb(vec3(r, g, b));\\n}\\n\\nvec3 spectral_reflectance_to_xyz(float R[SPECTRAL_SIZE]) {\\n    vec3 xyz = vec3(0.0);\\n    \\n    xyz +=  R[0] * vec3(0.00006469, 0.00000184, 0.00030502);\\n    xyz +=  R[1] * vec3(0.00021941, 0.00000621, 0.00103681);\\n    xyz +=  R[2] * vec3(0.00112057, 0.00003101, 0.00531314);\\n    xyz +=  R[3] * vec3(0.00376661, 0.00010475, 0.01795439);\\n    xyz +=  R[4] * vec3(0.01188055, 0.00035364, 0.05707758);\\n    xyz +=  R[5] * vec3(0.02328644, 0.00095147, 0.11365162);\\n    xyz +=  R[6] * vec3(0.03455942, 0.00228226, 0.17335873);\\n    xyz +=  R[7] * vec3(0.03722379, 0.00420733, 0.19620658);\\n    xyz +=  R[8] * vec3(0.03241838, 0.00668880, 0.18608237);\\n    xyz +=  R[9] * vec3(0.02123321, 0.00988840, 0.13995048);\\n    xyz += R[10] * vec3(0.01049099, 0.01524945, 0.08917453);\\n    xyz += R[11] * vec3(0.00329584, 0.02141831, 0.04789621);\\n    xyz += R[12] * vec3(0.00050704, 0.03342293, 0.02814563);\\n    xyz += R[13] * vec3(0.00094867, 0.05131001, 0.01613766);\\n    xyz += R[14] * vec3(0.00627372, 0.07040208, 0.00775910);\\n    xyz += R[15] * vec3(0.01686462, 0.08783871, 0.00429615);\\n    xyz += R[16] * vec3(0.02868965, 0.09424905, 0.00200551);\\n    xyz += R[17] * vec3(0.04267481, 0.09795667, 0.00086147);\\n    xyz += R[18] * vec3(0.05625475, 0.09415219, 0.00036904);\\n    xyz += R[19] * vec3(0.06947040, 0.08678102, 0.00019143);\\n    xyz += R[20] * vec3(0.08305315, 0.07885653, 0.00014956);\\n    xyz += R[21] * vec3(0.08612610, 0.06352670, 0.00009231);\\n    xyz += R[22] * vec3(0.09046614, 0.05374142, 0.00006813);\\n    xyz += R[23] * vec3(0.08500387, 0.04264606, 0.00002883);\\n    xyz += R[24] * vec3(0.07090667, 0.03161735, 0.00001577);\\n    xyz += R[25] * vec3(0.05062889, 0.02088521, 0.00000394);\\n    xyz += R[26] * vec3(0.03547396, 0.01386011, 0.00000158);\\n    xyz += R[27] * vec3(0.02146821, 0.00810264, 0.00000000);\\n    xyz += R[28] * vec3(0.01251646, 0.00463010, 0.00000000);\\n    xyz += R[29] * vec3(0.00680458, 0.00249138, 0.00000000);\\n    xyz += R[30] * vec3(0.00346457, 0.00125930, 0.00000000);\\n    xyz += R[31] * vec3(0.00149761, 0.00054165, 0.00000000);\\n    xyz += R[32] * vec3(0.00076970, 0.00027795, 0.00000000);\\n    xyz += R[33] * vec3(0.00040737, 0.00014711, 0.00000000);\\n    xyz += R[34] * vec3(0.00016901, 0.00006103, 0.00000000);\\n    xyz += R[35] * vec3(0.00009522, 0.00003439, 0.00000000);\\n    xyz += R[36] * vec3(0.00004903, 0.00001771, 0.00000000);\\n    xyz += R[37] * vec3(0.00002000, 0.00000722, 0.00000000);\\n\\n    return xyz;\\n}\\n\\nfloat spectral_linear_to_concentration(float l1, float l2, float t) {\\n    float t1 = l1 * pow(1.0 - t, 2.0);\\n    float t2 = l2 * pow(t, 2.0);\\n\\n    return t2 / (t1 + t2);\\n}\\n\\nvec3 spectral_mix(vec3 color1, vec3 color2, float t) {\\n    vec3 lrgb1 = spectral_srgb_to_linear(color1);\\n    vec3 lrgb2 = spectral_srgb_to_linear(color2);\\n\\n    float R1[SPECTRAL_SIZE];\\n    float R2[SPECTRAL_SIZE];\\n\\n    spectral_linear_to_reflectance(lrgb1, R1);\\n    spectral_linear_to_reflectance(lrgb2, R2);\\n\\n    float l1 = spectral_reflectance_to_xyz(R1)[1];\\n    float l2 = spectral_reflectance_to_xyz(R2)[1];\\n\\n    t = spectral_linear_to_concentration(l1, l2, t);\\n\\n    float R[SPECTRAL_SIZE];\\n\\n    for (int i = 0; i < SPECTRAL_SIZE; i++) {\\n      float KS = (1.0 - t) * (pow(1.0 - R1[i], 2.0) / (2.0 * R1[i])) + t * (pow(1.0 - R2[i], 2.0) / (2.0 * R2[i]));\\n      float KM = 1.0 + KS - sqrt(pow(KS, 2.0) + 2.0 * KS);\\n\\n      //Saunderson correction\\n      // let S = ((1.0 - K1) * (1.0 - K2) * KM) / (1.0 - K2 * KM);\\n\\n      R[i] = KM;\\n    }\\n\\n    return spectral_xyz_to_srgb(spectral_reflectance_to_xyz(R));\\n}\\n\\nvec4 spectral_mix(vec4 color1, vec4 color2, float t) {\\n    return vec4(spectral_mix(color1.rgb, color2.rgb, t), mix(color1.a, color2.a, t));\\n}\\n\\n#endif\\n\\nvec3 mul3( in mat3 m, in vec3 v ){return vec3(dot(v,m[0]),dot(v,m[1]),dot(v,m[2]));}\\n\\nvec3 mul3( in vec3 v, in mat3 m ){return mul3(m,v);}\\n\\nvec3 srgb2oklab(vec3 c) {\\n    \\n    mat3 m1 = mat3(\\n        0.4122214708,0.5363325363,0.0514459929,\\n        0.2119034982,0.6806995451,0.1073969566,\\n        0.0883024619,0.2817188376,0.6299787005\\n    );\\n    \\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = pow(lms,vec3(1./3.));\\n\\n    mat3 m2 = mat3(\\n        +0.2104542553,+0.7936177850,-0.0040720468,\\n        +1.9779984951,-2.4285922050,+0.4505937099,\\n        +0.0259040371,+0.7827717662,-0.8086757660\\n    );\\n    \\n    return mul3(m2,lms);\\n}\\n\\nvec3 oklab2srgb(vec3 c)\\n{\\n    mat3 m1 = mat3(\\n        1.0000000000,+0.3963377774,+0.2158037573,\\n        1.0000000000,-0.1055613458,-0.0638541728,\\n        1.0000000000,-0.0894841775,-1.2914855480\\n    );\\n\\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = lms * lms * lms;\\n  \\n    mat3 m2 = mat3(\\n        +4.0767416621,-3.3077115913,+0.2309699292,\\n        -1.2684380046,+2.6097574011,-0.3413193965,\\n        -0.0041960863,-0.7034186147,+1.7076147010\\n    );\\n    return mul3(m2,lms);\\n}\\n\\nvec3 lab2lch( in vec3 c ){return vec3(c.x,sqrt((c.y*c.y) + (c.z * c.z)),atan(c.z,c.y));}\\n\\nvec3 lch2lab( in vec3 c ){return vec3(c.x,c.y*cos(c.z),c.y*sin(c.z));}\\n\\nvec3 srgb_to_oklch( in vec3 c ) { return lab2lch(srgb2oklab(c)); }\\nvec3 oklch_to_srgb( in vec3 c ) { return oklab2srgb(lch2lab(c)); }\\n\\nfloat luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }\\n\\nfloat luma(vec4 color) { return dot(color.rgb, vec3(0.299, 0.587, 0.114)); }\\n\\nvec4 rgb2cmyki(in vec3 c) { float k = max(max(c.r, c.g), c.b); return min(vec4(c.rgb / k, k), 1.0); }\\n\\nvec3 cmyki2rgb(in vec4 c) { return c.rgb * c.a; }\\n\\nvec3 lerpHSV(in vec3 hsv1, in vec3 hsv2, in float rate)\\n{\\n    float hue = (mod(mod((hsv2.x-hsv1.x), 1.) + 1.5, 1.)-0.5)*rate + hsv1.x;\\n    return vec3(hue, mix(hsv1.yz, hsv2.yz, rate));\\n}\\n\\nvec3 hsv2rgb(vec3 c)\\n{\\n    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nvec3 rgb2hsv(vec3 c)\\n{\\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\\n\\n    float d = q.x - min(q.w, q.y);\\n    float e = 1.0e-10;\\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\\n}\\n\\nvec3 hsv2rgbSmooth( in vec3 hsv )\\n{\\n    vec3 rgb = clamp( abs(mod(hsv.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );\\n\\n    rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing\\n\\n    return hsv.z * mix( vec3(1.0), rgb, hsv.y);\\n}\\n\\nvec3 hueShift(vec3 col, vec3 hsv){\\n    vec3 h = rgb2hsv(col);\\n    h.x += hsv.x;\\n\\n    h.y *= hsv.y;\\n    h.z *= hsv.z;\\n\\n    return hsv2rgbSmooth(h);\\n}\\n\\nvec4 blend_brushstroke(vec4 col, vec4 stroke, int blending_colour_space){\\n  // col.xyz = mix(col.xyz, stroke.xyz, stroke.w); \\n  \\n  int mode = blending_colour_space;\\n  \\n  if(stroke.w > 0.00000001){\\n    // float interpolant = stroke.w;\\n    stroke.xyz = stroke.xyz/max(stroke.w,0.001);\\n    \\n    if(mode == 0){\\n      col.xyz = spectral_mix(col.xyz, clamp(stroke.xyz,0.00001,0.99999), stroke.w);\\n      if(stroke.w > 0.99999)\\n        col.xyz = stroke.xyz;\\n    } else if(mode == 1){\\n      col.xyz = srgb_to_oklch( col.xyz );\\n      stroke.xyz = srgb_to_oklch( stroke.xyz );\\n      col.xy = mix(col.xy, stroke.xy,stroke.w);\\n      float tau = acos(-1.) * 2.;\\n      float h_a = stroke.z;\\n      float h_b = stroke.z + tau;\\n      float dist_a = abs(col.z - h_a);\\n      float dist_b = abs(col.z - h_b);\\n      if(dist_a < dist_b){\\n        col.z = mix(col.z, h_a, stroke.w);\\n      } else {\\n        col.z = mix(col.z, h_b, stroke.w);\\n      }\\n      col.z = mod(col.z, tau);\\n      // col.z = max(col.z)\\n      // if(isnan(col.z)){\\n      //   col.z = 1.;\\n      // }\\n\\n      col.xyz = oklch_to_srgb( col.xyz );\\n      col.xyz = clamp(col.xyz,0.,1.);\\n    } else {\\n      col.xyz = mix(col.xyz, stroke.xyz, stroke.w);\\n    }\\n    col.w = max(col.w, stroke.w);\\n  }\\n\\n  return col; \\n}\\n\\nuniform sampler2D fb_a;\\nuniform sampler2D fb_b;\\n\\nin vec2 uv;\\nout vec4 col;\\n\\nvoid main() {\\n  \\n  vec2 u = (gl_FragCoord.xy - 0.5*R)/min(R.x,R.y);\\n  \\n  vec4 tex_this_prev_frame = texture(fb_a, gl_FragCoord.xy/R);\\n  vec4 tex_lines_curr = texture(fb_b, gl_FragCoord.xy/R);\\n  vec4 fac = vec4(0.3,.1 - ptr_pressure * 0.3,0.9,1);\\n  col = mix(\\n    tex_this_prev_frame,\\n    tex_lines_curr.a * fac,\\n    0.01\\n  );\\n    \\n  col.w = 1.;\\n}    \\n\\n  \\n  \\n\\t\\t \";";
+module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n  float dark_mode;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\n\\n#ifndef SPECTRAL\\n#define SPECTRAL\\n\\nconst int SPECTRAL_SIZE = 38;\\nconst float SPECTRAL_GAMMA = 2.4;\\nconst float SPECTRAL_EPSILON = 0.0001;\\n\\nfloat spectral_uncompand(float x) {\\n  return (x < 0.04045) ? x / 12.92 : pow((x + 0.055) / 1.055, SPECTRAL_GAMMA);\\n}\\n\\nfloat spectral_compand(float x) {\\n  return (x < 0.0031308) ? x * 12.92 : 1.055 * pow(x, 1.0 / SPECTRAL_GAMMA) - 0.055;\\n}\\n\\nvec3 spectral_srgb_to_linear(vec3 srgb) {\\n    return vec3(spectral_uncompand(srgb[0]), spectral_uncompand(srgb[1]), spectral_uncompand(srgb[2]));\\n}\\n\\nvec3 spectral_linear_to_srgb(vec3 lrgb) {\\n    return clamp(vec3(spectral_compand(lrgb[0]), spectral_compand(lrgb[1]), spectral_compand(lrgb[2])), 0.0, 1.0);\\n}\\n\\nvoid spectral_upsampling(vec3 lrgb, out float w, out float c, out float m, out float y, out float r, out float g, out float b) {\\n    w = min(lrgb.r, min(lrgb.g, lrgb.b));\\n\\n    lrgb -= w;\\n\\n    c = min(lrgb.g, lrgb.b);\\n    m = min(lrgb.r, lrgb.b);\\n    y = min(lrgb.r, lrgb.g);\\n    r = min(max(0., lrgb.r - lrgb.b), max(0., lrgb.r - lrgb.g));\\n    g = min(max(0., lrgb.g - lrgb.b), max(0., lrgb.g - lrgb.r));\\n    b = min(max(0., lrgb.b - lrgb.g), max(0., lrgb.b - lrgb.r));\\n}\\n\\nvoid spectral_linear_to_reflectance(vec3 lrgb, inout float R[SPECTRAL_SIZE]) {\\n    float w, c, m, y, r, g, b;\\n    \\n    spectral_upsampling(lrgb, w, c, m, y, r, g, b);\\n    \\n     R[0] = max(SPECTRAL_EPSILON, w + c * 0.96853629 + m * 0.51567122 + y * 0.02055257 + r * 0.03147571 + g * 0.49108579 + b * 0.97901834);\\n     R[1] = max(SPECTRAL_EPSILON, w + c * 0.96855103 + m * 0.54015520 + y * 0.02059936 + r * 0.03146636 + g * 0.46944057 + b * 0.97901649);\\n     R[2] = max(SPECTRAL_EPSILON, w + c * 0.96859338 + m * 0.62645502 + y * 0.02062723 + r * 0.03140624 + g * 0.40165780 + b * 0.97901118);\\n     R[3] = max(SPECTRAL_EPSILON, w + c * 0.96877345 + m * 0.75595012 + y * 0.02073387 + r * 0.03119611 + g * 0.24490420 + b * 0.97892146);\\n     R[4] = max(SPECTRAL_EPSILON, w + c * 0.96942204 + m * 0.92826996 + y * 0.02114202 + r * 0.03053888 + g * 0.06826880 + b * 0.97858555);\\n     R[5] = max(SPECTRAL_EPSILON, w + c * 0.97143709 + m * 0.97223624 + y * 0.02233154 + r * 0.02856855 + g * 0.02732883 + b * 0.97743705);\\n     R[6] = max(SPECTRAL_EPSILON, w + c * 0.97541862 + m * 0.98616174 + y * 0.02556857 + r * 0.02459485 + g * 0.01360600 + b * 0.97428075);\\n     R[7] = max(SPECTRAL_EPSILON, w + c * 0.98074186 + m * 0.98955255 + y * 0.03330189 + r * 0.01929520 + g * 0.01000187 + b * 0.96663223);\\n     R[8] = max(SPECTRAL_EPSILON, w + c * 0.98580992 + m * 0.98676237 + y * 0.05185294 + r * 0.01423112 + g * 0.01284127 + b * 0.94822893);\\n     R[9] = max(SPECTRAL_EPSILON, w + c * 0.98971194 + m * 0.97312575 + y * 0.10087639 + r * 0.01033111 + g * 0.02636635 + b * 0.89937713);\\n    R[10] = max(SPECTRAL_EPSILON, w + c * 0.99238027 + m * 0.91944277 + y * 0.24000413 + r * 0.00765876 + g * 0.07058713 + b * 0.76070164);\\n    R[11] = max(SPECTRAL_EPSILON, w + c * 0.99409844 + m * 0.32564851 + y * 0.53589066 + r * 0.00593693 + g * 0.70421692 + b * 0.46420440);\\n    R[12] = max(SPECTRAL_EPSILON, w + c * 0.99517200 + m * 0.13820628 + y * 0.79874659 + r * 0.00485616 + g * 0.85473994 + b * 0.20123039);\\n    R[13] = max(SPECTRAL_EPSILON, w + c * 0.99576545 + m * 0.05015143 + y * 0.91186529 + r * 0.00426186 + g * 0.95081565 + b * 0.08808402);\\n    R[14] = max(SPECTRAL_EPSILON, w + c * 0.99593552 + m * 0.02912336 + y * 0.95399623 + r * 0.00409039 + g * 0.97170370 + b * 0.04592894);\\n    R[15] = max(SPECTRAL_EPSILON, w + c * 0.99564041 + m * 0.02421691 + y * 0.97137099 + r * 0.00438375 + g * 0.97651888 + b * 0.02860373);\\n    R[16] = max(SPECTRAL_EPSILON, w + c * 0.99464769 + m * 0.02660696 + y * 0.97939505 + r * 0.00537525 + g * 0.97429245 + b * 0.02060067);\\n    R[17] = max(SPECTRAL_EPSILON, w + c * 0.99229579 + m * 0.03407586 + y * 0.98345207 + r * 0.00772962 + g * 0.97012917 + b * 0.01656701);\\n    R[18] = max(SPECTRAL_EPSILON, w + c * 0.98638762 + m * 0.04835936 + y * 0.98553736 + r * 0.01366120 + g * 0.94258630 + b * 0.01451549);\\n    R[19] = max(SPECTRAL_EPSILON, w + c * 0.96829712 + m * 0.00011720 + y * 0.98648905 + r * 0.03181352 + g * 0.99989207 + b * 0.01357964);\\n    R[20] = max(SPECTRAL_EPSILON, w + c * 0.89228016 + m * 0.00008554 + y * 0.98674535 + r * 0.10791525 + g * 0.99989891 + b * 0.01331243);\\n    R[21] = max(SPECTRAL_EPSILON, w + c * 0.53740239 + m * 0.85267882 + y * 0.98657555 + r * 0.46249516 + g * 0.13823139 + b * 0.01347661);\\n    R[22] = max(SPECTRAL_EPSILON, w + c * 0.15360445 + m * 0.93188793 + y * 0.98611877 + r * 0.84604333 + g * 0.06968113 + b * 0.01387181);\\n    R[23] = max(SPECTRAL_EPSILON, w + c * 0.05705719 + m * 0.94810268 + y * 0.98559942 + r * 0.94275572 + g * 0.05628787 + b * 0.01435472);\\n    R[24] = max(SPECTRAL_EPSILON, w + c * 0.03126539 + m * 0.94200977 + y * 0.98507063 + r * 0.96860996 + g * 0.06111561 + b * 0.01479836);\\n    R[25] = max(SPECTRAL_EPSILON, w + c * 0.02205445 + m * 0.91478045 + y * 0.98460039 + r * 0.97783966 + g * 0.08987709 + b * 0.01515250);\\n    R[26] = max(SPECTRAL_EPSILON, w + c * 0.01802271 + m * 0.87065445 + y * 0.98425301 + r * 0.98187757 + g * 0.13656016 + b * 0.01540513);\\n    R[27] = max(SPECTRAL_EPSILON, w + c * 0.01613460 + m * 0.78827548 + y * 0.98403909 + r * 0.98377315 + g * 0.22169624 + b * 0.01557233);\\n    R[28] = max(SPECTRAL_EPSILON, w + c * 0.01520947 + m * 0.65738359 + y * 0.98388535 + r * 0.98470202 + g * 0.32176956 + b * 0.01565710);\\n    R[29] = max(SPECTRAL_EPSILON, w + c * 0.01475977 + m * 0.59909403 + y * 0.98376116 + r * 0.98515481 + g * 0.36157329 + b * 0.01571025);\\n    R[30] = max(SPECTRAL_EPSILON, w + c * 0.01454263 + m * 0.56817268 + y * 0.98368246 + r * 0.98537114 + g * 0.48361920 + b * 0.01571916);\\n    R[31] = max(SPECTRAL_EPSILON, w + c * 0.01444459 + m * 0.54031997 + y * 0.98365023 + r * 0.98546685 + g * 0.46488579 + b * 0.01572133);\\n    R[32] = max(SPECTRAL_EPSILON, w + c * 0.01439897 + m * 0.52110241 + y * 0.98361309 + r * 0.98550011 + g * 0.47440306 + b * 0.01572502);\\n    R[33] = max(SPECTRAL_EPSILON, w + c * 0.01437620 + m * 0.51041094 + y * 0.98357259 + r * 0.98551031 + g * 0.48576990 + b * 0.01571717);\\n    R[34] = max(SPECTRAL_EPSILON, w + c * 0.01436343 + m * 0.50526577 + y * 0.98353856 + r * 0.98550741 + g * 0.49267971 + b * 0.01571905);\\n    R[35] = max(SPECTRAL_EPSILON, w + c * 0.01435687 + m * 0.50255080 + y * 0.98351247 + r * 0.98551323 + g * 0.49625685 + b * 0.01571059);\\n    R[36] = max(SPECTRAL_EPSILON, w + c * 0.01435370 + m * 0.50126452 + y * 0.98350101 + r * 0.98551563 + g * 0.49807754 + b * 0.01569728);\\n    R[37] = max(SPECTRAL_EPSILON, w + c * 0.01435408 + m * 0.50083021 + y * 0.98350852 + r * 0.98551547 + g * 0.49889859 + b * 0.01570020);\\n}\\n\\nvec3 spectral_xyz_to_srgb(vec3 xyz) {\\n    mat3 XYZ_RGB;\\n\\n    XYZ_RGB[0] = vec3( 3.24306333, -1.53837619, -0.49893282);\\n    XYZ_RGB[1] = vec3(-0.96896309,  1.87542451,  0.04154303);\\n    XYZ_RGB[2] = vec3( 0.05568392, -0.20417438,  1.05799454);\\n    \\n    float r = dot(XYZ_RGB[0], xyz);\\n    float g = dot(XYZ_RGB[1], xyz);\\n    float b = dot(XYZ_RGB[2], xyz);\\n\\n    return spectral_linear_to_srgb(vec3(r, g, b));\\n}\\n\\nvec3 spectral_reflectance_to_xyz(float R[SPECTRAL_SIZE]) {\\n    vec3 xyz = vec3(0.0);\\n    \\n    xyz +=  R[0] * vec3(0.00006469, 0.00000184, 0.00030502);\\n    xyz +=  R[1] * vec3(0.00021941, 0.00000621, 0.00103681);\\n    xyz +=  R[2] * vec3(0.00112057, 0.00003101, 0.00531314);\\n    xyz +=  R[3] * vec3(0.00376661, 0.00010475, 0.01795439);\\n    xyz +=  R[4] * vec3(0.01188055, 0.00035364, 0.05707758);\\n    xyz +=  R[5] * vec3(0.02328644, 0.00095147, 0.11365162);\\n    xyz +=  R[6] * vec3(0.03455942, 0.00228226, 0.17335873);\\n    xyz +=  R[7] * vec3(0.03722379, 0.00420733, 0.19620658);\\n    xyz +=  R[8] * vec3(0.03241838, 0.00668880, 0.18608237);\\n    xyz +=  R[9] * vec3(0.02123321, 0.00988840, 0.13995048);\\n    xyz += R[10] * vec3(0.01049099, 0.01524945, 0.08917453);\\n    xyz += R[11] * vec3(0.00329584, 0.02141831, 0.04789621);\\n    xyz += R[12] * vec3(0.00050704, 0.03342293, 0.02814563);\\n    xyz += R[13] * vec3(0.00094867, 0.05131001, 0.01613766);\\n    xyz += R[14] * vec3(0.00627372, 0.07040208, 0.00775910);\\n    xyz += R[15] * vec3(0.01686462, 0.08783871, 0.00429615);\\n    xyz += R[16] * vec3(0.02868965, 0.09424905, 0.00200551);\\n    xyz += R[17] * vec3(0.04267481, 0.09795667, 0.00086147);\\n    xyz += R[18] * vec3(0.05625475, 0.09415219, 0.00036904);\\n    xyz += R[19] * vec3(0.06947040, 0.08678102, 0.00019143);\\n    xyz += R[20] * vec3(0.08305315, 0.07885653, 0.00014956);\\n    xyz += R[21] * vec3(0.08612610, 0.06352670, 0.00009231);\\n    xyz += R[22] * vec3(0.09046614, 0.05374142, 0.00006813);\\n    xyz += R[23] * vec3(0.08500387, 0.04264606, 0.00002883);\\n    xyz += R[24] * vec3(0.07090667, 0.03161735, 0.00001577);\\n    xyz += R[25] * vec3(0.05062889, 0.02088521, 0.00000394);\\n    xyz += R[26] * vec3(0.03547396, 0.01386011, 0.00000158);\\n    xyz += R[27] * vec3(0.02146821, 0.00810264, 0.00000000);\\n    xyz += R[28] * vec3(0.01251646, 0.00463010, 0.00000000);\\n    xyz += R[29] * vec3(0.00680458, 0.00249138, 0.00000000);\\n    xyz += R[30] * vec3(0.00346457, 0.00125930, 0.00000000);\\n    xyz += R[31] * vec3(0.00149761, 0.00054165, 0.00000000);\\n    xyz += R[32] * vec3(0.00076970, 0.00027795, 0.00000000);\\n    xyz += R[33] * vec3(0.00040737, 0.00014711, 0.00000000);\\n    xyz += R[34] * vec3(0.00016901, 0.00006103, 0.00000000);\\n    xyz += R[35] * vec3(0.00009522, 0.00003439, 0.00000000);\\n    xyz += R[36] * vec3(0.00004903, 0.00001771, 0.00000000);\\n    xyz += R[37] * vec3(0.00002000, 0.00000722, 0.00000000);\\n\\n    return xyz;\\n}\\n\\nfloat spectral_linear_to_concentration(float l1, float l2, float t) {\\n    float t1 = l1 * pow(1.0 - t, 2.0);\\n    float t2 = l2 * pow(t, 2.0);\\n\\n    return t2 / (t1 + t2);\\n}\\n\\nvec3 spectral_mix(vec3 color1, vec3 color2, float t) {\\n    vec3 lrgb1 = spectral_srgb_to_linear(color1);\\n    vec3 lrgb2 = spectral_srgb_to_linear(color2);\\n\\n    float R1[SPECTRAL_SIZE];\\n    float R2[SPECTRAL_SIZE];\\n\\n    spectral_linear_to_reflectance(lrgb1, R1);\\n    spectral_linear_to_reflectance(lrgb2, R2);\\n\\n    float l1 = spectral_reflectance_to_xyz(R1)[1];\\n    float l2 = spectral_reflectance_to_xyz(R2)[1];\\n\\n    t = spectral_linear_to_concentration(l1, l2, t);\\n\\n    float R[SPECTRAL_SIZE];\\n\\n    for (int i = 0; i < SPECTRAL_SIZE; i++) {\\n      float KS = (1.0 - t) * (pow(1.0 - R1[i], 2.0) / (2.0 * R1[i])) + t * (pow(1.0 - R2[i], 2.0) / (2.0 * R2[i]));\\n      float KM = 1.0 + KS - sqrt(pow(KS, 2.0) + 2.0 * KS);\\n\\n      //Saunderson correction\\n      // let S = ((1.0 - K1) * (1.0 - K2) * KM) / (1.0 - K2 * KM);\\n\\n      R[i] = KM;\\n    }\\n\\n    return spectral_xyz_to_srgb(spectral_reflectance_to_xyz(R));\\n}\\n\\nvec4 spectral_mix(vec4 color1, vec4 color2, float t) {\\n    return vec4(spectral_mix(color1.rgb, color2.rgb, t), mix(color1.a, color2.a, t));\\n}\\n\\n#endif\\n\\nvec3 mul3( in mat3 m, in vec3 v ){return vec3(dot(v,m[0]),dot(v,m[1]),dot(v,m[2]));}\\n\\nvec3 mul3( in vec3 v, in mat3 m ){return mul3(m,v);}\\n\\nvec3 srgb2oklab(vec3 c) {\\n    \\n    mat3 m1 = mat3(\\n        0.4122214708,0.5363325363,0.0514459929,\\n        0.2119034982,0.6806995451,0.1073969566,\\n        0.0883024619,0.2817188376,0.6299787005\\n    );\\n    \\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = pow(lms,vec3(1./3.));\\n\\n    mat3 m2 = mat3(\\n        +0.2104542553,+0.7936177850,-0.0040720468,\\n        +1.9779984951,-2.4285922050,+0.4505937099,\\n        +0.0259040371,+0.7827717662,-0.8086757660\\n    );\\n    \\n    return mul3(m2,lms);\\n}\\n\\nvec3 oklab2srgb(vec3 c)\\n{\\n    mat3 m1 = mat3(\\n        1.0000000000,+0.3963377774,+0.2158037573,\\n        1.0000000000,-0.1055613458,-0.0638541728,\\n        1.0000000000,-0.0894841775,-1.2914855480\\n    );\\n\\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = lms * lms * lms;\\n  \\n    mat3 m2 = mat3(\\n        +4.0767416621,-3.3077115913,+0.2309699292,\\n        -1.2684380046,+2.6097574011,-0.3413193965,\\n        -0.0041960863,-0.7034186147,+1.7076147010\\n    );\\n    return mul3(m2,lms);\\n}\\n\\nvec3 lab2lch( in vec3 c ){return vec3(c.x,sqrt((c.y*c.y) + (c.z * c.z)),atan(c.z,c.y));}\\n\\nvec3 lch2lab( in vec3 c ){return vec3(c.x,c.y*cos(c.z),c.y*sin(c.z));}\\n\\nvec3 srgb_to_oklch( in vec3 c ) { return lab2lch(srgb2oklab(c)); }\\nvec3 oklch_to_srgb( in vec3 c ) { return oklab2srgb(lch2lab(c)); }\\n\\nfloat luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }\\n\\nfloat luma(vec4 color) { return dot(color.rgb, vec3(0.299, 0.587, 0.114)); }\\n\\nvec4 rgb2cmyki(in vec3 c) { float k = max(max(c.r, c.g), c.b); return min(vec4(c.rgb / k, k), 1.0); }\\n\\nvec3 cmyki2rgb(in vec4 c) { return c.rgb * c.a; }\\n\\nvec3 lerpHSV(in vec3 hsv1, in vec3 hsv2, in float rate)\\n{\\n    float hue = (mod(mod((hsv2.x-hsv1.x), 1.) + 1.5, 1.)-0.5)*rate + hsv1.x;\\n    return vec3(hue, mix(hsv1.yz, hsv2.yz, rate));\\n}\\n\\nvec3 hsv2rgb(vec3 c)\\n{\\n    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nvec3 rgb2hsv(vec3 c)\\n{\\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\\n\\n    float d = q.x - min(q.w, q.y);\\n    float e = 1.0e-10;\\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\\n}\\n\\nvec3 hsv2rgbSmooth( in vec3 hsv )\\n{\\n    vec3 rgb = clamp( abs(mod(hsv.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );\\n\\n    rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing\\n\\n    return hsv.z * mix( vec3(1.0), rgb, hsv.y);\\n}\\n\\nvec3 hueShift(vec3 col, vec3 hsv){\\n    vec3 h = rgb2hsv(col);\\n    h.x += hsv.x;\\n\\n    h.y *= hsv.y;\\n    h.z *= hsv.z;\\n\\n    return hsv2rgbSmooth(h);\\n}\\n\\nvec4 blend_brushstroke(vec4 col, vec4 stroke, int blending_colour_space){\\n  // col.xyz = mix(col.xyz, stroke.xyz, stroke.w); \\n  \\n  int mode = blending_colour_space;\\n  \\n  if(stroke.w > 0.00000001){\\n    // float interpolant = stroke.w;\\n    stroke.xyz = stroke.xyz/max(stroke.w,0.001);\\n    \\n    if(mode == 0){\\n      col.xyz = spectral_mix(col.xyz, clamp(stroke.xyz,0.00001,0.99999), stroke.w);\\n      if(stroke.w > 0.99999)\\n        col.xyz = stroke.xyz;\\n    } else if(mode == 1){\\n      col.xyz = srgb_to_oklch( col.xyz );\\n      stroke.xyz = srgb_to_oklch( stroke.xyz );\\n      col.xy = mix(col.xy, stroke.xy,stroke.w);\\n      float tau = acos(-1.) * 2.;\\n      float h_a = stroke.z;\\n      float h_b = stroke.z + tau;\\n      float dist_a = abs(col.z - h_a);\\n      float dist_b = abs(col.z - h_b);\\n      if(dist_a < dist_b){\\n        col.z = mix(col.z, h_a, stroke.w);\\n      } else {\\n        col.z = mix(col.z, h_b, stroke.w);\\n      }\\n      col.z = mod(col.z, tau);\\n      // col.z = max(col.z)\\n      // if(isnan(col.z)){\\n      //   col.z = 1.;\\n      // }\\n\\n      col.xyz = oklch_to_srgb( col.xyz );\\n      col.xyz = clamp(col.xyz,0.,1.);\\n    } else {\\n      col.xyz = mix(col.xyz, stroke.xyz, stroke.w);\\n    }\\n    col.w = max(col.w, stroke.w);\\n  }\\n\\n  return col; \\n}\\n\\nuniform sampler2D fb_a;\\nuniform sampler2D fb_b;\\n\\nin vec2 uv;\\nout vec4 col;\\n\\nvoid main() {\\n  \\n  vec2 u = (gl_FragCoord.xy - 0.5*R)/min(R.x,R.y);\\n  \\n  vec4 tex_this_prev_frame = texture(fb_a, gl_FragCoord.xy/R);\\n  vec4 tex_lines_curr = texture(fb_b, gl_FragCoord.xy/R);\\n  vec4 fac = vec4(0.3,.1 - ptr_pressure * 0.3,0.9,1);\\n  col = mix(\\n    tex_this_prev_frame,\\n    tex_lines_curr.a * fac,\\n    0.01\\n  );\\n    \\n  col.w = 1.;\\n}    \\n\\n  \\n  \\n\\t\\t \";";
 
 /***/ }),
 
@@ -631,7 +631,7 @@ module.exports = "export default \"#version 300 es\\nprecision highp float;\\npr
 /***/ ((module) => {
 
 "use strict";
-module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\nout vec2 uv;\\n\\nvec2 css_contain(vec2 u, vec2 input_res, vec2 tex_res){\\n\\tfloat input_ratio = (input_res.x/input_res.y);\\n\\tfloat tex_ratio = (tex_res.x/tex_res.y);\\n\\tfloat ratio = input_ratio / tex_ratio;\\n\\t\\n\\tif(ratio < 1.){\\n\\t\\t// gl_Position.x -= ( 1. - 1./ratio)*0.5;\\n\\t\\tu.x *= ratio;\\n\\t} else {\\n\\t\\t// gl_Position.y -= ( 1. - ratio)*0.5;\\n\\t\\tu.y /= ratio;\\n\\t}\\n  return u;\\n}\\n\\nvec2 ndc_aspect_correct(vec2 u, vec2 r){\\n\\tif(r.x < r.y){\\n\\t\\tu.y /= r.y/r.x;\\n\\t} else {\\n\\t\\tu.x /= r.x/r.y;\\n\\t}\\n  return u;\\n}\\n\\nuniform float zoom;\\nuniform vec2 panning;\\nvoid main(){\\n  uv = positions[gl_VertexID];\\n  gl_Position = vec4(positions[gl_VertexID],0,1);\\n}  \\n\\t\\t\\t\\n\";";
+module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n  float dark_mode;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\nout vec2 uv;\\n\\nvec2 css_contain(vec2 u, vec2 input_res, vec2 tex_res){\\n\\tfloat input_ratio = (input_res.x/input_res.y);\\n\\tfloat tex_ratio = (tex_res.x/tex_res.y);\\n\\tfloat ratio = input_ratio / tex_ratio;\\n\\t\\n\\tif(ratio < 1.){\\n\\t\\t// gl_Position.x -= ( 1. - 1./ratio)*0.5;\\n\\t\\tu.x *= ratio;\\n\\t} else {\\n\\t\\t// gl_Position.y -= ( 1. - ratio)*0.5;\\n\\t\\tu.y /= ratio;\\n\\t}\\n  return u;\\n}\\n\\nvec2 ndc_aspect_correct(vec2 u, vec2 r){\\n\\tif(r.x < r.y){\\n\\t\\tu.y /= r.y/r.x;\\n\\t} else {\\n\\t\\tu.x /= r.x/r.y;\\n\\t}\\n  return u;\\n}\\n\\nuniform float zoom;\\nuniform vec2 panning;\\nvoid main(){\\n  uv = positions[gl_VertexID];\\n  gl_Position = vec4(positions[gl_VertexID],0,1);\\n}  \\n\\t\\t\\t\\n\";";
 
 /***/ }),
 
@@ -639,7 +639,7 @@ module.exports = "export default \"#version 300 es\\nprecision highp float;\\npr
 /***/ ((module) => {
 
 "use strict";
-module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\n\\nvec3 mul3( in mat3 m, in vec3 v ){return vec3(dot(v,m[0]),dot(v,m[1]),dot(v,m[2]));}\\n\\nvec3 mul3( in vec3 v, in mat3 m ){return mul3(m,v);}\\n\\nvec3 srgb2oklab(vec3 c) {\\n    \\n    mat3 m1 = mat3(\\n        0.4122214708,0.5363325363,0.0514459929,\\n        0.2119034982,0.6806995451,0.1073969566,\\n        0.0883024619,0.2817188376,0.6299787005\\n    );\\n    \\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = pow(lms,vec3(1./3.));\\n\\n    mat3 m2 = mat3(\\n        +0.2104542553,+0.7936177850,-0.0040720468,\\n        +1.9779984951,-2.4285922050,+0.4505937099,\\n        +0.0259040371,+0.7827717662,-0.8086757660\\n    );\\n    \\n    return mul3(m2,lms);\\n}\\n\\nvec3 oklab2srgb(vec3 c)\\n{\\n    mat3 m1 = mat3(\\n        1.0000000000,+0.3963377774,+0.2158037573,\\n        1.0000000000,-0.1055613458,-0.0638541728,\\n        1.0000000000,-0.0894841775,-1.2914855480\\n    );\\n\\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = lms * lms * lms;\\n  \\n    mat3 m2 = mat3(\\n        +4.0767416621,-3.3077115913,+0.2309699292,\\n        -1.2684380046,+2.6097574011,-0.3413193965,\\n        -0.0041960863,-0.7034186147,+1.7076147010\\n    );\\n    return mul3(m2,lms);\\n}\\n\\nvec3 lab2lch( in vec3 c ){return vec3(c.x,sqrt((c.y*c.y) + (c.z * c.z)),atan(c.z,c.y));}\\n\\nvec3 lch2lab( in vec3 c ){return vec3(c.x,c.y*cos(c.z),c.y*sin(c.z));}\\n\\nvec3 srgb_to_oklch( in vec3 c ) { return lab2lch(srgb2oklab(c)); }\\nvec3 oklch_to_srgb( in vec3 c ) { return oklab2srgb(lch2lab(c)); }\\n\\nfloat luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }\\n\\nfloat luma(vec4 color) { return dot(color.rgb, vec3(0.299, 0.587, 0.114)); }\\n\\nvec4 rgb2cmyki(in vec3 c) { float k = max(max(c.r, c.g), c.b); return min(vec4(c.rgb / k, k), 1.0); }\\n\\nvec3 cmyki2rgb(in vec4 c) { return c.rgb * c.a; }\\n\\nvec3 lerpHSV(in vec3 hsv1, in vec3 hsv2, in float rate)\\n{\\n    float hue = (mod(mod((hsv2.x-hsv1.x), 1.) + 1.5, 1.)-0.5)*rate + hsv1.x;\\n    return vec3(hue, mix(hsv1.yz, hsv2.yz, rate));\\n}\\n\\nvec3 hsv2rgb(vec3 c)\\n{\\n    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nvec3 rgb2hsv(vec3 c)\\n{\\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\\n\\n    float d = q.x - min(q.w, q.y);\\n    float e = 1.0e-10;\\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\\n}\\n\\nvec3 hsv2rgbSmooth( in vec3 hsv )\\n{\\n    vec3 rgb = clamp( abs(mod(hsv.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );\\n\\n    rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing\\n\\n    return hsv.z * mix( vec3(1.0), rgb, hsv.y);\\n}\\n\\nvec3 hueShift(vec3 col, vec3 hsv){\\n    vec3 h = rgb2hsv(col);\\n    h.x += hsv.x;\\n\\n    h.y *= hsv.y;\\n    h.z *= hsv.z;\\n\\n    return hsv2rgbSmooth(h);\\n}\\n\\nuint seed = 11425u;\\n\\nuint hash_u(uint _a) {\\n   uint a = _a;\\n   a ^= a >> 16;\\n   a *= 0x7feb352du;\\n   a ^= a >> 15;\\n   a *= 0x846ca68bu;\\n   a ^= a >> 16;\\n   return a; \\n }\\nfloat hash_f(){ uint s = hash_u(seed); seed = s;return ( float( s ) / float( 0xffffffffu ) ); }\\nvec2 hash_v2(){ return vec2(hash_f(), hash_f()); }\\nvec3 hash_v3(){ return vec3(hash_f(), hash_f(), hash_f()); }\\nvec4 hash_v4(){ return vec4(hash_f(), hash_f(), hash_f(), hash_f()); }\\n\\nfloat hash_f_s(uint s){ s = hash_u(s); return ( float( s ) / float( 0xffffffffu ) ); }\\n// vec2 hash_22_s(uvec2 s){ uint _s = hash_u(s.x) + hash_u(s.y); return vec2(hash_f_s(_s.x), hash_f_s(_s.y)); }\\nfloat hash_21_s(ivec2 _s_){ \\n  uvec2 s = uvec2(_s_);\\n  uint _s = hash_u(s.x + hash_u(s.y)) + hash_u(s.y + hash_u(s.x)); \\n  return hash_f_s(_s); \\n}\\n// vec3 hash_23_s(){ return vec3(hash_f_s(), hash_f_s(), hash_f_s()); }\\n// vec4 hash_24_s(){ return vec4(hash_f_s(), hash_f_s(), hash_f_s(), hash_f_s()); }\\n\\nfloat valueNoise( in vec2 p ){\\n    p += 100.;\\n    ivec2 i = ivec2(floor( p ));\\n    vec2 f = fract( p );\\n\\n    // cubic interpolant\\n    vec2 u = f*f*(3.0-2.0*f);\\n\\n    return mix( mix( hash_21_s( i + ivec2(0,0) ), \\n                     hash_21_s( i + ivec2(1,0) ), u.x),\\n                mix( hash_21_s( i + ivec2(0,1) ), \\n                     hash_21_s( i + ivec2(1,1) ), u.x), u.y);\\n}\\n\\nin vec2 uv;\\n\\nout vec4 col;\\n\\nfloat sdBox(vec2 p, vec2 sz){\\n    p = abs(p) - sz;\\n    return max(p.x,p.y);\\n}\\nvoid main() {\\n  vec2 boxSz = vec2(0.49);\\n  \\n  float pi = 3.14159265359;\\n  float tau = 2.*pi;\\n\\n  col = vec4(0,0,0,1);\\n  \\n  vec2 u = uv - 0.5;\\n  \\n  \\n  \\n  // return;\\n\\n  \\n  {\\n    vec2 dx = dFdx(uv.xy);\\n    vec2 dy = dFdy(uv.xy);\\n    \\n    float sd = sdBox(u,boxSz);\\n    // sd = sdBox(u,boxSz - fwidth(sd)); // ?\\n\\n    float fw = fwidth((sd));\\n    \\n    #define render(pos)  (1.-step(0.,sdBox(pos,boxSz)))\\n        \\n\\n    float w = 0.;\\n    float _Bias = 1.;\\n    vec2 uvOffsets = vec2(0.125, 0.375);\\n    vec2 offsetUV = vec2(0.0, 0.0);\\n\\n    offsetUV.xy = u.xy + uvOffsets.x * dx + uvOffsets.y * dy;\\n    w += render(offsetUV.xy);\\n    offsetUV.xy = u.xy - uvOffsets.x * dx - uvOffsets.y * dy;\\n    w += render(offsetUV.xy);\\n    offsetUV.xy = u.xy + uvOffsets.y * dx - uvOffsets.x * dy;\\n    w += render(offsetUV.xy);\\n    offsetUV.xy = u.xy - uvOffsets.y * dx + uvOffsets.x * dy;\\n    w += render(offsetUV.xy);\\n    w *= 1./4.;\\n    col.w *= w;\\n      \\n      // uvOffsets = uvOffsets * rot(0.25*acos(-1.));\\n      // offsetUV.xy = u.xy + uvOffsets.x * dx + uvOffsets.y * dy;\\n      // w += render(offsetUV.xy);\\n      // offsetUV.xy = u.xy - uvOffsets.x * dx - uvOffsets.y * dy;\\n      // w += render(offsetUV.xy);\\n      // offsetUV.xy = u.xy + uvOffsets.y * dx - uvOffsets.x * dy;\\n      // w += render(offsetUV.xy);\\n      // offsetUV.xy = u.xy - uvOffsets.y * dx + uvOffsets.x * dy;\\n      // w += render(offsetUV.xy);\\n\\n      // w /= 8.;\\n      // col.w *= w;\\n      //col.x = 1.;\\n  } \\n}\";";
+module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n  float dark_mode;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\n\\nvec3 mul3( in mat3 m, in vec3 v ){return vec3(dot(v,m[0]),dot(v,m[1]),dot(v,m[2]));}\\n\\nvec3 mul3( in vec3 v, in mat3 m ){return mul3(m,v);}\\n\\nvec3 srgb2oklab(vec3 c) {\\n    \\n    mat3 m1 = mat3(\\n        0.4122214708,0.5363325363,0.0514459929,\\n        0.2119034982,0.6806995451,0.1073969566,\\n        0.0883024619,0.2817188376,0.6299787005\\n    );\\n    \\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = pow(lms,vec3(1./3.));\\n\\n    mat3 m2 = mat3(\\n        +0.2104542553,+0.7936177850,-0.0040720468,\\n        +1.9779984951,-2.4285922050,+0.4505937099,\\n        +0.0259040371,+0.7827717662,-0.8086757660\\n    );\\n    \\n    return mul3(m2,lms);\\n}\\n\\nvec3 oklab2srgb(vec3 c)\\n{\\n    mat3 m1 = mat3(\\n        1.0000000000,+0.3963377774,+0.2158037573,\\n        1.0000000000,-0.1055613458,-0.0638541728,\\n        1.0000000000,-0.0894841775,-1.2914855480\\n    );\\n\\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = lms * lms * lms;\\n  \\n    mat3 m2 = mat3(\\n        +4.0767416621,-3.3077115913,+0.2309699292,\\n        -1.2684380046,+2.6097574011,-0.3413193965,\\n        -0.0041960863,-0.7034186147,+1.7076147010\\n    );\\n    return mul3(m2,lms);\\n}\\n\\nvec3 lab2lch( in vec3 c ){return vec3(c.x,sqrt((c.y*c.y) + (c.z * c.z)),atan(c.z,c.y));}\\n\\nvec3 lch2lab( in vec3 c ){return vec3(c.x,c.y*cos(c.z),c.y*sin(c.z));}\\n\\nvec3 srgb_to_oklch( in vec3 c ) { return lab2lch(srgb2oklab(c)); }\\nvec3 oklch_to_srgb( in vec3 c ) { return oklab2srgb(lch2lab(c)); }\\n\\nfloat luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }\\n\\nfloat luma(vec4 color) { return dot(color.rgb, vec3(0.299, 0.587, 0.114)); }\\n\\nvec4 rgb2cmyki(in vec3 c) { float k = max(max(c.r, c.g), c.b); return min(vec4(c.rgb / k, k), 1.0); }\\n\\nvec3 cmyki2rgb(in vec4 c) { return c.rgb * c.a; }\\n\\nvec3 lerpHSV(in vec3 hsv1, in vec3 hsv2, in float rate)\\n{\\n    float hue = (mod(mod((hsv2.x-hsv1.x), 1.) + 1.5, 1.)-0.5)*rate + hsv1.x;\\n    return vec3(hue, mix(hsv1.yz, hsv2.yz, rate));\\n}\\n\\nvec3 hsv2rgb(vec3 c)\\n{\\n    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nvec3 rgb2hsv(vec3 c)\\n{\\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\\n\\n    float d = q.x - min(q.w, q.y);\\n    float e = 1.0e-10;\\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\\n}\\n\\nvec3 hsv2rgbSmooth( in vec3 hsv )\\n{\\n    vec3 rgb = clamp( abs(mod(hsv.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );\\n\\n    rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing\\n\\n    return hsv.z * mix( vec3(1.0), rgb, hsv.y);\\n}\\n\\nvec3 hueShift(vec3 col, vec3 hsv){\\n    vec3 h = rgb2hsv(col);\\n    h.x += hsv.x;\\n\\n    h.y *= hsv.y;\\n    h.z *= hsv.z;\\n\\n    return hsv2rgbSmooth(h);\\n}\\n\\nuint seed = 11425u;\\n\\nuint hash_u(uint _a) {\\n   uint a = _a;\\n   a ^= a >> 16;\\n   a *= 0x7feb352du;\\n   a ^= a >> 15;\\n   a *= 0x846ca68bu;\\n   a ^= a >> 16;\\n   return a; \\n }\\nfloat hash_f(){ uint s = hash_u(seed); seed = s;return ( float( s ) / float( 0xffffffffu ) ); }\\nvec2 hash_v2(){ return vec2(hash_f(), hash_f()); }\\nvec3 hash_v3(){ return vec3(hash_f(), hash_f(), hash_f()); }\\nvec4 hash_v4(){ return vec4(hash_f(), hash_f(), hash_f(), hash_f()); }\\n\\nfloat hash_f_s(uint s){ s = hash_u(s); return ( float( s ) / float( 0xffffffffu ) ); }\\n// vec2 hash_22_s(uvec2 s){ uint _s = hash_u(s.x) + hash_u(s.y); return vec2(hash_f_s(_s.x), hash_f_s(_s.y)); }\\nfloat hash_21_s(ivec2 _s_){ \\n  uvec2 s = uvec2(_s_);\\n  uint _s = hash_u(s.x + hash_u(s.y)) + hash_u(s.y + hash_u(s.x)); \\n  return hash_f_s(_s); \\n}\\n// vec3 hash_23_s(){ return vec3(hash_f_s(), hash_f_s(), hash_f_s()); }\\n// vec4 hash_24_s(){ return vec4(hash_f_s(), hash_f_s(), hash_f_s(), hash_f_s()); }\\n\\nfloat valueNoise( in vec2 p ){\\n    p += 100.;\\n    ivec2 i = ivec2(floor( p ));\\n    vec2 f = fract( p );\\n\\n    // cubic interpolant\\n    vec2 u = f*f*(3.0-2.0*f);\\n\\n    return mix( mix( hash_21_s( i + ivec2(0,0) ), \\n                     hash_21_s( i + ivec2(1,0) ), u.x),\\n                mix( hash_21_s( i + ivec2(0,1) ), \\n                     hash_21_s( i + ivec2(1,1) ), u.x), u.y);\\n}\\n\\nin vec2 uv;\\n\\nout vec4 col;\\n\\nfloat sdBox(vec2 p, vec2 sz){\\n    p = abs(p) - sz;\\n    return max(p.x,p.y);\\n}\\nvoid main() {\\n  vec2 boxSz = vec2(0.49);\\n  \\n  float pi = 3.14159265359;\\n  float tau = 2.*pi;\\n\\n  col = vec4(0,0,0,1);\\n  \\n  vec2 u = uv - 0.5;\\n  \\n  \\n  \\n  // return;\\n\\n  \\n  {\\n    vec2 dx = dFdx(uv.xy);\\n    vec2 dy = dFdy(uv.xy);\\n    \\n    float sd = sdBox(u,boxSz);\\n    // sd = sdBox(u,boxSz - fwidth(sd)); // ?\\n\\n    float fw = fwidth((sd));\\n    \\n    #define render(pos)  (1.-step(0.,sdBox(pos,boxSz)))\\n        \\n\\n    float w = 0.;\\n    float _Bias = 1.;\\n    vec2 uvOffsets = vec2(0.125, 0.375);\\n    vec2 offsetUV = vec2(0.0, 0.0);\\n\\n    offsetUV.xy = u.xy + uvOffsets.x * dx + uvOffsets.y * dy;\\n    w += render(offsetUV.xy);\\n    offsetUV.xy = u.xy - uvOffsets.x * dx - uvOffsets.y * dy;\\n    w += render(offsetUV.xy);\\n    offsetUV.xy = u.xy + uvOffsets.y * dx - uvOffsets.x * dy;\\n    w += render(offsetUV.xy);\\n    offsetUV.xy = u.xy - uvOffsets.y * dx + uvOffsets.x * dy;\\n    w += render(offsetUV.xy);\\n    w *= 1./4.;\\n    col.w *= w;\\n      \\n      // uvOffsets = uvOffsets * rot(0.25*acos(-1.));\\n      // offsetUV.xy = u.xy + uvOffsets.x * dx + uvOffsets.y * dy;\\n      // w += render(offsetUV.xy);\\n      // offsetUV.xy = u.xy - uvOffsets.x * dx - uvOffsets.y * dy;\\n      // w += render(offsetUV.xy);\\n      // offsetUV.xy = u.xy + uvOffsets.y * dx - uvOffsets.x * dy;\\n      // w += render(offsetUV.xy);\\n      // offsetUV.xy = u.xy - uvOffsets.y * dx + uvOffsets.x * dy;\\n      // w += render(offsetUV.xy);\\n\\n      // w /= 8.;\\n      // col.w *= w;\\n      //col.x = 1.;\\n  } \\n}\";";
 
 /***/ }),
 
@@ -647,7 +647,7 @@ module.exports = "export default \"#version 300 es\\nprecision highp float;\\npr
 /***/ ((module) => {
 
 "use strict";
-module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\nout vec2 uv;\\n\\nlayout(location = 0) in vec4 pos;\\n// layout(location = 1) in vec4 col;\\nvoid main(){\\n  // gl_Position.xy *= brush_sz;\\n  vec2 p = pos.xy;\\n  // p = (p - 0.5*R)/min(R.x,R.y);\\n  float ratio = R.x/R.y;\\n  if(ratio > 0.){\\n    p.x /= ratio;\\n  } else {\\n    p.x *= ratio;\\n  }\\n  \\n  gl_Position = vec4(p.xy,0,1);\\n\\n  uv = pos.zw;\\n  // uv = ;\\n}  \";";
+module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n  float dark_mode;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\nout vec2 uv;\\n\\nlayout(location = 0) in vec4 pos;\\n// layout(location = 1) in vec4 col;\\nvoid main(){\\n  // gl_Position.xy *= brush_sz;\\n  vec2 p = pos.xy;\\n  // p = (p - 0.5*R)/min(R.x,R.y);\\n  float ratio = R.x/R.y;\\n  if(ratio > 0.){\\n    p.x /= ratio;\\n  } else {\\n    p.x *= ratio;\\n  }\\n  \\n  gl_Position = vec4(p.xy,0,1);\\n\\n  uv = pos.zw;\\n  // uv = ;\\n}  \";";
 
 /***/ }),
 
@@ -655,7 +655,7 @@ module.exports = "export default \"#version 300 es\\nprecision highp float;\\npr
 /***/ ((module) => {
 
 "use strict";
-module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\n\\n#ifndef SPECTRAL\\n#define SPECTRAL\\n\\nconst int SPECTRAL_SIZE = 38;\\nconst float SPECTRAL_GAMMA = 2.4;\\nconst float SPECTRAL_EPSILON = 0.0001;\\n\\nfloat spectral_uncompand(float x) {\\n  return (x < 0.04045) ? x / 12.92 : pow((x + 0.055) / 1.055, SPECTRAL_GAMMA);\\n}\\n\\nfloat spectral_compand(float x) {\\n  return (x < 0.0031308) ? x * 12.92 : 1.055 * pow(x, 1.0 / SPECTRAL_GAMMA) - 0.055;\\n}\\n\\nvec3 spectral_srgb_to_linear(vec3 srgb) {\\n    return vec3(spectral_uncompand(srgb[0]), spectral_uncompand(srgb[1]), spectral_uncompand(srgb[2]));\\n}\\n\\nvec3 spectral_linear_to_srgb(vec3 lrgb) {\\n    return clamp(vec3(spectral_compand(lrgb[0]), spectral_compand(lrgb[1]), spectral_compand(lrgb[2])), 0.0, 1.0);\\n}\\n\\nvoid spectral_upsampling(vec3 lrgb, out float w, out float c, out float m, out float y, out float r, out float g, out float b) {\\n    w = min(lrgb.r, min(lrgb.g, lrgb.b));\\n\\n    lrgb -= w;\\n\\n    c = min(lrgb.g, lrgb.b);\\n    m = min(lrgb.r, lrgb.b);\\n    y = min(lrgb.r, lrgb.g);\\n    r = min(max(0., lrgb.r - lrgb.b), max(0., lrgb.r - lrgb.g));\\n    g = min(max(0., lrgb.g - lrgb.b), max(0., lrgb.g - lrgb.r));\\n    b = min(max(0., lrgb.b - lrgb.g), max(0., lrgb.b - lrgb.r));\\n}\\n\\nvoid spectral_linear_to_reflectance(vec3 lrgb, inout float R[SPECTRAL_SIZE]) {\\n    float w, c, m, y, r, g, b;\\n    \\n    spectral_upsampling(lrgb, w, c, m, y, r, g, b);\\n    \\n     R[0] = max(SPECTRAL_EPSILON, w + c * 0.96853629 + m * 0.51567122 + y * 0.02055257 + r * 0.03147571 + g * 0.49108579 + b * 0.97901834);\\n     R[1] = max(SPECTRAL_EPSILON, w + c * 0.96855103 + m * 0.54015520 + y * 0.02059936 + r * 0.03146636 + g * 0.46944057 + b * 0.97901649);\\n     R[2] = max(SPECTRAL_EPSILON, w + c * 0.96859338 + m * 0.62645502 + y * 0.02062723 + r * 0.03140624 + g * 0.40165780 + b * 0.97901118);\\n     R[3] = max(SPECTRAL_EPSILON, w + c * 0.96877345 + m * 0.75595012 + y * 0.02073387 + r * 0.03119611 + g * 0.24490420 + b * 0.97892146);\\n     R[4] = max(SPECTRAL_EPSILON, w + c * 0.96942204 + m * 0.92826996 + y * 0.02114202 + r * 0.03053888 + g * 0.06826880 + b * 0.97858555);\\n     R[5] = max(SPECTRAL_EPSILON, w + c * 0.97143709 + m * 0.97223624 + y * 0.02233154 + r * 0.02856855 + g * 0.02732883 + b * 0.97743705);\\n     R[6] = max(SPECTRAL_EPSILON, w + c * 0.97541862 + m * 0.98616174 + y * 0.02556857 + r * 0.02459485 + g * 0.01360600 + b * 0.97428075);\\n     R[7] = max(SPECTRAL_EPSILON, w + c * 0.98074186 + m * 0.98955255 + y * 0.03330189 + r * 0.01929520 + g * 0.01000187 + b * 0.96663223);\\n     R[8] = max(SPECTRAL_EPSILON, w + c * 0.98580992 + m * 0.98676237 + y * 0.05185294 + r * 0.01423112 + g * 0.01284127 + b * 0.94822893);\\n     R[9] = max(SPECTRAL_EPSILON, w + c * 0.98971194 + m * 0.97312575 + y * 0.10087639 + r * 0.01033111 + g * 0.02636635 + b * 0.89937713);\\n    R[10] = max(SPECTRAL_EPSILON, w + c * 0.99238027 + m * 0.91944277 + y * 0.24000413 + r * 0.00765876 + g * 0.07058713 + b * 0.76070164);\\n    R[11] = max(SPECTRAL_EPSILON, w + c * 0.99409844 + m * 0.32564851 + y * 0.53589066 + r * 0.00593693 + g * 0.70421692 + b * 0.46420440);\\n    R[12] = max(SPECTRAL_EPSILON, w + c * 0.99517200 + m * 0.13820628 + y * 0.79874659 + r * 0.00485616 + g * 0.85473994 + b * 0.20123039);\\n    R[13] = max(SPECTRAL_EPSILON, w + c * 0.99576545 + m * 0.05015143 + y * 0.91186529 + r * 0.00426186 + g * 0.95081565 + b * 0.08808402);\\n    R[14] = max(SPECTRAL_EPSILON, w + c * 0.99593552 + m * 0.02912336 + y * 0.95399623 + r * 0.00409039 + g * 0.97170370 + b * 0.04592894);\\n    R[15] = max(SPECTRAL_EPSILON, w + c * 0.99564041 + m * 0.02421691 + y * 0.97137099 + r * 0.00438375 + g * 0.97651888 + b * 0.02860373);\\n    R[16] = max(SPECTRAL_EPSILON, w + c * 0.99464769 + m * 0.02660696 + y * 0.97939505 + r * 0.00537525 + g * 0.97429245 + b * 0.02060067);\\n    R[17] = max(SPECTRAL_EPSILON, w + c * 0.99229579 + m * 0.03407586 + y * 0.98345207 + r * 0.00772962 + g * 0.97012917 + b * 0.01656701);\\n    R[18] = max(SPECTRAL_EPSILON, w + c * 0.98638762 + m * 0.04835936 + y * 0.98553736 + r * 0.01366120 + g * 0.94258630 + b * 0.01451549);\\n    R[19] = max(SPECTRAL_EPSILON, w + c * 0.96829712 + m * 0.00011720 + y * 0.98648905 + r * 0.03181352 + g * 0.99989207 + b * 0.01357964);\\n    R[20] = max(SPECTRAL_EPSILON, w + c * 0.89228016 + m * 0.00008554 + y * 0.98674535 + r * 0.10791525 + g * 0.99989891 + b * 0.01331243);\\n    R[21] = max(SPECTRAL_EPSILON, w + c * 0.53740239 + m * 0.85267882 + y * 0.98657555 + r * 0.46249516 + g * 0.13823139 + b * 0.01347661);\\n    R[22] = max(SPECTRAL_EPSILON, w + c * 0.15360445 + m * 0.93188793 + y * 0.98611877 + r * 0.84604333 + g * 0.06968113 + b * 0.01387181);\\n    R[23] = max(SPECTRAL_EPSILON, w + c * 0.05705719 + m * 0.94810268 + y * 0.98559942 + r * 0.94275572 + g * 0.05628787 + b * 0.01435472);\\n    R[24] = max(SPECTRAL_EPSILON, w + c * 0.03126539 + m * 0.94200977 + y * 0.98507063 + r * 0.96860996 + g * 0.06111561 + b * 0.01479836);\\n    R[25] = max(SPECTRAL_EPSILON, w + c * 0.02205445 + m * 0.91478045 + y * 0.98460039 + r * 0.97783966 + g * 0.08987709 + b * 0.01515250);\\n    R[26] = max(SPECTRAL_EPSILON, w + c * 0.01802271 + m * 0.87065445 + y * 0.98425301 + r * 0.98187757 + g * 0.13656016 + b * 0.01540513);\\n    R[27] = max(SPECTRAL_EPSILON, w + c * 0.01613460 + m * 0.78827548 + y * 0.98403909 + r * 0.98377315 + g * 0.22169624 + b * 0.01557233);\\n    R[28] = max(SPECTRAL_EPSILON, w + c * 0.01520947 + m * 0.65738359 + y * 0.98388535 + r * 0.98470202 + g * 0.32176956 + b * 0.01565710);\\n    R[29] = max(SPECTRAL_EPSILON, w + c * 0.01475977 + m * 0.59909403 + y * 0.98376116 + r * 0.98515481 + g * 0.36157329 + b * 0.01571025);\\n    R[30] = max(SPECTRAL_EPSILON, w + c * 0.01454263 + m * 0.56817268 + y * 0.98368246 + r * 0.98537114 + g * 0.48361920 + b * 0.01571916);\\n    R[31] = max(SPECTRAL_EPSILON, w + c * 0.01444459 + m * 0.54031997 + y * 0.98365023 + r * 0.98546685 + g * 0.46488579 + b * 0.01572133);\\n    R[32] = max(SPECTRAL_EPSILON, w + c * 0.01439897 + m * 0.52110241 + y * 0.98361309 + r * 0.98550011 + g * 0.47440306 + b * 0.01572502);\\n    R[33] = max(SPECTRAL_EPSILON, w + c * 0.01437620 + m * 0.51041094 + y * 0.98357259 + r * 0.98551031 + g * 0.48576990 + b * 0.01571717);\\n    R[34] = max(SPECTRAL_EPSILON, w + c * 0.01436343 + m * 0.50526577 + y * 0.98353856 + r * 0.98550741 + g * 0.49267971 + b * 0.01571905);\\n    R[35] = max(SPECTRAL_EPSILON, w + c * 0.01435687 + m * 0.50255080 + y * 0.98351247 + r * 0.98551323 + g * 0.49625685 + b * 0.01571059);\\n    R[36] = max(SPECTRAL_EPSILON, w + c * 0.01435370 + m * 0.50126452 + y * 0.98350101 + r * 0.98551563 + g * 0.49807754 + b * 0.01569728);\\n    R[37] = max(SPECTRAL_EPSILON, w + c * 0.01435408 + m * 0.50083021 + y * 0.98350852 + r * 0.98551547 + g * 0.49889859 + b * 0.01570020);\\n}\\n\\nvec3 spectral_xyz_to_srgb(vec3 xyz) {\\n    mat3 XYZ_RGB;\\n\\n    XYZ_RGB[0] = vec3( 3.24306333, -1.53837619, -0.49893282);\\n    XYZ_RGB[1] = vec3(-0.96896309,  1.87542451,  0.04154303);\\n    XYZ_RGB[2] = vec3( 0.05568392, -0.20417438,  1.05799454);\\n    \\n    float r = dot(XYZ_RGB[0], xyz);\\n    float g = dot(XYZ_RGB[1], xyz);\\n    float b = dot(XYZ_RGB[2], xyz);\\n\\n    return spectral_linear_to_srgb(vec3(r, g, b));\\n}\\n\\nvec3 spectral_reflectance_to_xyz(float R[SPECTRAL_SIZE]) {\\n    vec3 xyz = vec3(0.0);\\n    \\n    xyz +=  R[0] * vec3(0.00006469, 0.00000184, 0.00030502);\\n    xyz +=  R[1] * vec3(0.00021941, 0.00000621, 0.00103681);\\n    xyz +=  R[2] * vec3(0.00112057, 0.00003101, 0.00531314);\\n    xyz +=  R[3] * vec3(0.00376661, 0.00010475, 0.01795439);\\n    xyz +=  R[4] * vec3(0.01188055, 0.00035364, 0.05707758);\\n    xyz +=  R[5] * vec3(0.02328644, 0.00095147, 0.11365162);\\n    xyz +=  R[6] * vec3(0.03455942, 0.00228226, 0.17335873);\\n    xyz +=  R[7] * vec3(0.03722379, 0.00420733, 0.19620658);\\n    xyz +=  R[8] * vec3(0.03241838, 0.00668880, 0.18608237);\\n    xyz +=  R[9] * vec3(0.02123321, 0.00988840, 0.13995048);\\n    xyz += R[10] * vec3(0.01049099, 0.01524945, 0.08917453);\\n    xyz += R[11] * vec3(0.00329584, 0.02141831, 0.04789621);\\n    xyz += R[12] * vec3(0.00050704, 0.03342293, 0.02814563);\\n    xyz += R[13] * vec3(0.00094867, 0.05131001, 0.01613766);\\n    xyz += R[14] * vec3(0.00627372, 0.07040208, 0.00775910);\\n    xyz += R[15] * vec3(0.01686462, 0.08783871, 0.00429615);\\n    xyz += R[16] * vec3(0.02868965, 0.09424905, 0.00200551);\\n    xyz += R[17] * vec3(0.04267481, 0.09795667, 0.00086147);\\n    xyz += R[18] * vec3(0.05625475, 0.09415219, 0.00036904);\\n    xyz += R[19] * vec3(0.06947040, 0.08678102, 0.00019143);\\n    xyz += R[20] * vec3(0.08305315, 0.07885653, 0.00014956);\\n    xyz += R[21] * vec3(0.08612610, 0.06352670, 0.00009231);\\n    xyz += R[22] * vec3(0.09046614, 0.05374142, 0.00006813);\\n    xyz += R[23] * vec3(0.08500387, 0.04264606, 0.00002883);\\n    xyz += R[24] * vec3(0.07090667, 0.03161735, 0.00001577);\\n    xyz += R[25] * vec3(0.05062889, 0.02088521, 0.00000394);\\n    xyz += R[26] * vec3(0.03547396, 0.01386011, 0.00000158);\\n    xyz += R[27] * vec3(0.02146821, 0.00810264, 0.00000000);\\n    xyz += R[28] * vec3(0.01251646, 0.00463010, 0.00000000);\\n    xyz += R[29] * vec3(0.00680458, 0.00249138, 0.00000000);\\n    xyz += R[30] * vec3(0.00346457, 0.00125930, 0.00000000);\\n    xyz += R[31] * vec3(0.00149761, 0.00054165, 0.00000000);\\n    xyz += R[32] * vec3(0.00076970, 0.00027795, 0.00000000);\\n    xyz += R[33] * vec3(0.00040737, 0.00014711, 0.00000000);\\n    xyz += R[34] * vec3(0.00016901, 0.00006103, 0.00000000);\\n    xyz += R[35] * vec3(0.00009522, 0.00003439, 0.00000000);\\n    xyz += R[36] * vec3(0.00004903, 0.00001771, 0.00000000);\\n    xyz += R[37] * vec3(0.00002000, 0.00000722, 0.00000000);\\n\\n    return xyz;\\n}\\n\\nfloat spectral_linear_to_concentration(float l1, float l2, float t) {\\n    float t1 = l1 * pow(1.0 - t, 2.0);\\n    float t2 = l2 * pow(t, 2.0);\\n\\n    return t2 / (t1 + t2);\\n}\\n\\nvec3 spectral_mix(vec3 color1, vec3 color2, float t) {\\n    vec3 lrgb1 = spectral_srgb_to_linear(color1);\\n    vec3 lrgb2 = spectral_srgb_to_linear(color2);\\n\\n    float R1[SPECTRAL_SIZE];\\n    float R2[SPECTRAL_SIZE];\\n\\n    spectral_linear_to_reflectance(lrgb1, R1);\\n    spectral_linear_to_reflectance(lrgb2, R2);\\n\\n    float l1 = spectral_reflectance_to_xyz(R1)[1];\\n    float l2 = spectral_reflectance_to_xyz(R2)[1];\\n\\n    t = spectral_linear_to_concentration(l1, l2, t);\\n\\n    float R[SPECTRAL_SIZE];\\n\\n    for (int i = 0; i < SPECTRAL_SIZE; i++) {\\n      float KS = (1.0 - t) * (pow(1.0 - R1[i], 2.0) / (2.0 * R1[i])) + t * (pow(1.0 - R2[i], 2.0) / (2.0 * R2[i]));\\n      float KM = 1.0 + KS - sqrt(pow(KS, 2.0) + 2.0 * KS);\\n\\n      //Saunderson correction\\n      // let S = ((1.0 - K1) * (1.0 - K2) * KM) / (1.0 - K2 * KM);\\n\\n      R[i] = KM;\\n    }\\n\\n    return spectral_xyz_to_srgb(spectral_reflectance_to_xyz(R));\\n}\\n\\nvec4 spectral_mix(vec4 color1, vec4 color2, float t) {\\n    return vec4(spectral_mix(color1.rgb, color2.rgb, t), mix(color1.a, color2.a, t));\\n}\\n\\n#endif\\n\\nvec3 mul3( in mat3 m, in vec3 v ){return vec3(dot(v,m[0]),dot(v,m[1]),dot(v,m[2]));}\\n\\nvec3 mul3( in vec3 v, in mat3 m ){return mul3(m,v);}\\n\\nvec3 srgb2oklab(vec3 c) {\\n    \\n    mat3 m1 = mat3(\\n        0.4122214708,0.5363325363,0.0514459929,\\n        0.2119034982,0.6806995451,0.1073969566,\\n        0.0883024619,0.2817188376,0.6299787005\\n    );\\n    \\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = pow(lms,vec3(1./3.));\\n\\n    mat3 m2 = mat3(\\n        +0.2104542553,+0.7936177850,-0.0040720468,\\n        +1.9779984951,-2.4285922050,+0.4505937099,\\n        +0.0259040371,+0.7827717662,-0.8086757660\\n    );\\n    \\n    return mul3(m2,lms);\\n}\\n\\nvec3 oklab2srgb(vec3 c)\\n{\\n    mat3 m1 = mat3(\\n        1.0000000000,+0.3963377774,+0.2158037573,\\n        1.0000000000,-0.1055613458,-0.0638541728,\\n        1.0000000000,-0.0894841775,-1.2914855480\\n    );\\n\\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = lms * lms * lms;\\n  \\n    mat3 m2 = mat3(\\n        +4.0767416621,-3.3077115913,+0.2309699292,\\n        -1.2684380046,+2.6097574011,-0.3413193965,\\n        -0.0041960863,-0.7034186147,+1.7076147010\\n    );\\n    return mul3(m2,lms);\\n}\\n\\nvec3 lab2lch( in vec3 c ){return vec3(c.x,sqrt((c.y*c.y) + (c.z * c.z)),atan(c.z,c.y));}\\n\\nvec3 lch2lab( in vec3 c ){return vec3(c.x,c.y*cos(c.z),c.y*sin(c.z));}\\n\\nvec3 srgb_to_oklch( in vec3 c ) { return lab2lch(srgb2oklab(c)); }\\nvec3 oklch_to_srgb( in vec3 c ) { return oklab2srgb(lch2lab(c)); }\\n\\nfloat luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }\\n\\nfloat luma(vec4 color) { return dot(color.rgb, vec3(0.299, 0.587, 0.114)); }\\n\\nvec4 rgb2cmyki(in vec3 c) { float k = max(max(c.r, c.g), c.b); return min(vec4(c.rgb / k, k), 1.0); }\\n\\nvec3 cmyki2rgb(in vec4 c) { return c.rgb * c.a; }\\n\\nvec3 lerpHSV(in vec3 hsv1, in vec3 hsv2, in float rate)\\n{\\n    float hue = (mod(mod((hsv2.x-hsv1.x), 1.) + 1.5, 1.)-0.5)*rate + hsv1.x;\\n    return vec3(hue, mix(hsv1.yz, hsv2.yz, rate));\\n}\\n\\nvec3 hsv2rgb(vec3 c)\\n{\\n    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nvec3 rgb2hsv(vec3 c)\\n{\\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\\n\\n    float d = q.x - min(q.w, q.y);\\n    float e = 1.0e-10;\\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\\n}\\n\\nvec3 hsv2rgbSmooth( in vec3 hsv )\\n{\\n    vec3 rgb = clamp( abs(mod(hsv.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );\\n\\n    rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing\\n\\n    return hsv.z * mix( vec3(1.0), rgb, hsv.y);\\n}\\n\\nvec3 hueShift(vec3 col, vec3 hsv){\\n    vec3 h = rgb2hsv(col);\\n    h.x += hsv.x;\\n\\n    h.y *= hsv.y;\\n    h.z *= hsv.z;\\n\\n    return hsv2rgbSmooth(h);\\n}\\n\\nvec4 blend_brushstroke(vec4 col, vec4 stroke, int blending_colour_space){\\n  // col.xyz = mix(col.xyz, stroke.xyz, stroke.w); \\n  \\n  int mode = blending_colour_space;\\n  \\n  if(stroke.w > 0.00000001){\\n    // float interpolant = stroke.w;\\n    stroke.xyz = stroke.xyz/max(stroke.w,0.001);\\n    \\n    if(mode == 0){\\n      col.xyz = spectral_mix(col.xyz, clamp(stroke.xyz,0.00001,0.99999), stroke.w);\\n      if(stroke.w > 0.99999)\\n        col.xyz = stroke.xyz;\\n    } else if(mode == 1){\\n      col.xyz = srgb_to_oklch( col.xyz );\\n      stroke.xyz = srgb_to_oklch( stroke.xyz );\\n      col.xy = mix(col.xy, stroke.xy,stroke.w);\\n      float tau = acos(-1.) * 2.;\\n      float h_a = stroke.z;\\n      float h_b = stroke.z + tau;\\n      float dist_a = abs(col.z - h_a);\\n      float dist_b = abs(col.z - h_b);\\n      if(dist_a < dist_b){\\n        col.z = mix(col.z, h_a, stroke.w);\\n      } else {\\n        col.z = mix(col.z, h_b, stroke.w);\\n      }\\n      col.z = mod(col.z, tau);\\n      // col.z = max(col.z)\\n      // if(isnan(col.z)){\\n      //   col.z = 1.;\\n      // }\\n\\n      col.xyz = oklch_to_srgb( col.xyz );\\n      col.xyz = clamp(col.xyz,0.,1.);\\n    } else {\\n      col.xyz = mix(col.xyz, stroke.xyz, stroke.w);\\n    }\\n    col.w = max(col.w, stroke.w);\\n  }\\n\\n  return col; \\n}\\n\\nuniform sampler2D fb_a;\\nuniform sampler2D fb_b;\\nuniform sampler2D noise_tex;\\nin vec2 uv;\\nout vec4 col;\\n\\nvec3[] pal = vec3[](\\n    vec3(0.8,0.5,0.),\\n    vec3(0.2,0.6,0.4),\\n    vec3(1.0,0.0,0.7),\\n    vec3(1.0,1.0,0.99)\\n);\\n\\nvec3 mix_oklch(vec3 col_a, vec3 col_b, float a){\\n  // return mix(col_a,col_b,a);\\n  float tau = 3.14159265359 * 2.;\\n  float col_b_h_1 = col_b.z;\\n  float col_b_h_2 = col_b.z + tau;\\n  float dist_a = abs(col_a.z - col_b_h_1);\\n  float dist_b = abs(col_a.z - col_b_h_2);\\n  // if(dist_a < dist_b){\\n  //   col_a.z = mix(col_a.z, col_b_h_1, a);\\n  // } else {\\n  //   col_a.z = mix(col_a.z, col_b_h_2, a);\\n  // }\\n  col_a.z = mix(col_a.z,col_b.z,a);\\n\\n  col_a.x = mix(col_a.x, col_b.x, a);\\n  col_a.y = mix(col_a.y, col_b.y, a);\\n  // col_a.z = mod(col_a.z, tau);\\n  return col_a;\\n}\\n\\nvoid main() {\\n  vec2 u = (gl_FragCoord.xy - 0.5*R)/min(R.x,R.y);\\n  vec2 un = (gl_FragCoord.xy/R);\\n\\n  col = vec4(0,0,0,1);\\n  \\n  vec4 t_a = texture(fb_a, un);\\n  vec4 t_b = texelFetch(fb_b, ivec2(gl_FragCoord), 0);\\n  vec4 noise = texture(noise_tex, fract(u*3.));\\n\\n  const float bayer[] = float[64](\\n     0., 32., 8., 40., 2., 34., 10., 42., /* 8x8 Bayer ordered dithering */\\n    48., 16., 56., 24., 50., 18., 58., 26., /* pattern. Each input pixel */\\n    12., 44., 4., 36., 14., 46., 6., 38., /* is scaled to the 0..63 range */\\n    60., 28., 52., 20., 62., 30., 54., 22., /* before looking in this table */\\n     3., 35., 11., 43., 1., 33., 9., 41., /* to determine the action. */\\n    51., 19., 59., 27., 49., 17., 57., 25.,\\n    15., 47., 7., 39., 13., 45., 5., 37.,\\n    63., 31., 55., 23., 61., 29., 53., 21.\\n  );\\n\\n  col += t_a;\\n  col = mix(col, vec4(0), t_b.a);\\n  \\n  // col += bayer[]\\n  \\n\\t// vec2 sc = px_sz / aspect_ratio;\\n  // u += time;\\n  // uv += 1.0;\\n\\tvec2 sc = 4./R;\\n\\t// vec2 fruv = fract(u / sc);\\n\\tvec2 fuv = floor((uv + 5.)/ sc) * sc;\\n\\t\\n\\tvec2 buv = mod(fuv/sc, 8.);\\n\\tfloat bay = float(bayer[int(buv.x) + int(buv.y)*8])/63.;\\n\\n  \\n  float T = time;\\n  \\n  // col = clamp(col,0.,1.);\\n  vec2 mouse_pos = vec2(mouse_pos_x, mouse_pos_y);\\n\\n  col.xyz = srgb_to_oklch(col.xyz);\\n\\n  col.z += (bay*2. - 1.)*0.9*(1. + mouse_pos.y);\\n  // if(col.y < 0.001 && col.x < 0.001){\\n  //   col.x += (bay*2. - 1.)*0.7;\\n  // }\\n  // col.x = max(col.x, 0.1);\\n\\n  col.xyz = oklch_to_srgb(col.xyz);\\n  \\n  \\n\\n  col = pow(col,vec4(0.454545454545)); \\n  col += (noise*noise*noise)*0.15;\\n  col.w = 1.;\\n}    \\n\\n  \\n  \\n\\t\\t \";";
+module.exports = "export default \"#version 300 es\\nprecision highp float;\\nprecision highp int;\\n#define GLSLIFY 1\\nuniform sampler2D canvas_back;\\nuniform sampler2D temp_tex;\\nuniform sampler2D canvas_a;\\nuniform sampler2D canvas_b;\\n\\nuniform sampler2D brush_texture[7];\\n\\nuniform Settings {\\n  vec2 R;\\n  vec2 canvasR;\\n  float time;\\n  float ptr_pressure;\\n  float mouse_pos_x;\\n  float mouse_pos_y;\\n  float dark_mode;\\n};\\n\\n#define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))\\nvec2[] positions = vec2[4](\\n  vec2(-1, -1), vec2(1, -1), vec2(-1, 1),vec2(1, 1)\\n);\\n\\n#ifndef SPECTRAL\\n#define SPECTRAL\\n\\nconst int SPECTRAL_SIZE = 38;\\nconst float SPECTRAL_GAMMA = 2.4;\\nconst float SPECTRAL_EPSILON = 0.0001;\\n\\nfloat spectral_uncompand(float x) {\\n  return (x < 0.04045) ? x / 12.92 : pow((x + 0.055) / 1.055, SPECTRAL_GAMMA);\\n}\\n\\nfloat spectral_compand(float x) {\\n  return (x < 0.0031308) ? x * 12.92 : 1.055 * pow(x, 1.0 / SPECTRAL_GAMMA) - 0.055;\\n}\\n\\nvec3 spectral_srgb_to_linear(vec3 srgb) {\\n    return vec3(spectral_uncompand(srgb[0]), spectral_uncompand(srgb[1]), spectral_uncompand(srgb[2]));\\n}\\n\\nvec3 spectral_linear_to_srgb(vec3 lrgb) {\\n    return clamp(vec3(spectral_compand(lrgb[0]), spectral_compand(lrgb[1]), spectral_compand(lrgb[2])), 0.0, 1.0);\\n}\\n\\nvoid spectral_upsampling(vec3 lrgb, out float w, out float c, out float m, out float y, out float r, out float g, out float b) {\\n    w = min(lrgb.r, min(lrgb.g, lrgb.b));\\n\\n    lrgb -= w;\\n\\n    c = min(lrgb.g, lrgb.b);\\n    m = min(lrgb.r, lrgb.b);\\n    y = min(lrgb.r, lrgb.g);\\n    r = min(max(0., lrgb.r - lrgb.b), max(0., lrgb.r - lrgb.g));\\n    g = min(max(0., lrgb.g - lrgb.b), max(0., lrgb.g - lrgb.r));\\n    b = min(max(0., lrgb.b - lrgb.g), max(0., lrgb.b - lrgb.r));\\n}\\n\\nvoid spectral_linear_to_reflectance(vec3 lrgb, inout float R[SPECTRAL_SIZE]) {\\n    float w, c, m, y, r, g, b;\\n    \\n    spectral_upsampling(lrgb, w, c, m, y, r, g, b);\\n    \\n     R[0] = max(SPECTRAL_EPSILON, w + c * 0.96853629 + m * 0.51567122 + y * 0.02055257 + r * 0.03147571 + g * 0.49108579 + b * 0.97901834);\\n     R[1] = max(SPECTRAL_EPSILON, w + c * 0.96855103 + m * 0.54015520 + y * 0.02059936 + r * 0.03146636 + g * 0.46944057 + b * 0.97901649);\\n     R[2] = max(SPECTRAL_EPSILON, w + c * 0.96859338 + m * 0.62645502 + y * 0.02062723 + r * 0.03140624 + g * 0.40165780 + b * 0.97901118);\\n     R[3] = max(SPECTRAL_EPSILON, w + c * 0.96877345 + m * 0.75595012 + y * 0.02073387 + r * 0.03119611 + g * 0.24490420 + b * 0.97892146);\\n     R[4] = max(SPECTRAL_EPSILON, w + c * 0.96942204 + m * 0.92826996 + y * 0.02114202 + r * 0.03053888 + g * 0.06826880 + b * 0.97858555);\\n     R[5] = max(SPECTRAL_EPSILON, w + c * 0.97143709 + m * 0.97223624 + y * 0.02233154 + r * 0.02856855 + g * 0.02732883 + b * 0.97743705);\\n     R[6] = max(SPECTRAL_EPSILON, w + c * 0.97541862 + m * 0.98616174 + y * 0.02556857 + r * 0.02459485 + g * 0.01360600 + b * 0.97428075);\\n     R[7] = max(SPECTRAL_EPSILON, w + c * 0.98074186 + m * 0.98955255 + y * 0.03330189 + r * 0.01929520 + g * 0.01000187 + b * 0.96663223);\\n     R[8] = max(SPECTRAL_EPSILON, w + c * 0.98580992 + m * 0.98676237 + y * 0.05185294 + r * 0.01423112 + g * 0.01284127 + b * 0.94822893);\\n     R[9] = max(SPECTRAL_EPSILON, w + c * 0.98971194 + m * 0.97312575 + y * 0.10087639 + r * 0.01033111 + g * 0.02636635 + b * 0.89937713);\\n    R[10] = max(SPECTRAL_EPSILON, w + c * 0.99238027 + m * 0.91944277 + y * 0.24000413 + r * 0.00765876 + g * 0.07058713 + b * 0.76070164);\\n    R[11] = max(SPECTRAL_EPSILON, w + c * 0.99409844 + m * 0.32564851 + y * 0.53589066 + r * 0.00593693 + g * 0.70421692 + b * 0.46420440);\\n    R[12] = max(SPECTRAL_EPSILON, w + c * 0.99517200 + m * 0.13820628 + y * 0.79874659 + r * 0.00485616 + g * 0.85473994 + b * 0.20123039);\\n    R[13] = max(SPECTRAL_EPSILON, w + c * 0.99576545 + m * 0.05015143 + y * 0.91186529 + r * 0.00426186 + g * 0.95081565 + b * 0.08808402);\\n    R[14] = max(SPECTRAL_EPSILON, w + c * 0.99593552 + m * 0.02912336 + y * 0.95399623 + r * 0.00409039 + g * 0.97170370 + b * 0.04592894);\\n    R[15] = max(SPECTRAL_EPSILON, w + c * 0.99564041 + m * 0.02421691 + y * 0.97137099 + r * 0.00438375 + g * 0.97651888 + b * 0.02860373);\\n    R[16] = max(SPECTRAL_EPSILON, w + c * 0.99464769 + m * 0.02660696 + y * 0.97939505 + r * 0.00537525 + g * 0.97429245 + b * 0.02060067);\\n    R[17] = max(SPECTRAL_EPSILON, w + c * 0.99229579 + m * 0.03407586 + y * 0.98345207 + r * 0.00772962 + g * 0.97012917 + b * 0.01656701);\\n    R[18] = max(SPECTRAL_EPSILON, w + c * 0.98638762 + m * 0.04835936 + y * 0.98553736 + r * 0.01366120 + g * 0.94258630 + b * 0.01451549);\\n    R[19] = max(SPECTRAL_EPSILON, w + c * 0.96829712 + m * 0.00011720 + y * 0.98648905 + r * 0.03181352 + g * 0.99989207 + b * 0.01357964);\\n    R[20] = max(SPECTRAL_EPSILON, w + c * 0.89228016 + m * 0.00008554 + y * 0.98674535 + r * 0.10791525 + g * 0.99989891 + b * 0.01331243);\\n    R[21] = max(SPECTRAL_EPSILON, w + c * 0.53740239 + m * 0.85267882 + y * 0.98657555 + r * 0.46249516 + g * 0.13823139 + b * 0.01347661);\\n    R[22] = max(SPECTRAL_EPSILON, w + c * 0.15360445 + m * 0.93188793 + y * 0.98611877 + r * 0.84604333 + g * 0.06968113 + b * 0.01387181);\\n    R[23] = max(SPECTRAL_EPSILON, w + c * 0.05705719 + m * 0.94810268 + y * 0.98559942 + r * 0.94275572 + g * 0.05628787 + b * 0.01435472);\\n    R[24] = max(SPECTRAL_EPSILON, w + c * 0.03126539 + m * 0.94200977 + y * 0.98507063 + r * 0.96860996 + g * 0.06111561 + b * 0.01479836);\\n    R[25] = max(SPECTRAL_EPSILON, w + c * 0.02205445 + m * 0.91478045 + y * 0.98460039 + r * 0.97783966 + g * 0.08987709 + b * 0.01515250);\\n    R[26] = max(SPECTRAL_EPSILON, w + c * 0.01802271 + m * 0.87065445 + y * 0.98425301 + r * 0.98187757 + g * 0.13656016 + b * 0.01540513);\\n    R[27] = max(SPECTRAL_EPSILON, w + c * 0.01613460 + m * 0.78827548 + y * 0.98403909 + r * 0.98377315 + g * 0.22169624 + b * 0.01557233);\\n    R[28] = max(SPECTRAL_EPSILON, w + c * 0.01520947 + m * 0.65738359 + y * 0.98388535 + r * 0.98470202 + g * 0.32176956 + b * 0.01565710);\\n    R[29] = max(SPECTRAL_EPSILON, w + c * 0.01475977 + m * 0.59909403 + y * 0.98376116 + r * 0.98515481 + g * 0.36157329 + b * 0.01571025);\\n    R[30] = max(SPECTRAL_EPSILON, w + c * 0.01454263 + m * 0.56817268 + y * 0.98368246 + r * 0.98537114 + g * 0.48361920 + b * 0.01571916);\\n    R[31] = max(SPECTRAL_EPSILON, w + c * 0.01444459 + m * 0.54031997 + y * 0.98365023 + r * 0.98546685 + g * 0.46488579 + b * 0.01572133);\\n    R[32] = max(SPECTRAL_EPSILON, w + c * 0.01439897 + m * 0.52110241 + y * 0.98361309 + r * 0.98550011 + g * 0.47440306 + b * 0.01572502);\\n    R[33] = max(SPECTRAL_EPSILON, w + c * 0.01437620 + m * 0.51041094 + y * 0.98357259 + r * 0.98551031 + g * 0.48576990 + b * 0.01571717);\\n    R[34] = max(SPECTRAL_EPSILON, w + c * 0.01436343 + m * 0.50526577 + y * 0.98353856 + r * 0.98550741 + g * 0.49267971 + b * 0.01571905);\\n    R[35] = max(SPECTRAL_EPSILON, w + c * 0.01435687 + m * 0.50255080 + y * 0.98351247 + r * 0.98551323 + g * 0.49625685 + b * 0.01571059);\\n    R[36] = max(SPECTRAL_EPSILON, w + c * 0.01435370 + m * 0.50126452 + y * 0.98350101 + r * 0.98551563 + g * 0.49807754 + b * 0.01569728);\\n    R[37] = max(SPECTRAL_EPSILON, w + c * 0.01435408 + m * 0.50083021 + y * 0.98350852 + r * 0.98551547 + g * 0.49889859 + b * 0.01570020);\\n}\\n\\nvec3 spectral_xyz_to_srgb(vec3 xyz) {\\n    mat3 XYZ_RGB;\\n\\n    XYZ_RGB[0] = vec3( 3.24306333, -1.53837619, -0.49893282);\\n    XYZ_RGB[1] = vec3(-0.96896309,  1.87542451,  0.04154303);\\n    XYZ_RGB[2] = vec3( 0.05568392, -0.20417438,  1.05799454);\\n    \\n    float r = dot(XYZ_RGB[0], xyz);\\n    float g = dot(XYZ_RGB[1], xyz);\\n    float b = dot(XYZ_RGB[2], xyz);\\n\\n    return spectral_linear_to_srgb(vec3(r, g, b));\\n}\\n\\nvec3 spectral_reflectance_to_xyz(float R[SPECTRAL_SIZE]) {\\n    vec3 xyz = vec3(0.0);\\n    \\n    xyz +=  R[0] * vec3(0.00006469, 0.00000184, 0.00030502);\\n    xyz +=  R[1] * vec3(0.00021941, 0.00000621, 0.00103681);\\n    xyz +=  R[2] * vec3(0.00112057, 0.00003101, 0.00531314);\\n    xyz +=  R[3] * vec3(0.00376661, 0.00010475, 0.01795439);\\n    xyz +=  R[4] * vec3(0.01188055, 0.00035364, 0.05707758);\\n    xyz +=  R[5] * vec3(0.02328644, 0.00095147, 0.11365162);\\n    xyz +=  R[6] * vec3(0.03455942, 0.00228226, 0.17335873);\\n    xyz +=  R[7] * vec3(0.03722379, 0.00420733, 0.19620658);\\n    xyz +=  R[8] * vec3(0.03241838, 0.00668880, 0.18608237);\\n    xyz +=  R[9] * vec3(0.02123321, 0.00988840, 0.13995048);\\n    xyz += R[10] * vec3(0.01049099, 0.01524945, 0.08917453);\\n    xyz += R[11] * vec3(0.00329584, 0.02141831, 0.04789621);\\n    xyz += R[12] * vec3(0.00050704, 0.03342293, 0.02814563);\\n    xyz += R[13] * vec3(0.00094867, 0.05131001, 0.01613766);\\n    xyz += R[14] * vec3(0.00627372, 0.07040208, 0.00775910);\\n    xyz += R[15] * vec3(0.01686462, 0.08783871, 0.00429615);\\n    xyz += R[16] * vec3(0.02868965, 0.09424905, 0.00200551);\\n    xyz += R[17] * vec3(0.04267481, 0.09795667, 0.00086147);\\n    xyz += R[18] * vec3(0.05625475, 0.09415219, 0.00036904);\\n    xyz += R[19] * vec3(0.06947040, 0.08678102, 0.00019143);\\n    xyz += R[20] * vec3(0.08305315, 0.07885653, 0.00014956);\\n    xyz += R[21] * vec3(0.08612610, 0.06352670, 0.00009231);\\n    xyz += R[22] * vec3(0.09046614, 0.05374142, 0.00006813);\\n    xyz += R[23] * vec3(0.08500387, 0.04264606, 0.00002883);\\n    xyz += R[24] * vec3(0.07090667, 0.03161735, 0.00001577);\\n    xyz += R[25] * vec3(0.05062889, 0.02088521, 0.00000394);\\n    xyz += R[26] * vec3(0.03547396, 0.01386011, 0.00000158);\\n    xyz += R[27] * vec3(0.02146821, 0.00810264, 0.00000000);\\n    xyz += R[28] * vec3(0.01251646, 0.00463010, 0.00000000);\\n    xyz += R[29] * vec3(0.00680458, 0.00249138, 0.00000000);\\n    xyz += R[30] * vec3(0.00346457, 0.00125930, 0.00000000);\\n    xyz += R[31] * vec3(0.00149761, 0.00054165, 0.00000000);\\n    xyz += R[32] * vec3(0.00076970, 0.00027795, 0.00000000);\\n    xyz += R[33] * vec3(0.00040737, 0.00014711, 0.00000000);\\n    xyz += R[34] * vec3(0.00016901, 0.00006103, 0.00000000);\\n    xyz += R[35] * vec3(0.00009522, 0.00003439, 0.00000000);\\n    xyz += R[36] * vec3(0.00004903, 0.00001771, 0.00000000);\\n    xyz += R[37] * vec3(0.00002000, 0.00000722, 0.00000000);\\n\\n    return xyz;\\n}\\n\\nfloat spectral_linear_to_concentration(float l1, float l2, float t) {\\n    float t1 = l1 * pow(1.0 - t, 2.0);\\n    float t2 = l2 * pow(t, 2.0);\\n\\n    return t2 / (t1 + t2);\\n}\\n\\nvec3 spectral_mix(vec3 color1, vec3 color2, float t) {\\n    vec3 lrgb1 = spectral_srgb_to_linear(color1);\\n    vec3 lrgb2 = spectral_srgb_to_linear(color2);\\n\\n    float R1[SPECTRAL_SIZE];\\n    float R2[SPECTRAL_SIZE];\\n\\n    spectral_linear_to_reflectance(lrgb1, R1);\\n    spectral_linear_to_reflectance(lrgb2, R2);\\n\\n    float l1 = spectral_reflectance_to_xyz(R1)[1];\\n    float l2 = spectral_reflectance_to_xyz(R2)[1];\\n\\n    t = spectral_linear_to_concentration(l1, l2, t);\\n\\n    float R[SPECTRAL_SIZE];\\n\\n    for (int i = 0; i < SPECTRAL_SIZE; i++) {\\n      float KS = (1.0 - t) * (pow(1.0 - R1[i], 2.0) / (2.0 * R1[i])) + t * (pow(1.0 - R2[i], 2.0) / (2.0 * R2[i]));\\n      float KM = 1.0 + KS - sqrt(pow(KS, 2.0) + 2.0 * KS);\\n\\n      //Saunderson correction\\n      // let S = ((1.0 - K1) * (1.0 - K2) * KM) / (1.0 - K2 * KM);\\n\\n      R[i] = KM;\\n    }\\n\\n    return spectral_xyz_to_srgb(spectral_reflectance_to_xyz(R));\\n}\\n\\nvec4 spectral_mix(vec4 color1, vec4 color2, float t) {\\n    return vec4(spectral_mix(color1.rgb, color2.rgb, t), mix(color1.a, color2.a, t));\\n}\\n\\n#endif\\n\\nvec3 mul3( in mat3 m, in vec3 v ){return vec3(dot(v,m[0]),dot(v,m[1]),dot(v,m[2]));}\\n\\nvec3 mul3( in vec3 v, in mat3 m ){return mul3(m,v);}\\n\\nvec3 srgb2oklab(vec3 c) {\\n    \\n    mat3 m1 = mat3(\\n        0.4122214708,0.5363325363,0.0514459929,\\n        0.2119034982,0.6806995451,0.1073969566,\\n        0.0883024619,0.2817188376,0.6299787005\\n    );\\n    \\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = pow(lms,vec3(1./3.));\\n\\n    mat3 m2 = mat3(\\n        +0.2104542553,+0.7936177850,-0.0040720468,\\n        +1.9779984951,-2.4285922050,+0.4505937099,\\n        +0.0259040371,+0.7827717662,-0.8086757660\\n    );\\n    \\n    return mul3(m2,lms);\\n}\\n\\nvec3 oklab2srgb(vec3 c)\\n{\\n    mat3 m1 = mat3(\\n        1.0000000000,+0.3963377774,+0.2158037573,\\n        1.0000000000,-0.1055613458,-0.0638541728,\\n        1.0000000000,-0.0894841775,-1.2914855480\\n    );\\n\\n    vec3 lms = mul3(m1,c);\\n    \\n    lms = lms * lms * lms;\\n  \\n    mat3 m2 = mat3(\\n        +4.0767416621,-3.3077115913,+0.2309699292,\\n        -1.2684380046,+2.6097574011,-0.3413193965,\\n        -0.0041960863,-0.7034186147,+1.7076147010\\n    );\\n    return mul3(m2,lms);\\n}\\n\\nvec3 lab2lch( in vec3 c ){return vec3(c.x,sqrt((c.y*c.y) + (c.z * c.z)),atan(c.z,c.y));}\\n\\nvec3 lch2lab( in vec3 c ){return vec3(c.x,c.y*cos(c.z),c.y*sin(c.z));}\\n\\nvec3 srgb_to_oklch( in vec3 c ) { return lab2lch(srgb2oklab(c)); }\\nvec3 oklch_to_srgb( in vec3 c ) { return oklab2srgb(lch2lab(c)); }\\n\\nfloat luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }\\n\\nfloat luma(vec4 color) { return dot(color.rgb, vec3(0.299, 0.587, 0.114)); }\\n\\nvec4 rgb2cmyki(in vec3 c) { float k = max(max(c.r, c.g), c.b); return min(vec4(c.rgb / k, k), 1.0); }\\n\\nvec3 cmyki2rgb(in vec4 c) { return c.rgb * c.a; }\\n\\nvec3 lerpHSV(in vec3 hsv1, in vec3 hsv2, in float rate)\\n{\\n    float hue = (mod(mod((hsv2.x-hsv1.x), 1.) + 1.5, 1.)-0.5)*rate + hsv1.x;\\n    return vec3(hue, mix(hsv1.yz, hsv2.yz, rate));\\n}\\n\\nvec3 hsv2rgb(vec3 c)\\n{\\n    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\\n}\\n\\nvec3 rgb2hsv(vec3 c)\\n{\\n    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\\n    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\\n    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\\n\\n    float d = q.x - min(q.w, q.y);\\n    float e = 1.0e-10;\\n    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\\n}\\n\\nvec3 hsv2rgbSmooth( in vec3 hsv )\\n{\\n    vec3 rgb = clamp( abs(mod(hsv.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );\\n\\n    rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing\\n\\n    return hsv.z * mix( vec3(1.0), rgb, hsv.y);\\n}\\n\\nvec3 hueShift(vec3 col, vec3 hsv){\\n    vec3 h = rgb2hsv(col);\\n    h.x += hsv.x;\\n\\n    h.y *= hsv.y;\\n    h.z *= hsv.z;\\n\\n    return hsv2rgbSmooth(h);\\n}\\n\\nvec4 blend_brushstroke(vec4 col, vec4 stroke, int blending_colour_space){\\n  // col.xyz = mix(col.xyz, stroke.xyz, stroke.w); \\n  \\n  int mode = blending_colour_space;\\n  \\n  if(stroke.w > 0.00000001){\\n    // float interpolant = stroke.w;\\n    stroke.xyz = stroke.xyz/max(stroke.w,0.001);\\n    \\n    if(mode == 0){\\n      col.xyz = spectral_mix(col.xyz, clamp(stroke.xyz,0.00001,0.99999), stroke.w);\\n      if(stroke.w > 0.99999)\\n        col.xyz = stroke.xyz;\\n    } else if(mode == 1){\\n      col.xyz = srgb_to_oklch( col.xyz );\\n      stroke.xyz = srgb_to_oklch( stroke.xyz );\\n      col.xy = mix(col.xy, stroke.xy,stroke.w);\\n      float tau = acos(-1.) * 2.;\\n      float h_a = stroke.z;\\n      float h_b = stroke.z + tau;\\n      float dist_a = abs(col.z - h_a);\\n      float dist_b = abs(col.z - h_b);\\n      if(dist_a < dist_b){\\n        col.z = mix(col.z, h_a, stroke.w);\\n      } else {\\n        col.z = mix(col.z, h_b, stroke.w);\\n      }\\n      col.z = mod(col.z, tau);\\n      // col.z = max(col.z)\\n      // if(isnan(col.z)){\\n      //   col.z = 1.;\\n      // }\\n\\n      col.xyz = oklch_to_srgb( col.xyz );\\n      col.xyz = clamp(col.xyz,0.,1.);\\n    } else {\\n      col.xyz = mix(col.xyz, stroke.xyz, stroke.w);\\n    }\\n    col.w = max(col.w, stroke.w);\\n  }\\n\\n  return col; \\n}\\n\\nuniform sampler2D fb_a;\\nuniform sampler2D fb_b;\\nuniform sampler2D noise_tex;\\nin vec2 uv;\\nout vec4 col;\\n\\nvec3[] pal = vec3[](\\n    vec3(0.8,0.5,0.),\\n    vec3(0.2,0.6,0.4),\\n    vec3(1.0,0.0,0.7),\\n    vec3(1.0,1.0,0.99)\\n);\\n\\nvec3 mix_oklch(vec3 col_a, vec3 col_b, float a){\\n  // return mix(col_a,col_b,a);\\n  float tau = 3.14159265359 * 2.;\\n  float col_b_h_1 = col_b.z;\\n  float col_b_h_2 = col_b.z + tau;\\n  float dist_a = abs(col_a.z - col_b_h_1);\\n  float dist_b = abs(col_a.z - col_b_h_2);\\n  // if(dist_a < dist_b){\\n  //   col_a.z = mix(col_a.z, col_b_h_1, a);\\n  // } else {\\n  //   col_a.z = mix(col_a.z, col_b_h_2, a);\\n  // }\\n  col_a.z = mix(col_a.z,col_b.z,a);\\n\\n  col_a.x = mix(col_a.x, col_b.x, a);\\n  col_a.y = mix(col_a.y, col_b.y, a);\\n  // col_a.z = mod(col_a.z, tau);\\n  return col_a;\\n}\\n\\nvoid main() {\\n  vec2 u = (gl_FragCoord.xy - 0.5*R)/min(R.x,R.y);\\n  vec2 un = (gl_FragCoord.xy/R);\\n\\n  col = vec4(0,0,0,1);\\n  \\n  vec4 t_a = texture(fb_a, un);\\n  vec4 t_b = texelFetch(fb_b, ivec2(gl_FragCoord), 0);\\n  vec4 noise = texture(noise_tex, fract(u*3.));\\n\\n  const float bayer[] = float[64](\\n     0./63., 32./63., 8./63., 40./63., 2./63., 34./63., 10./63., 42./63., /* 8x8 Bayer ordered dithering */\\n    48./63., 16./63., 56./63., 24./63., 50./63., 18./63., 58./63., 26./63., /* pattern. Each input pixel */\\n    12./63., 44./63., 4./63., 36./63., 14./63., 46./63., 6./63., 38./63., /* is scaled to the 0..63 range */\\n    60./63., 28./63., 52./63., 20./63., 62./63., 30./63., 54./63., 22./63., /* before looking in this table */\\n     3./63., 35./63., 11./63., 43./63., 1./63., 33./63., 9./63., 41./63., /* to determine the action. */\\n    51./63., 19./63., 59./63., 27./63., 49./63., 17./63., 57./63., 25./63.,\\n    15./63., 47./63., 7./63., 39./63., 13./63., 45./63., 5./63., 37./63.,\\n    63./63., 31./63., 55./63., 23./63., 61./63., 29./63., 53./63., 21./63.\\n  );\\n\\n  col += t_a*1.0;\\n  col = mix(col, vec4(0), t_b.a);\\n  \\n  // col += bayer[]\\n  \\n\\t// vec2 sc = px_sz / aspect_ratio;\\n  // u += time;\\n  // uv += 1.0;\\n\\tvec2 sc = 4./R;\\n\\t// vec2 fruv = fract(u / sc);\\n\\tvec2 fuv = floor((uv + 5.)/ sc) * sc;\\n\\tvec2 buv = mod(fuv/sc, 8.);\\n\\tbuv = mod(floor(gl_FragCoord.xy/2.0), 8.);\\n\\n\\tfloat bay = bayer[int(buv.x) + int(buv.y)*8];\\n\\n  \\n  float T = time;\\n  \\n  // col = clamp(col,0.,1.);\\n  vec2 mouse_pos = vec2(mouse_pos_x, mouse_pos_y);\\n  vec2 muv = (mouse_pos*R)/min(R.x,R.y);\\n\\n  col.xyz = srgb_to_oklch(col.xyz);\\n\\n  col.z += (bay*2. - 1.)*0.9*(1. - ptr_pressure * 5. * smoothstep(0.5,0., length(muv - u)));\\n  // if(col.y < 0.001 && col.x < 0.001){\\n  //   col.x += (bay*2. - 1.)*0.7;\\n  // }\\n  // col.x = max(col.x, 0.1);\\n\\n  col.xyz = oklch_to_srgb(col.xyz);\\n  \\n  \\n  // col = 1.-col;\\n\\n  col = pow(col,vec4(0.454545454545)); \\n  col += (noise*noise*noise)*0.15;\\n  col.w = 1.;\\n}    \\n\\n  \\n  \\n\\t\\t \";";
 
 /***/ })
 
@@ -1001,7 +1001,7 @@ function validate_store(store, name) {
 	}
 }
 
-function subscribe(store, ...callbacks) {
+function utils_subscribe(store, ...callbacks) {
 	if (store == null) {
 		for (const callback of callbacks) {
 			callback(undefined);
@@ -1022,13 +1022,13 @@ function subscribe(store, ...callbacks) {
  */
 function get_store_value(store) {
 	let value;
-	subscribe(store, (_) => (value = _))();
+	utils_subscribe(store, (_) => (value = _))();
 	return value;
 }
 
 /** @returns {void} */
 function component_subscribe(component, store, callback) {
-	component.$$.on_destroy.push(subscribe(store, callback));
+	component.$$.on_destroy.push(utils_subscribe(store, callback));
 }
 
 function create_slot(definition, ctx, $$scope, fn) {
@@ -4827,7 +4827,7 @@ var style_update = injectStylesIntoStyleTag_default()(style/* default */.Z, opti
 
 ;// CONCATENATED MODULE: ./node_modules/waveform-path/dist/waveform-path.min.js
 const getAudioData=e=>{window.AudioContext=window.AudioContext||window.webkitAudioContext;const a=new AudioContext;return fetch(e).then(e=>e.arrayBuffer()).then(e=>a.decodeAudioData(e)).catch(e=>{console.error(e)})},linearPath=(e,a)=>{const{channel:t=0,samples:v=e.length,height:h=100,width:r=800,top:s=0,left:l=0,type:i="steps",paths:$=[{d:"Q",sx:0,sy:0,x:50,y:100,ex:100,ey:0}],animation:o=!1,animationframes:n=10,normalize:b=!0}=a;var a=getFramesData(e,t,o,n),e=getFilterData(a,v),w=b?getNormalizeData(e):e;let c="";var p,f,g="bars"!=i?(h+2*s)/2:h+s,m=r/v,y=$.length,u="mirror"==i?2*y:y,A=w.length;for(let n=0;n<A;n++){0<n&&(p=c.length,f=c.charAt(p-1),c+=";"==f||0===p?" M 0 0 ;":";");let s=-9999,o=-9999;for(let r=0;r<v;r++){var M="bars"==i||r%2?1:-1;let t=1;for(let e=0;e<u;e++){let a=e;e>=y&&(a=e-y,t=-1),$[a].minshow=$[a].minshow??0,$[a].maxshow=$[a].maxshow??1,$[a].normalize=$[a].normalize??!1;var d=$[a].normalize?1:w[n][r];if($[a].minshow<=w[n][r]&&$[a].maxshow>=w[n][r])switch($[a].d){case"L":var D=r*m+m*$[a].sx/100+l,x=g+d*$[a].sy/100*("bars"!=i?h/2:h)*-M*t,k=r*m+m*$[a].ex/100+l,z=g+d*$[a].ey/100*("bars"!=i?h/2:h)*-M*t;D===s&&x===o||(c+=`M ${D} ${x} `),c+=`L ${k} ${z} `,s=k,o=z;break;case"H":D=r*m+m*$[a].sx/100+l,x=g+d*$[a].y/100*("bars"!=i?h/2:h)*-M*t,k=r*m+m*$[a].ex/100+l;D===s&&x===o||(c+=`M ${D} ${x} `),c+=`H ${k} `,s=k,o=x;break;case"V":var z=r*m+m*$[a].x/100+l,C=g+d*$[a].sy/100*("bars"!=i?h/2:h)*-M*t,F=g+d*$[a].ey/100*("bars"!=i?h/2:h)*-M*t;z===s&&C===o||(c+=`M ${z} ${C} `),c+=`V ${F} `,s=z,o=F;break;case"C":var C=r*m+m*$[a].sx/100+l,F=g-g*$[a].sy/100*M,Q=r*m+m*$[a].x/100+l,P=g+d*$[a].y/100*("bars"!=i?h:2*h)*-M*t,L=r*m+m*$[a].ex/100+l,Z=g-g*$[a].ey/100*M;C===s&&F===o||(c+=`M ${C} ${F} `),c+=`C ${C} ${F} ${Q} ${P} ${L} ${Z} `,s=L,o=Z;break;case"Q":var Q=r*m+m*$[a].sx/100+l,P=g+d*$[a].sy/100*("bars"!=i?h/2:h)*-M*t,L=r*m+m*$[a].x/100+l,Z=g+d*$[a].y/100*("bars"!=i?h:2*h)*-M*t,N=r*m+m*$[a].ex/100+l,H=g+d*$[a].ey/100*("bars"!=i?h/2:h)*-M*t;Q===s&&P===o||(c+=`M ${Q} ${P} `),c+=`Q ${L} ${Z} ${N} ${H} `,s=N,o=H;break;case"A":{var N=r*m+m*$[a].sx/100+l,H=g+d*$[a].sy/100*("bars"!=i?h/2:h)*-M*t,V=r*m+m*$[a].ex/100+l,B=g+d*$[a].ey/100*("bars"!=i?h/2:h)*-M*t,I=(N===s&&H===o||(c+=`M ${N} ${H} `),$[a].rx*m/100),R=$[a].ry*m/100;let e=$[a].sweep;-1==M&&(e=1==e?0:1),-1==t&&(e=1==e?0:1),c+=`A ${I} ${R} ${$[a].angle} ${$[a].arc} ${e} ${V} ${B} `,s=V,o=B;break}case"Z":c+="Z "}}}}return c},polarPath=(e,a)=>{const{channel:t=0,samples:v=e.length,distance:h=50,length:l=100,top:i=0,left:$=0,type:b="steps",startdeg:r=0,enddeg:s=360,invertdeg:o=!1,invertpath:n=!1,paths:c=[{d:"Q",sdeg:0,sr:0,deg:50,r:100,edeg:100,er:0}],animation:w=!1,animationframes:p=10,normalize:f=!0}=a;var a=getFramesData(e,t,w,p),e=getFilterData(a,v),y=f?getNormalizeData(e):e;let g="";var u,A,a=s<r?s+360:s,m=o?(r-a)/v:(a-r)/v,D=o?90+r+180:90+r,M=n?-1:1,k=c.length,z="mirror"==b?2*k:k,C=Math.PI/180,F=y.length;for(let n=0;n<F;n++){0<n&&(u=g.length,A=g.charAt(u-1),g+=";"==A||0===u?" M 0 0 ;":";");let s=-9999,o=-9999;for(let r=0;r<v;r++){var d="bars"==b||r%2?1:-1;let t=1;for(let e=0;e<z;e++){let a=e;e>=k&&(a=e-k,t=-1),c[a].minshow=c[a].minshow??0,c[a].maxshow=c[a].maxshow??1,c[a].normalize=c[a].normalize??!1;var x=c[a].normalize?1:y[n][r];if(c[a].minshow<=y[n][r]&&c[a].maxshow>=y[n][r])switch(c[a].d){case"L":var Q=(m*(r+c[a].sdeg/100)-D)*C,P=(m*(r+c[a].edeg/100)-D)*C,L=$+(l*(c[a].sr/100)*x*d*t*M+h)*Math.cos(Q),Q=i+(l*(c[a].sr/100)*x*d*t*M+h)*Math.sin(Q),Z=$+(l*(c[a].er/100)*x*d*t*M+h)*Math.cos(P),P=i+(l*(c[a].er/100)*x*d*t*M+h)*Math.sin(P);L===s&&Q===o||(g+=`M ${L} ${Q} `),g+=`L ${Z} ${P} `,s=Z,o=P;break;case"C":var L=(m*(r+c[a].sdeg/100)-D)*C,Q=(m*(r+c[a].deg/100)-D)*C,Z=(m*(r+c[a].edeg/100)-D)*C,P=$+(l*(c[a].sr/100)*x*d*t*M+h)*Math.cos(L),N=i+(l*(c[a].sr/100)*x*d*t*M+h)*Math.sin(L),H=$+(l*(c[a].r/100)*x*d*t*M+h)*Math.cos(Q),V=i+(l*(c[a].r/100)*x*d*t*M+h)*Math.sin(Q),B=$+(l*(c[a].er/100)*x*d*t*M+h)*Math.cos(Z),I=i+(l*(c[a].er/100)*x*d*t*M+h)*Math.sin(Z);P===s&&N===o||(g+=`M ${P} ${N} `),g+=`C ${P} ${N} ${H} ${V} ${B} ${I} `,s=B,o=I;break;case"Q":var N=(m*(r+c[a].sdeg/100)-D)*C,H=(m*(r+c[a].deg/100)-D)*C,V=(m*(r+c[a].edeg/100)-D)*C,B=$+(l*(c[a].sr/100)*x*d*t*M+h)*Math.cos(N),I=i+(l*(c[a].sr/100)*x*d*t*M+h)*Math.sin(N),R=$+(l*(c[a].r/100)*x*d*t*M+h)*Math.cos(H),j=i+(l*(c[a].r/100)*x*d*t*M+h)*Math.sin(H),q=$+(l*(c[a].er/100)*x*d*t*M+h)*Math.cos(V),E=i+(l*(c[a].er/100)*x*d*t*M+h)*Math.sin(V);B===s&&I===o||(g+=`M ${B} ${I} `),g+=`Q ${R} ${j} ${q} ${E} `,s=q,o=E;break;case"A":{var R=(m*(r+c[a].sdeg/100)-D)*C,j=(m*(r+c[a].edeg/100)-D)*C,q=$+(l*(c[a].sr/100)*x*d*t*M+h)*Math.cos(R),E=i+(l*(c[a].sr/100)*x*d*t*M+h)*Math.sin(R),G=$+(l*(c[a].er/100)*x*d*t*M+h)*Math.cos(j),J=i+(l*(c[a].er/100)*x*d*t*M+h)*Math.sin(j),K=(q===s&&E===o||(g+=`M ${q} ${E} `),m*r*c[a].angle/100),O=c[a].rx*m/100,S=c[a].ry*m/100;let e=c[a].sweep;-1==d&&(e=1==e?0:1),-1==t&&(e=1==e?0:1),g+=`A ${O} ${S} ${K} ${c[a].arc} ${e} ${G} ${J} `,s=G,o=J;break}case"Z":g+="Z "}}}}return g},getFramesData=(e,a,t,r)=>{const s=e.getChannelData(a),o=[];if(t){var n=e.sampleRate/r;for(let e=0;e<s.length;e+=n){var h=s.slice(e,e+n);o.push(h)}}else o.push(s);return o},getFilterData=(r,a)=>{const e=[];var s=r.length;for(let t=0;t<s;t++){var o=Math.floor(r[t].length/a);const h=[];for(let e=0;e<a;e++){var n=o*e;let a=0;for(let e=0;e<o;e++)a+=Math.abs(r[t][n+e]);h.push(a/o)}e.push(h)}return e},getNormalizeData=a=>{const t=[];var r=a.length;for(let e=0;e<r;e++){var s=Math.max(...a[e]);t.push(s)}const o=Math.pow(Math.max(...t),-1),n=[];for(let e=0;e<r;e++){var h=a[e].map(e=>e*o);n.push(h)}return n};
-;// CONCATENATED MODULE: ./src/wave-audio-path-player/dist/wave-audio-path-player.es.js
+;// CONCATENATED MODULE: ./src/components/utils/wave-audio-path-player.es.js
 
 
 
@@ -5225,24 +5225,24 @@ window.customElements.define('wave-audio-path-player', AudioPathPlayer);
 // EXTERNAL MODULE: ./public/play_pause.svg
 var play_pause = __webpack_require__(2);
 var play_pause_default = /*#__PURE__*/__webpack_require__.n(play_pause);
-;// CONCATENATED MODULE: ./src/components/Video.svelte
-/* src\components\Video.svelte generated by Svelte v4.2.0 */
+;// CONCATENATED MODULE: ./src/components/utils/Video.svelte
+/* src\components\utils\Video.svelte generated by Svelte v4.2.0 */
 
 
 
 
-const file = "src\\components\\Video.svelte";
+const file = "src\\components\\utils\\Video.svelte";
 
 function create_fragment(ctx) {
 	let div;
 	let video;
-	let video_src_value;
 
 	const block = {
 		c: function create() {
 			div = dom_element("div");
 			video = dom_element("video");
-			if (!src_url_equal(video.src, video_src_value = /*src*/ ctx[0])) attr_dev(video, "src", video_src_value);
+			attr_dev(video, "class", "lozad");
+			attr_dev(video, "data-src", /*src*/ ctx[0]);
 			video.loop = true;
 			video.autoplay = true;
 			video.muted = true;
@@ -5259,8 +5259,8 @@ function create_fragment(ctx) {
 			/*video_binding*/ ctx[2](video);
 		},
 		p: function update(ctx, [dirty]) {
-			if (dirty & /*src*/ 1 && !src_url_equal(video.src, video_src_value = /*src*/ ctx[0])) {
-				attr_dev(video, "src", video_src_value);
+			if (dirty & /*src*/ 1) {
+				attr_dev(video, "data-src", /*src*/ ctx[0]);
 			}
 		},
 		i: utils_noop,
@@ -5394,6 +5394,215 @@ class Video extends SvelteComponentDev {
 }
 
 /* harmony default export */ const Video_svelte = (Video);
+;// CONCATENATED MODULE: ./src/components/utils/Image.svelte
+/* src\components\utils\Image.svelte generated by Svelte v4.2.0 */
+
+
+
+const Image_svelte_file = "src\\components\\utils\\Image.svelte";
+
+function Image_svelte_create_fragment(ctx) {
+	let img;
+	let img_data_src_value;
+
+	const block = {
+		c: function create() {
+			img = dom_element("img");
+			attr_dev(img, "class", "lozad");
+			attr_dev(img, "data-src", img_data_src_value = `${window.LFS_PREPEND}${/*src*/ ctx[0]}`);
+			add_location(img, Image_svelte_file, 3, 0, 50);
+		},
+		l: function claim(nodes) {
+			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, img, anchor);
+		},
+		p: function update(ctx, [dirty]) {
+			if (dirty & /*src*/ 1 && img_data_src_value !== (img_data_src_value = `${window.LFS_PREPEND}${/*src*/ ctx[0]}`)) {
+				attr_dev(img, "data-src", img_data_src_value);
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(img);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: Image_svelte_create_fragment.name,
+		type: "component",
+		source: "",
+		ctx
+	});
+
+	return block;
+}
+
+function Image_svelte_instance($$self, $$props, $$invalidate) {
+	let { $$slots: slots = {}, $$scope } = $$props;
+	validate_slots('Image', slots, []);
+	let { src = "" } = $$props;
+	const writable_props = ['src'];
+
+	Object.keys($$props).forEach(key => {
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Image> was created with unknown prop '${key}'`);
+	});
+
+	$$self.$$set = $$props => {
+		if ('src' in $$props) $$invalidate(0, src = $$props.src);
+	};
+
+	$$self.$capture_state = () => ({ src });
+
+	$$self.$inject_state = $$props => {
+		if ('src' in $$props) $$invalidate(0, src = $$props.src);
+	};
+
+	if ($$props && "$$inject" in $$props) {
+		$$self.$inject_state($$props.$$inject);
+	}
+
+	return [src];
+}
+
+class Image_svelte_Image extends SvelteComponentDev {
+	constructor(options) {
+		super(options);
+		init(this, options, Image_svelte_instance, Image_svelte_create_fragment, safe_not_equal, { src: 0 });
+
+		dispatch_dev("SvelteRegisterComponent", {
+			component: this,
+			tagName: "Image",
+			options,
+			id: Image_svelte_create_fragment.name
+		});
+	}
+
+	get src() {
+		throw new Error("<Image>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	set src(value) {
+		throw new Error("<Image>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+}
+
+/* harmony default export */ const Image_svelte = (Image_svelte_Image);
+;// CONCATENATED MODULE: ./src/components/utils/SubTitle.svelte
+/* src\components\utils\SubTitle.svelte generated by Svelte v4.2.0 */
+
+
+
+const SubTitle_svelte_file = "src\\components\\utils\\SubTitle.svelte";
+
+function SubTitle_svelte_create_fragment(ctx) {
+	let div;
+	let current;
+	const default_slot_template = /*#slots*/ ctx[1].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[0], null);
+
+	const block = {
+		c: function create() {
+			div = dom_element("div");
+			if (default_slot) default_slot.c();
+			set_style(div, "margin-left", "auto");
+			set_style(div, "margin-right", "auto");
+			set_style(div, "margin-top", "0.5rem");
+			add_location(div, SubTitle_svelte_file, 1, 0, 1);
+		},
+		l: function claim(nodes) {
+			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div, anchor);
+
+			if (default_slot) {
+				default_slot.m(div, null);
+			}
+
+			current = true;
+		},
+		p: function update(ctx, [dirty]) {
+			if (default_slot) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 1)) {
+					update_slot_base(
+						default_slot,
+						default_slot_template,
+						ctx,
+						/*$$scope*/ ctx[0],
+						!current
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[0])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[0], dirty, null),
+						null
+					);
+				}
+			}
+		},
+		i: function intro(local) {
+			if (current) return;
+			transitions_transition_in(default_slot, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transitions_transition_out(default_slot, local);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(div);
+			}
+
+			if (default_slot) default_slot.d(detaching);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: SubTitle_svelte_create_fragment.name,
+		type: "component",
+		source: "",
+		ctx
+	});
+
+	return block;
+}
+
+function SubTitle_svelte_instance($$self, $$props, $$invalidate) {
+	let { $$slots: slots = {}, $$scope } = $$props;
+	validate_slots('SubTitle', slots, ['default']);
+	const writable_props = [];
+
+	Object.keys($$props).forEach(key => {
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<SubTitle> was created with unknown prop '${key}'`);
+	});
+
+	$$self.$$set = $$props => {
+		if ('$$scope' in $$props) $$invalidate(0, $$scope = $$props.$$scope);
+	};
+
+	return [$$scope, slots];
+}
+
+class SubTitle extends SvelteComponentDev {
+	constructor(options) {
+		super(options);
+		init(this, options, SubTitle_svelte_instance, SubTitle_svelte_create_fragment, safe_not_equal, {});
+
+		dispatch_dev("SvelteRegisterComponent", {
+			component: this,
+			tagName: "SubTitle",
+			options,
+			id: SubTitle_svelte_create_fragment.name
+		});
+	}
+}
+
+/* harmony default export */ const SubTitle_svelte = (SubTitle);
 ;// CONCATENATED MODULE: ./src/components/blog/2023_08_18_forward_pathtracing_in_comp_shader.svelte
 /* src\components\blog\2023_08_18_forward_pathtracing_in_comp_shader.svelte generated by Svelte v4.2.0 */
 
@@ -5402,7 +5611,116 @@ class Video extends SvelteComponentDev {
 
 
 
+
+
 const _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file = "src\\components\\blog\\2023_08_18_forward_pathtracing_in_comp_shader.svelte";
+
+// (52:0) <SubTitle>
+function create_default_slot_2(ctx) {
+	let t0;
+	let a;
+	let t2;
+
+	const block = {
+		c: function create() {
+			t0 = dom_text("Forward traced ");
+			a = dom_element("a");
+			a.textContent = "mandelbox";
+			t2 = dom_text(", in my Kotlin OpenGL engine");
+			attr_dev(a, "href", "https://en.wikipedia.org/wiki/Mandelbox");
+			add_location(a, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 52, 4, 1829);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, t0, anchor);
+			insert_dev(target, a, anchor);
+			insert_dev(target, t2, anchor);
+		},
+		p: utils_noop,
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(t0);
+				detach_dev(a);
+				detach_dev(t2);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot_2.name,
+		type: "slot",
+		source: "(52:0) <SubTitle>",
+		ctx
+	});
+
+	return block;
+}
+
+// (66:0) <SubTitle>
+function create_default_slot_1(ctx) {
+	let t0;
+	let a;
+
+	const block = {
+		c: function create() {
+			t0 = dom_text("2d pathtracing sketch by ");
+			a = dom_element("a");
+			a.textContent = "lycium";
+			attr_dev(a, "href", "https://www.deviantart.com/lyc");
+			add_location(a, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 66, 26, 2377);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, t0, anchor);
+			insert_dev(target, a, anchor);
+		},
+		p: utils_noop,
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(t0);
+				detach_dev(a);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot_1.name,
+		type: "slot",
+		source: "(66:0) <SubTitle>",
+		ctx
+	});
+
+	return block;
+}
+
+// (90:0) <SubTitle>
+function create_default_slot(ctx) {
+	let t;
+
+	const block = {
+		c: function create() {
+			t = dom_text("Artistic liberty taken with refraction physics and line drawing.");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, t, anchor);
+		},
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(t);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_default_slot.name,
+		type: "slot",
+		source: "(90:0) <SubTitle>",
+		ctx
+	});
+
+	return block;
+}
 
 function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(ctx) {
 	let header;
@@ -5440,81 +5758,75 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 	let t19;
 	let video0;
 	let t20;
-	let div1;
+	let subtitle0;
 	let t21;
-	let a2;
-	let t23;
-	let t24;
 	let br4;
-	let t25;
+	let t22;
 	let p2;
+	let t23;
+	let a2;
+	let t25;
 	let t26;
-	let a3;
-	let t28;
-	let t29;
 	let br5;
-	let t30;
+	let t27;
 	let br6;
-	let t31;
-	let img;
-	let img_src_value;
-	let t32;
-	let div2;
-	let t33;
-	let a4;
-	let t35;
+	let t28;
+	let image;
+	let t29;
+	let subtitle1;
+	let t30;
 	let br7;
-	let t36;
+	let t31;
 	let p3;
-	let t38;
+	let t33;
 	let p4;
-	let t39;
-	let a5;
-	let t41;
-	let t42;
+	let t34;
+	let a3;
+	let t36;
+	let t37;
 	let br8;
-	let t43;
-	let div3;
+	let t38;
+	let div1;
 	let hr0;
-	let t44;
+	let t39;
 	let ol0;
-	let t45;
-	let a6;
-	let t47;
+	let t40;
+	let a4;
+	let t42;
 	let br9;
-	let t48;
-	let a7;
-	let t50;
-	let t51;
+	let t43;
+	let a5;
+	let t45;
+	let t46;
 	let hr1;
-	let t52;
+	let t47;
 	let p5;
-	let t54;
+	let t49;
 	let br10;
-	let t55;
+	let t50;
 	let br11;
-	let t56;
+	let t51;
 	let video1;
-	let t57;
-	let div4;
-	let t59;
+	let t52;
+	let subtitle2;
+	let t53;
 	let br12;
-	let t60;
+	let t54;
 	let br13;
-	let t61;
+	let t55;
 	let p6;
-	let t63;
+	let t57;
 	let ol1;
 	let li0;
-	let t65;
+	let t59;
 	let li1;
-	let t67;
+	let t61;
 	let li2;
-	let t69;
+	let t63;
 	let li3;
-	let t71;
+	let t65;
 	let p7;
-	let t73;
+	let t67;
 	let pre0;
 
 	let raw0_value = `<code class="language-glsl"><span class="token keyword">layout</span><span class="token punctuation">(</span>rgba32ui<span class="token punctuation">)</span> <span class="token keyword">uniform</span> <span class="token keyword">coherent</span> <span class="token keyword">restrict</span> <span class="token keyword">uimage2D</span> accum_image<span class="token punctuation">;</span>
@@ -5562,42 +5874,42 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 	<span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span></code>` + "";
 
-	let t74;
+	let t68;
 	let p8;
-	let t76;
+	let t70;
 	let br14;
-	let t77;
+	let t71;
 	let pre1;
 	let raw1_value = `<code class="language-undefined">layout(r32ui) uniform coherent restrict uimage2D i_flameCounter;</code>` + "";
-	let t78;
+	let t72;
 	let ul;
 	let li4;
-	let t79;
-	let a8;
-	let t81;
-	let a9;
-	let t83;
-	let t84;
+	let t73;
+	let a6;
+	let t75;
+	let a7;
+	let t77;
+	let t78;
 	let li5;
-	let t86;
+	let t80;
 	let li6;
-	let t88;
+	let t82;
 	let p9;
+	let t83;
+	let a8;
+	let t85;
+	let t86;
+	let br15;
+	let t87;
+	let br16;
+	let t88;
+	let p10;
 	let t89;
-	let a10;
+	let a9;
 	let t91;
 	let t92;
-	let br15;
-	let t93;
-	let br16;
-	let t94;
-	let p10;
-	let t95;
-	let a11;
-	let t97;
-	let t98;
 	let p11;
-	let t100;
+	let t94;
 	let pre2;
 
 	let raw2_value = `<code class="language-glsl"><span class="token keyword">void</span> <span class="token function">drawLine</span><span class="token punctuation">(</span><span class="token keyword">vec3</span> p_start<span class="token punctuation">,</span> <span class="token keyword">vec3</span> p_end<span class="token punctuation">,</span> <span class="token keyword">vec3</span> throughput<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
@@ -5626,23 +5938,23 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 	<span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span></code>` + "";
 
-	let t101;
+	let t95;
 	let p12;
+	let t96;
+	let a10;
+	let t98;
+	let a11;
+	let t100;
+	let t101;
+	let p13;
 	let t102;
 	let a12;
 	let t104;
 	let a13;
 	let t106;
 	let t107;
-	let p13;
-	let t108;
-	let a14;
-	let t110;
-	let a15;
-	let t112;
-	let t113;
 	let p14;
-	let t115;
+	let t109;
 	let p15;
 	let current;
 
@@ -5653,9 +5965,38 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 			$$inline: true
 		});
 
+	subtitle0 = new SubTitle_svelte({
+			props: {
+				$$slots: { default: [create_default_slot_2] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
+
+	image = new Image_svelte({
+			props: { src: `/blog/lyc-sketch.gif` },
+			$$inline: true
+		});
+
+	subtitle1 = new SubTitle_svelte({
+			props: {
+				$$slots: { default: [create_default_slot_1] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
+
 	video1 = new Video_svelte({
 			props: {
 				src: `${window.LFS_PREPEND}/images/generative_mograph/OUT (3).mp4`
+			},
+			$$inline: true
+		});
+
+	subtitle2 = new SubTitle_svelte({
+			props: {
+				$$slots: { default: [create_default_slot] },
+				$$scope: { ctx }
 			},
 			$$inline: true
 		});
@@ -5697,280 +6038,254 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 			t19 = space();
 			create_component(video0.$$.fragment);
 			t20 = space();
-			div1 = dom_element("div");
-			t21 = dom_text("Forward traced ");
-			a2 = dom_element("a");
-			a2.textContent = "mandelbox";
-			t23 = dom_text(", in my Kotlin OpenGL engine");
-			t24 = space();
+			create_component(subtitle0.$$.fragment);
+			t21 = space();
 			br4 = dom_element("br");
-			t25 = space();
+			t22 = space();
 			p2 = dom_element("p");
-			t26 = dom_text("There are 2 directional conic lightsources, refracting through a fractal ");
-			a3 = dom_element("a");
-			a3.textContent = "implicit surface";
-			t28 = dom_text(".\nRays are shot stochastically and rendered as lines.");
-			t29 = space();
+			t23 = dom_text("There are 2 directional conic lightsources, refracting through a fractal ");
+			a2 = dom_element("a");
+			a2.textContent = "implicit surface";
+			t25 = dom_text(".\nRays are shot stochastically and rendered as lines.");
+			t26 = space();
 			br5 = dom_element("br");
-			t30 = space();
+			t27 = space();
 			br6 = dom_element("br");
-			t31 = space();
-			img = dom_element("img");
-			t32 = space();
-			div2 = dom_element("div");
-			t33 = dom_text("2d pathtracing sketch by ");
-			a4 = dom_element("a");
-			a4.textContent = "lycium";
-			t35 = space();
+			t28 = space();
+			create_component(image.$$.fragment);
+			t29 = space();
+			create_component(subtitle1.$$.fragment);
+			t30 = space();
 			br7 = dom_element("br");
-			t36 = space();
+			t31 = space();
 			p3 = dom_element("p");
 			p3.textContent = "This is not physically accurate, because it’s a display of raw fluence¹, rather than irradiance².\nIt looks freaiking cool though :)";
-			t38 = space();
+			t33 = space();
 			p4 = dom_element("p");
-			t39 = dom_text("Displaying fluence is done in 2d pathtracing, possibly the first resource on which is this ");
-			a5 = dom_element("a");
-			a5.textContent = "blogpost";
-			t41 = dom_text(" by lycium (also possibly the first time it was done).");
-			t42 = space();
+			t34 = dom_text("Displaying fluence is done in 2d pathtracing, possibly the first resource on which is this ");
+			a3 = dom_element("a");
+			a3.textContent = "blogpost";
+			t36 = dom_text(" by lycium (also possibly the first time it was done).");
+			t37 = space();
 			br8 = dom_element("br");
-			t43 = space();
-			div3 = dom_element("div");
+			t38 = space();
+			div1 = dom_element("div");
 			hr0 = dom_element("hr");
-			t44 = space();
+			t39 = space();
 			ol0 = dom_element("ol");
-			t45 = dom_text("1. ");
-			a6 = dom_element("a");
-			a6.textContent = "Fluence";
-			t47 = dom_text(" - integral of radiance incoming in a region, over all angles. Measures radiance passing through a point.  ");
+			t40 = dom_text("1. ");
+			a4 = dom_element("a");
+			a4.textContent = "Fluence";
+			t42 = dom_text(" - integral of radiance incoming in a region, over all angles. Measures radiance passing through a point.  ");
 			br9 = dom_element("br");
-			t48 = dom_text("\n      2. ");
-			a7 = dom_element("a");
-			a7.textContent = "Irradiance";
-			t50 = dom_text(" - energy received per surface area. Measures radiance hitting a surface. Irradiance over a region on the camera sensor is what you integrate in a pathtracer.");
-			t51 = space();
+			t43 = dom_text("\n      2. ");
+			a5 = dom_element("a");
+			a5.textContent = "Irradiance";
+			t45 = dom_text(" - energy received per surface area. Measures radiance hitting a surface. Irradiance over a region on the camera sensor is what you integrate in a pathtracer.");
+			t46 = space();
 			hr1 = dom_element("hr");
-			t52 = space();
+			t47 = space();
 			p5 = dom_element("p");
 			p5.textContent = "One day, I randomly had the idea of translating it to 3d, while also using forward pathtracing. That resulted in the following sketch:";
-			t54 = space();
+			t49 = space();
 			br10 = dom_element("br");
-			t55 = space();
+			t50 = space();
 			br11 = dom_element("br");
-			t56 = space();
+			t51 = space();
 			create_component(video1.$$.fragment);
-			t57 = space();
-			div4 = dom_element("div");
-			div4.textContent = "Artistic liberty taken with refraction physics and line drawing.";
-			t59 = space();
+			t52 = space();
+			create_component(subtitle2.$$.fragment);
+			t53 = space();
 			br12 = dom_element("br");
-			t60 = space();
+			t54 = space();
 			br13 = dom_element("br");
-			t61 = space();
+			t55 = space();
 			p6 = dom_element("p");
 			p6.textContent = "The basic algorithm is:";
-			t63 = space();
+			t57 = space();
 			ol1 = dom_element("ol");
 			li0 = dom_element("li");
 			li0.textContent = "2 images are created, one for accumulation and one for post processing.";
-			t65 = space();
+			t59 = space();
 			li1 = dom_element("li");
 			li1.textContent = "A compute shader is dispatched. Each thread picks a random light, raytraces from it.";
-			t67 = space();
+			t61 = space();
 			li2 = dom_element("li");
 			li2.textContent = "For every bounce, it draws a line using atomic adds to the accumulation image.";
-			t69 = space();
+			t63 = space();
 			li3 = dom_element("li");
 			li3.textContent = "Post processing shader is used to “tonemap” by scaling brightness relative to the amount of raytracing threads.";
-			t71 = space();
+			t65 = space();
 			p7 = dom_element("p");
 			p7.textContent = "The raytracing shader is something like:";
-			t73 = space();
+			t67 = space();
 			pre0 = dom_element("pre");
-			t74 = space();
+			t68 = space();
 			p8 = dom_element("p");
 			p8.textContent = "Some clarifications:";
-			t76 = space();
+			t70 = space();
 			br14 = dom_element("br");
-			t77 = space();
+			t71 = space();
 			pre1 = dom_element("pre");
-			t78 = space();
+			t72 = space();
 			ul = dom_element("ul");
 			li4 = dom_element("li");
-			t79 = dom_text("“coherent” is needed when different ");
-			a8 = dom_element("a");
-			a8.textContent = "shader invocations";
-			t81 = dom_text("\n(single pixel in a frag shader, single thread in a compute shader) write/read to locations potentially read/written from other invocations.\nIt enforces ");
-			a9 = dom_element("a");
-			a9.textContent = "coherent memory access";
-			t83 = dom_text(". It can look cool if you don’t enable it :)");
-			t84 = space();
+			t73 = dom_text("“coherent” is needed when different ");
+			a6 = dom_element("a");
+			a6.textContent = "shader invocations";
+			t75 = dom_text("\n(single pixel in a frag shader, single thread in a compute shader) write/read to locations potentially read/written from other invocations.\nIt enforces ");
+			a7 = dom_element("a");
+			a7.textContent = "coherent memory access";
+			t77 = dom_text(". It can look cool if you don’t enable it :)");
+			t78 = space();
 			li5 = dom_element("li");
 			li5.textContent = "“restrict” is a hint to the compiler that you will only use a single variable to read from the memory buffer and you won’t use another varaible to read the first one. This leads to performance optimizations.";
-			t86 = space();
+			t80 = space();
 			li6 = dom_element("li");
 			li6.textContent = "“writeonly” doesn’t let you read from the memory. I’m not sure if it leads to any optimizations.";
-			t88 = space();
+			t82 = space();
 			p9 = dom_element("p");
-			t89 = dom_text("More info on the ");
-			a10 = dom_element("a");
-			a10.textContent = "khronos wiki";
-			t91 = dom_text(".");
-			t92 = space();
+			t83 = dom_text("More info on the ");
+			a8 = dom_element("a");
+			a8.textContent = "khronos wiki";
+			t85 = dom_text(".");
+			t86 = space();
 			br15 = dom_element("br");
-			t93 = space();
+			t87 = space();
 			br16 = dom_element("br");
-			t94 = space();
+			t88 = space();
 			p10 = dom_element("p");
-			t95 = dom_text("Okay, how do you draw a line?    \nWell I did it in a veryyy naive way, for art's sake :D  \nIdeally you would use ");
-			a11 = dom_element("a");
-			a11.textContent = "DDA";
-			t97 = dom_text(" - both accurate and cheap.");
-			t98 = space();
+			t89 = dom_text("Okay, how do you draw a line?    \nWell I did it in a veryyy naive way, for art's sake :D  \nIdeally you would use ");
+			a9 = dom_element("a");
+			a9.textContent = "DDA";
+			t91 = dom_text(" - both accurate and cheap.");
+			t92 = space();
 			p11 = dom_element("p");
 			p11.textContent = "In any case - here is the abomination:";
-			t100 = space();
+			t94 = space();
 			pre2 = dom_element("pre");
-			t101 = space();
+			t95 = space();
 			p12 = dom_element("p");
-			t102 = dom_text("“image");
-			a12 = dom_element("a");
-			a12.textContent = "Atomic";
-			t104 = dom_text("Add” lets multiple threads write/read a location without ");
-			a13 = dom_element("a");
-			a13.textContent = "data racing";
-			t106 = dom_text(".");
-			t107 = space();
+			t96 = dom_text("“image");
+			a10 = dom_element("a");
+			a10.textContent = "Atomic";
+			t98 = dom_text("Add” lets multiple threads write/read a location without ");
+			a11 = dom_element("a");
+			a11.textContent = "data racing";
+			t100 = dom_text(".");
+			t101 = space();
 			p13 = dom_element("p");
-			t108 = dom_text("If you feel like accumulating to a float buffer/image, you can do that with an ");
-			a14 = dom_element("a");
-			a14.textContent = "nvidia extension";
-			t110 = dom_text(",\nor the ");
-			a15 = dom_element("a");
-			a15.textContent = "compare-and-swap";
-			t112 = dom_text(" algorithm.");
-			t113 = space();
+			t102 = dom_text("If you feel like accumulating to a float buffer/image, you can do that with an ");
+			a12 = dom_element("a");
+			a12.textContent = "nvidia extension";
+			t104 = dom_text(",\nor the ");
+			a13 = dom_element("a");
+			a13.textContent = "compare-and-swap";
+			t106 = dom_text(" algorithm.");
+			t107 = space();
 			p14 = dom_element("p");
 			p14.textContent = "The whole article is trivial to translate to 2D.";
-			t115 = space();
+			t109 = space();
 			p15 = dom_element("p");
 			p15.textContent = "Hope you enjoyed reading this and feel free to send me stuff you’ve made on discord! :)";
-			add_location(strong, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 13, 9, 622);
-			add_location(h1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 13, 8, 618);
-			add_location(header, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 13, 0, 610);
+			add_location(strong, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 15, 4, 720);
+			add_location(h1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 15, 4, 716);
+			add_location(header, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 15, 0, 708);
 			attr_dev(div0, "class", "date");
-			add_location(div0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 14, 0, 661);
-			add_location(br0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 22, 0, 774);
-			add_location(br1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 23, 0, 781);
+			add_location(div0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 16, 0, 759);
+			add_location(br0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 24, 0, 872);
+			add_location(br1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 25, 0, 879);
 			attr_dev(a0, "href", "https://en.wikipedia.org/wiki/Lightmap");
 			attr_dev(a0, "rel", "nofollow");
-			add_location(a0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 24, 4, 839);
+			add_location(a0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 26, 44, 937);
 			attr_dev(a1, "href", "https://www.pbr-book.org/3ed-2018/Light_Transport_III_Bidirectional_Methods/Bidirectional_Path_Tracing");
 			attr_dev(a1, "rel", "nofollow");
-			add_location(a1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 28, 2, 929);
-			add_location(p0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 24, 0, 786);
-			add_location(p1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 33, 0, 1236);
-			add_location(br2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 34, 0, 1316);
-			add_location(br3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 35, 0, 1321);
-			attr_dev(a2, "href", "https://en.wikipedia.org/wiki/Mandelbox");
-			add_location(a2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 50, 0, 1792);
-			set_style(div1, "margin-left", "auto");
-			set_style(div1, "margin-right", "auto");
-			set_style(div1, "margin-top", "0.5rem");
-			add_location(div1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 49, 0, 1704);
-			add_location(br4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 52, 0, 1892);
-			attr_dev(a3, "href", "https://en.wikipedia.org/wiki/Implicit_surface");
+			add_location(a1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 30, 2, 1027);
+			add_location(p0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 26, 0, 884);
+			add_location(p1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 35, 0, 1334);
+			add_location(br2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 36, 0, 1414);
+			add_location(br3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 37, 0, 1419);
+			add_location(br4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 54, 0, 1934);
+			attr_dev(a2, "href", "https://en.wikipedia.org/wiki/Implicit_surface");
+			attr_dev(a2, "rel", "nofollow");
+			add_location(a2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 55, 38, 2015);
+			add_location(p2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 55, 0, 1939);
+			add_location(br5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 62, 0, 2291);
+			add_location(br6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 63, 0, 2296);
+			add_location(br7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 68, 0, 2441);
+			add_location(p3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 69, 0, 2446);
+			attr_dev(a3, "href", "https://web.archive.org/web/20040131013212/http://lycium.cfxweb.net/");
 			attr_dev(a3, "rel", "nofollow");
-			add_location(a3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 53, 0, 1973);
-			add_location(p2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 53, 0, 1897);
-			add_location(br5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 60, 0, 2249);
-			add_location(br6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 61, 0, 2254);
-			if (!src_url_equal(img.src, img_src_value = `${window.LFS_PREPEND}/blog/lyc-sketch.gif`)) attr_dev(img, "src", img_src_value);
-			add_location(img, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 62, 0, 2259);
-			attr_dev(a4, "href", "https://www.deviantart.com/lyc");
-			add_location(a4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 64, 24, 2417);
-			set_style(div2, "margin-left", "auto");
-			set_style(div2, "margin-right", "auto");
-			set_style(div2, "margin-top", "0.5rem");
-			add_location(div2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 63, 0, 2319);
-			add_location(br7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 66, 0, 2476);
-			add_location(p3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 67, 0, 2481);
-			attr_dev(a5, "href", "https://web.archive.org/web/20040131013212/http://lycium.cfxweb.net/");
-			attr_dev(a5, "rel", "nofollow");
-			add_location(a5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 69, 4, 2715);
-			add_location(p4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 69, 0, 2621);
-			add_location(br8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 73, 0, 2886);
-			add_location(hr0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 75, 0, 2917);
-			attr_dev(a6, "href", "https://cs.dartmouth.edu/wjarosz/publications/jarosz12theory.html");
-			add_location(a6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 77, 7, 2940);
-			add_location(br9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 77, 7, 3134);
-			attr_dev(a7, "href", "https://en.wikipedia.org/wiki/Irradiance");
-			add_location(a7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 78, 8, 3148);
-			add_location(ol0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 76, 0, 2926);
-			add_location(hr1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 80, 0, 3382);
-			attr_dev(div3, "class", "footnotes");
-			add_location(div3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 74, 0, 2891);
-			add_location(p5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 82, 0, 3396);
-			add_location(br10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 83, 0, 3541);
-			add_location(br11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 84, 0, 3546);
-			set_style(div4, "margin-left", "auto");
-			set_style(div4, "margin-right", "auto");
-			set_style(div4, "margin-top", "0.5rem");
-			add_location(div4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 87, 0, 3710);
-			add_location(br12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 90, 0, 3855);
-			add_location(br13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 91, 0, 3860);
-			add_location(p6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 92, 0, 3865);
-			add_location(li0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 94, 0, 3901);
-			add_location(li1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 95, 0, 3982);
-			add_location(li2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 96, 0, 4076);
-			add_location(li3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 97, 0, 4164);
-			add_location(ol1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 93, 0, 3896);
-			add_location(p7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 99, 0, 4291);
+			add_location(a3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 71, 0, 2680);
+			add_location(p4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 71, 0, 2586);
+			add_location(br8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 75, 0, 2851);
+			add_location(hr0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 77, 2, 2882);
+			attr_dev(a4, "href", "https://cs.dartmouth.edu/wjarosz/publications/jarosz12theory.html");
+			add_location(a4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 79, 6, 2905);
+			add_location(br9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 79, 6, 3099);
+			attr_dev(a5, "href", "https://en.wikipedia.org/wiki/Irradiance");
+			add_location(a5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 80, 0, 3113);
+			add_location(ol0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 78, 2, 2891);
+			add_location(hr1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 82, 0, 3347);
+			attr_dev(div1, "class", "footnotes");
+			add_location(div1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 76, 0, 2856);
+			add_location(p5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 84, 0, 3361);
+			add_location(br10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 85, 0, 3506);
+			add_location(br11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 86, 0, 3511);
+			add_location(br12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 92, 0, 3764);
+			add_location(br13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 93, 0, 3769);
+			add_location(p6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 94, 0, 3774);
+			add_location(li0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 96, 0, 3810);
+			add_location(li1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 97, 0, 3891);
+			add_location(li2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 98, 0, 3985);
+			add_location(li3, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 99, 0, 4073);
+			add_location(ol1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 95, 0, 3805);
+			add_location(p7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 101, 0, 4200);
 			attr_dev(pre0, "class", "language-glsl");
-			add_location(pre0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 100, 0, 4341);
-			add_location(p8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 144, 0, 10729);
-			add_location(br14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 145, 0, 10757);
+			add_location(pre0, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 102, 0, 4250);
+			add_location(p8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 146, 0, 10638);
+			add_location(br14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 147, 0, 10666);
 			attr_dev(pre1, "class", "language-undefined");
-			add_location(pre1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 146, 0, 10762);
-			attr_dev(a8, "href", "https://www.khronos.org/opengl/wiki/Shader#Execution_and_invocations");
+			add_location(pre1, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 148, 0, 10671);
+			attr_dev(a6, "href", "https://www.khronos.org/opengl/wiki/Shader#Execution_and_invocations");
+			attr_dev(a6, "rel", "nofollow");
+			add_location(a6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 150, 0, 10869);
+			attr_dev(a7, "href", "https://www.khronos.org/opengl/wiki/Memory_Model#Ensuring_visibility");
+			attr_dev(a7, "rel", "nofollow");
+			add_location(a7, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 155, 3, 11143);
+			add_location(li4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 150, 0, 10829);
+			add_location(li5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 160, 0, 11319);
+			add_location(li6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 162, 0, 11537);
+			add_location(ul, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 149, 0, 10824);
+			attr_dev(a8, "href", "https://www.khronos.org/opengl/wiki/Type_Qualifier_(GLSL)");
 			attr_dev(a8, "rel", "nofollow");
-			add_location(a8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 148, 3, 10960);
-			attr_dev(a9, "href", "https://www.khronos.org/opengl/wiki/Memory_Model#Ensuring_visibility");
-			attr_dev(a9, "rel", "nofollow");
-			add_location(a9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 153, 3, 11234);
-			add_location(li4, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 148, 0, 10920);
-			add_location(li5, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 158, 0, 11410);
-			add_location(li6, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 160, 0, 11628);
-			add_location(ul, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 147, 0, 10915);
-			attr_dev(a10, "href", "https://www.khronos.org/opengl/wiki/Type_Qualifier_(GLSL)");
-			attr_dev(a10, "rel", "nofollow");
-			add_location(a10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 163, 0, 11761);
-			add_location(p9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 163, 0, 11741);
-			add_location(br15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 167, 0, 11871);
-			add_location(br16, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 168, 0, 11878);
-			attr_dev(a11, "href", "https://www.shadertoy.com/view/4dX3zl");
-			add_location(a11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 172, 22, 12004);
-			add_location(p10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 169, 0, 11885);
-			add_location(p11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 173, 0, 12091);
+			add_location(a8, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 165, 0, 11670);
+			add_location(p9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 165, 0, 11650);
+			add_location(br15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 169, 0, 11780);
+			add_location(br16, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 170, 0, 11787);
+			attr_dev(a9, "href", "https://www.shadertoy.com/view/4dX3zl");
+			add_location(a9, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 174, 0, 11913);
+			add_location(p10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 171, 0, 11794);
+			add_location(p11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 175, 0, 12000);
 			attr_dev(pre2, "class", "language-glsl");
-			add_location(pre2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 174, 0, 12139);
-			attr_dev(a12, "href", "https://en.wikipedia.org/wiki/Linearizability");
+			add_location(pre2, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 176, 0, 12048);
+			attr_dev(a10, "href", "https://en.wikipedia.org/wiki/Linearizability");
+			attr_dev(a10, "rel", "nofollow");
+			add_location(a10, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 201, 3, 19330);
+			attr_dev(a11, "href", "https://en.wikipedia.org/wiki/Race_condition");
+			attr_dev(a11, "rel", "nofollow");
+			add_location(a11, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 204, 66, 19473);
+			add_location(p12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 201, 0, 19321);
+			attr_dev(a12, "href", "https://registry.khronos.org/OpenGL/extensions/NV/NV_shader_atomic_float.txt");
 			attr_dev(a12, "rel", "nofollow");
-			add_location(a12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 199, 2, 19421);
-			attr_dev(a13, "href", "https://en.wikipedia.org/wiki/Race_condition");
+			add_location(a12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 208, 75, 19651);
+			attr_dev(a13, "href", "https://en.wikipedia.org/wiki/Compare-and-swap");
 			attr_dev(a13, "rel", "nofollow");
-			add_location(a13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 202, 0, 19564);
-			add_location(p12, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 199, 0, 19412);
-			attr_dev(a14, "href", "https://registry.khronos.org/OpenGL/extensions/NV/NV_shader_atomic_float.txt");
-			attr_dev(a14, "rel", "nofollow");
-			add_location(a14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 206, 0, 19742);
-			attr_dev(a15, "href", "https://en.wikipedia.org/wiki/Compare-and-swap");
-			attr_dev(a15, "rel", "nofollow");
-			add_location(a15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 210, 4, 19878);
-			add_location(p13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 206, 0, 19660);
-			add_location(p14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 214, 0, 19991);
-			add_location(p15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 215, 0, 20049);
-			add_location(article, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 21, 0, 764);
+			add_location(a13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 212, 5, 19787);
+			add_location(p13, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 208, 0, 19569);
+			add_location(p14, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 216, 0, 19900);
+			add_location(p15, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 217, 0, 19958);
+			add_location(article, _2023_08_18_forward_pathtracing_in_comp_shader_svelte_file, 23, 0, 862);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -6008,137 +6323,132 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 			append_dev(article, t19);
 			mount_component(video0, article, null);
 			append_dev(article, t20);
-			append_dev(article, div1);
-			append_dev(div1, t21);
-			append_dev(div1, a2);
-			append_dev(div1, t23);
-			append_dev(article, t24);
+			mount_component(subtitle0, article, null);
+			append_dev(article, t21);
 			append_dev(article, br4);
-			append_dev(article, t25);
+			append_dev(article, t22);
 			append_dev(article, p2);
-			append_dev(p2, t26);
-			append_dev(p2, a3);
-			append_dev(p2, t28);
-			append_dev(article, t29);
+			append_dev(p2, t23);
+			append_dev(p2, a2);
+			append_dev(p2, t25);
+			append_dev(article, t26);
 			append_dev(article, br5);
-			append_dev(article, t30);
+			append_dev(article, t27);
 			append_dev(article, br6);
-			append_dev(article, t31);
-			append_dev(article, img);
-			append_dev(article, t32);
-			append_dev(article, div2);
-			append_dev(div2, t33);
-			append_dev(div2, a4);
-			append_dev(article, t35);
+			append_dev(article, t28);
+			mount_component(image, article, null);
+			append_dev(article, t29);
+			mount_component(subtitle1, article, null);
+			append_dev(article, t30);
 			append_dev(article, br7);
-			append_dev(article, t36);
+			append_dev(article, t31);
 			append_dev(article, p3);
-			append_dev(article, t38);
+			append_dev(article, t33);
 			append_dev(article, p4);
-			append_dev(p4, t39);
-			append_dev(p4, a5);
-			append_dev(p4, t41);
-			append_dev(article, t42);
+			append_dev(p4, t34);
+			append_dev(p4, a3);
+			append_dev(p4, t36);
+			append_dev(article, t37);
 			append_dev(article, br8);
-			append_dev(article, t43);
-			append_dev(article, div3);
-			append_dev(div3, hr0);
-			append_dev(div3, t44);
-			append_dev(div3, ol0);
-			append_dev(ol0, t45);
-			append_dev(ol0, a6);
-			append_dev(ol0, t47);
+			append_dev(article, t38);
+			append_dev(article, div1);
+			append_dev(div1, hr0);
+			append_dev(div1, t39);
+			append_dev(div1, ol0);
+			append_dev(ol0, t40);
+			append_dev(ol0, a4);
+			append_dev(ol0, t42);
 			append_dev(ol0, br9);
-			append_dev(ol0, t48);
-			append_dev(ol0, a7);
-			append_dev(ol0, t50);
-			append_dev(div3, t51);
-			append_dev(div3, hr1);
-			append_dev(article, t52);
+			append_dev(ol0, t43);
+			append_dev(ol0, a5);
+			append_dev(ol0, t45);
+			append_dev(div1, t46);
+			append_dev(div1, hr1);
+			append_dev(article, t47);
 			append_dev(article, p5);
-			append_dev(article, t54);
+			append_dev(article, t49);
 			append_dev(article, br10);
-			append_dev(article, t55);
+			append_dev(article, t50);
 			append_dev(article, br11);
-			append_dev(article, t56);
+			append_dev(article, t51);
 			mount_component(video1, article, null);
-			append_dev(article, t57);
-			append_dev(article, div4);
-			append_dev(article, t59);
+			append_dev(article, t52);
+			mount_component(subtitle2, article, null);
+			append_dev(article, t53);
 			append_dev(article, br12);
-			append_dev(article, t60);
+			append_dev(article, t54);
 			append_dev(article, br13);
-			append_dev(article, t61);
+			append_dev(article, t55);
 			append_dev(article, p6);
-			append_dev(article, t63);
+			append_dev(article, t57);
 			append_dev(article, ol1);
 			append_dev(ol1, li0);
-			append_dev(ol1, t65);
+			append_dev(ol1, t59);
 			append_dev(ol1, li1);
-			append_dev(ol1, t67);
+			append_dev(ol1, t61);
 			append_dev(ol1, li2);
-			append_dev(ol1, t69);
+			append_dev(ol1, t63);
 			append_dev(ol1, li3);
-			append_dev(article, t71);
+			append_dev(article, t65);
 			append_dev(article, p7);
-			append_dev(article, t73);
+			append_dev(article, t67);
 			append_dev(article, pre0);
 			pre0.innerHTML = raw0_value;
-			append_dev(article, t74);
+			append_dev(article, t68);
 			append_dev(article, p8);
-			append_dev(article, t76);
+			append_dev(article, t70);
 			append_dev(article, br14);
-			append_dev(article, t77);
+			append_dev(article, t71);
 			append_dev(article, pre1);
 			pre1.innerHTML = raw1_value;
-			append_dev(article, t78);
+			append_dev(article, t72);
 			append_dev(article, ul);
 			append_dev(ul, li4);
-			append_dev(li4, t79);
-			append_dev(li4, a8);
-			append_dev(li4, t81);
-			append_dev(li4, a9);
-			append_dev(li4, t83);
-			append_dev(ul, t84);
+			append_dev(li4, t73);
+			append_dev(li4, a6);
+			append_dev(li4, t75);
+			append_dev(li4, a7);
+			append_dev(li4, t77);
+			append_dev(ul, t78);
 			append_dev(ul, li5);
-			append_dev(ul, t86);
+			append_dev(ul, t80);
 			append_dev(ul, li6);
-			append_dev(article, t88);
+			append_dev(article, t82);
 			append_dev(article, p9);
-			append_dev(p9, t89);
-			append_dev(p9, a10);
-			append_dev(p9, t91);
-			append_dev(article, t92);
+			append_dev(p9, t83);
+			append_dev(p9, a8);
+			append_dev(p9, t85);
+			append_dev(article, t86);
 			append_dev(article, br15);
-			append_dev(article, t93);
+			append_dev(article, t87);
 			append_dev(article, br16);
-			append_dev(article, t94);
+			append_dev(article, t88);
 			append_dev(article, p10);
-			append_dev(p10, t95);
-			append_dev(p10, a11);
-			append_dev(p10, t97);
-			append_dev(article, t98);
+			append_dev(p10, t89);
+			append_dev(p10, a9);
+			append_dev(p10, t91);
+			append_dev(article, t92);
 			append_dev(article, p11);
-			append_dev(article, t100);
+			append_dev(article, t94);
 			append_dev(article, pre2);
 			pre2.innerHTML = raw2_value;
-			append_dev(article, t101);
+			append_dev(article, t95);
 			append_dev(article, p12);
-			append_dev(p12, t102);
-			append_dev(p12, a12);
-			append_dev(p12, t104);
-			append_dev(p12, a13);
-			append_dev(p12, t106);
-			append_dev(article, t107);
+			append_dev(p12, t96);
+			append_dev(p12, a10);
+			append_dev(p12, t98);
+			append_dev(p12, a11);
+			append_dev(p12, t100);
+			append_dev(article, t101);
 			append_dev(article, p13);
-			append_dev(p13, t108);
-			append_dev(p13, a14);
-			append_dev(p13, t110);
-			append_dev(p13, a15);
-			append_dev(p13, t112);
-			append_dev(article, t113);
+			append_dev(p13, t102);
+			append_dev(p13, a12);
+			append_dev(p13, t104);
+			append_dev(p13, a13);
+			append_dev(p13, t106);
+			append_dev(article, t107);
 			append_dev(article, p14);
-			append_dev(article, t115);
+			append_dev(article, t109);
 			append_dev(article, p15);
 			current = true;
 		},
@@ -6147,16 +6457,45 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 			if ((!current || dirty & /*date*/ 1) && t2_value !== (t2_value = /*date*/ ctx[0].getUTCFullYear() + "")) set_data_dev(t2, t2_value);
 			if ((!current || dirty & /*date*/ 1) && t4_value !== (t4_value = /*date*/ ctx[0].getUTCMonth() + 1 + "")) set_data_dev(t4, t4_value);
 			if ((!current || dirty & /*date*/ 1) && t6_value !== (t6_value = /*date*/ ctx[0].getUTCDate() + "")) set_data_dev(t6, t6_value);
+			const subtitle0_changes = {};
+
+			if (dirty & /*$$scope*/ 4) {
+				subtitle0_changes.$$scope = { dirty, ctx };
+			}
+
+			subtitle0.$set(subtitle0_changes);
+			const subtitle1_changes = {};
+
+			if (dirty & /*$$scope*/ 4) {
+				subtitle1_changes.$$scope = { dirty, ctx };
+			}
+
+			subtitle1.$set(subtitle1_changes);
+			const subtitle2_changes = {};
+
+			if (dirty & /*$$scope*/ 4) {
+				subtitle2_changes.$$scope = { dirty, ctx };
+			}
+
+			subtitle2.$set(subtitle2_changes);
 		},
 		i: function intro(local) {
 			if (current) return;
 			transitions_transition_in(video0.$$.fragment, local);
+			transitions_transition_in(subtitle0.$$.fragment, local);
+			transitions_transition_in(image.$$.fragment, local);
+			transitions_transition_in(subtitle1.$$.fragment, local);
 			transitions_transition_in(video1.$$.fragment, local);
+			transitions_transition_in(subtitle2.$$.fragment, local);
 			current = true;
 		},
 		o: function outro(local) {
 			transitions_transition_out(video0.$$.fragment, local);
+			transitions_transition_out(subtitle0.$$.fragment, local);
+			transitions_transition_out(image.$$.fragment, local);
+			transitions_transition_out(subtitle1.$$.fragment, local);
 			transitions_transition_out(video1.$$.fragment, local);
+			transitions_transition_out(subtitle2.$$.fragment, local);
 			current = false;
 		},
 		d: function destroy(detaching) {
@@ -6169,7 +6508,11 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_create_fragment(c
 			}
 
 			destroy_component(video0);
+			destroy_component(subtitle0);
+			destroy_component(image);
+			destroy_component(subtitle1);
 			destroy_component(video1);
+			destroy_component(subtitle2);
 		}
 	};
 
@@ -6214,6 +6557,8 @@ function _2023_08_18_forward_pathtracing_in_comp_shader_svelte_instance($$self, 
 		onMount: onMount,
 		play_pause_icon: (play_pause_default()),
 		Video: Video_svelte,
+		Image: Image_svelte,
+		SubTitle: SubTitle_svelte,
 		date,
 		title
 	});
@@ -6261,6 +6606,275 @@ class _2023_08_18_forward_pathtracing_in_comp_shader extends SvelteComponentDev 
 }
 
 /* harmony default export */ const _2023_08_18_forward_pathtracing_in_comp_shader_svelte = (_2023_08_18_forward_pathtracing_in_comp_shader);
+;// CONCATENATED MODULE: ./src/components/utils/BlogTitle.svelte
+/* src\components\utils\BlogTitle.svelte generated by Svelte v4.2.0 */
+
+
+
+const BlogTitle_svelte_file = "src\\components\\utils\\BlogTitle.svelte";
+
+function add_css(target) {
+	append_styles(target, "svelte-x2ss3q", ".date.svelte-x2ss3q{margin-right:1rem}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQmxvZ1RpdGxlLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFHa0Isb0JBQ2pCLFlBQUssS0FDTiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJCbG9nVGl0bGUuc3ZlbHRlIl19 */");
+}
+
+function BlogTitle_svelte_create_fragment(ctx) {
+	let header;
+	let h1;
+	let strong;
+	let t0;
+	let t1;
+	let div;
+	let t2_value = /*date*/ ctx[1].getUTCFullYear() + "";
+	let t2;
+	let t3;
+	let t4_value = /*date*/ ctx[1].getUTCMonth() + 1 + "";
+	let t4;
+	let t5;
+	let t6_value = /*date*/ ctx[1].getUTCDate() + "";
+	let t6;
+
+	const block = {
+		c: function create() {
+			header = dom_element("header");
+			h1 = dom_element("h1");
+			strong = dom_element("strong");
+			t0 = dom_text(/*title*/ ctx[0]);
+			t1 = space();
+			div = dom_element("div");
+			t2 = dom_text(t2_value);
+			t3 = dom_text("\n— \n");
+			t4 = dom_text(t4_value);
+			t5 = dom_text(" \n— \n");
+			t6 = dom_text(t6_value);
+			add_location(strong, BlogTitle_svelte_file, 7, 1, 140);
+			add_location(h1, BlogTitle_svelte_file, 7, 1, 136);
+			add_location(header, BlogTitle_svelte_file, 7, 0, 128);
+			attr_dev(div, "class", "date svelte-x2ss3q");
+			add_location(div, BlogTitle_svelte_file, 8, 0, 179);
+		},
+		l: function claim(nodes) {
+			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, header, anchor);
+			append_dev(header, h1);
+			append_dev(h1, strong);
+			append_dev(strong, t0);
+			insert_dev(target, t1, anchor);
+			insert_dev(target, div, anchor);
+			append_dev(div, t2);
+			append_dev(div, t3);
+			append_dev(div, t4);
+			append_dev(div, t5);
+			append_dev(div, t6);
+		},
+		p: function update(ctx, [dirty]) {
+			if (dirty & /*title*/ 1) set_data_dev(t0, /*title*/ ctx[0]);
+			if (dirty & /*date*/ 2 && t2_value !== (t2_value = /*date*/ ctx[1].getUTCFullYear() + "")) set_data_dev(t2, t2_value);
+			if (dirty & /*date*/ 2 && t4_value !== (t4_value = /*date*/ ctx[1].getUTCMonth() + 1 + "")) set_data_dev(t4, t4_value);
+			if (dirty & /*date*/ 2 && t6_value !== (t6_value = /*date*/ ctx[1].getUTCDate() + "")) set_data_dev(t6, t6_value);
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(header);
+				detach_dev(t1);
+				detach_dev(div);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: BlogTitle_svelte_create_fragment.name,
+		type: "component",
+		source: "",
+		ctx
+	});
+
+	return block;
+}
+
+function BlogTitle_svelte_instance($$self, $$props, $$invalidate) {
+	let { $$slots: slots = {}, $$scope } = $$props;
+	validate_slots('BlogTitle', slots, []);
+	let { title = "" } = $$props;
+	let { date } = $$props;
+
+	$$self.$$.on_mount.push(function () {
+		if (date === undefined && !('date' in $$props || $$self.$$.bound[$$self.$$.props['date']])) {
+			console.warn("<BlogTitle> was created without expected prop 'date'");
+		}
+	});
+
+	const writable_props = ['title', 'date'];
+
+	Object.keys($$props).forEach(key => {
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<BlogTitle> was created with unknown prop '${key}'`);
+	});
+
+	$$self.$$set = $$props => {
+		if ('title' in $$props) $$invalidate(0, title = $$props.title);
+		if ('date' in $$props) $$invalidate(1, date = $$props.date);
+	};
+
+	$$self.$capture_state = () => ({ title, date });
+
+	$$self.$inject_state = $$props => {
+		if ('title' in $$props) $$invalidate(0, title = $$props.title);
+		if ('date' in $$props) $$invalidate(1, date = $$props.date);
+	};
+
+	if ($$props && "$$inject" in $$props) {
+		$$self.$inject_state($$props.$$inject);
+	}
+
+	return [title, date];
+}
+
+class BlogTitle extends SvelteComponentDev {
+	constructor(options) {
+		super(options);
+		init(this, options, BlogTitle_svelte_instance, BlogTitle_svelte_create_fragment, safe_not_equal, { title: 0, date: 1 }, add_css);
+
+		dispatch_dev("SvelteRegisterComponent", {
+			component: this,
+			tagName: "BlogTitle",
+			options,
+			id: BlogTitle_svelte_create_fragment.name
+		});
+	}
+
+	get title() {
+		throw new Error("<BlogTitle>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	set title(value) {
+		throw new Error("<BlogTitle>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	get date() {
+		throw new Error("<BlogTitle>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	set date(value) {
+		throw new Error("<BlogTitle>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+}
+
+/* harmony default export */ const BlogTitle_svelte = (BlogTitle);
+;// CONCATENATED MODULE: ./src/components/utils/YoutubeVideo.svelte
+/* src\components\utils\YoutubeVideo.svelte generated by Svelte v4.2.0 */
+
+
+
+const YoutubeVideo_svelte_file = "src\\components\\utils\\YoutubeVideo.svelte";
+
+function YoutubeVideo_svelte_create_fragment(ctx) {
+	let div1;
+	let div0;
+	let iframe;
+	let iframe_src_value;
+
+	const block = {
+		c: function create() {
+			div1 = dom_element("div");
+			div0 = dom_element("div");
+			iframe = dom_element("iframe");
+			attr_dev(iframe, "title", "Youtube video");
+			if (!src_url_equal(iframe.src, iframe_src_value = `https://www.youtube.com/embed/${/*src*/ ctx[0]}?rel=0&modestbranding=1`)) attr_dev(iframe, "src", iframe_src_value);
+			attr_dev(iframe, "frameborder", "0");
+			attr_dev(iframe, "allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
+			iframe.allowFullscreen = true;
+			add_location(iframe, YoutubeVideo_svelte_file, 6, 0, 120);
+			add_location(div0, YoutubeVideo_svelte_file, 5, 2, 110);
+			attr_dev(div1, "class", "video-container");
+			add_location(div1, YoutubeVideo_svelte_file, 4, 0, 78);
+		},
+		l: function claim(nodes) {
+			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, div1, anchor);
+			append_dev(div1, div0);
+			append_dev(div0, iframe);
+		},
+		p: function update(ctx, [dirty]) {
+			if (dirty & /*src*/ 1 && !src_url_equal(iframe.src, iframe_src_value = `https://www.youtube.com/embed/${/*src*/ ctx[0]}?rel=0&modestbranding=1`)) {
+				attr_dev(iframe, "src", iframe_src_value);
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(div1);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: YoutubeVideo_svelte_create_fragment.name,
+		type: "component",
+		source: "",
+		ctx
+	});
+
+	return block;
+}
+
+function YoutubeVideo_svelte_instance($$self, $$props, $$invalidate) {
+	let { $$slots: slots = {}, $$scope } = $$props;
+	validate_slots('YoutubeVideo', slots, []);
+	let { src = "" } = $$props;
+	const writable_props = ['src'];
+
+	Object.keys($$props).forEach(key => {
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<YoutubeVideo> was created with unknown prop '${key}'`);
+	});
+
+	$$self.$$set = $$props => {
+		if ('src' in $$props) $$invalidate(0, src = $$props.src);
+	};
+
+	$$self.$capture_state = () => ({ src });
+
+	$$self.$inject_state = $$props => {
+		if ('src' in $$props) $$invalidate(0, src = $$props.src);
+	};
+
+	if ($$props && "$$inject" in $$props) {
+		$$self.$inject_state($$props.$$inject);
+	}
+
+	return [src];
+}
+
+class YoutubeVideo extends SvelteComponentDev {
+	constructor(options) {
+		super(options);
+		init(this, options, YoutubeVideo_svelte_instance, YoutubeVideo_svelte_create_fragment, safe_not_equal, { src: 0 });
+
+		dispatch_dev("SvelteRegisterComponent", {
+			component: this,
+			tagName: "YoutubeVideo",
+			options,
+			id: YoutubeVideo_svelte_create_fragment.name
+		});
+	}
+
+	get src() {
+		throw new Error("<YoutubeVideo>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	set src(value) {
+		throw new Error("<YoutubeVideo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+}
+
+/* harmony default export */ const YoutubeVideo_svelte = (YoutubeVideo);
 ;// CONCATENATED MODULE: ./src/components/blog/2023_08_17_flame_fractals_in_comp_shader.svelte
 /* src\components\blog\2023_08_17_flame_fractals_in_comp_shader.svelte generated by Svelte v4.2.0 */
 
@@ -6269,163 +6883,227 @@ class _2023_08_18_forward_pathtracing_in_comp_shader extends SvelteComponentDev 
 
 
 
+
+
+
+
 const _2023_08_17_flame_fractals_in_comp_shader_svelte_file = "src\\components\\blog\\2023_08_17_flame_fractals_in_comp_shader.svelte";
 
-function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
-	let header;
-	let h1;
-	let strong0;
-	let t0;
+// (52:0) <SubTitle>
+function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_default_slot_1(ctx) {
+	let a0;
 	let t1;
-	let div0;
-	let t2_value = /*date*/ ctx[0].getUTCFullYear() + "";
-	let t2;
-	let t3;
-	let t4_value = /*date*/ ctx[0].getUTCMonth() + 1 + "";
-	let t4;
-	let t5;
-	let t6_value = /*date*/ ctx[0].getUTCDate() + "";
-	let t6;
-	let t7;
+	let a1;
+
+	const block = {
+		c: function create() {
+			a0 = dom_element("a");
+			a0.textContent = "Vorpol Dawn";
+			t1 = dom_text(" by ");
+			a1 = dom_element("a");
+			a1.textContent = "technochroma";
+			attr_dev(a0, "href", "https://www.deviantart.com/technochroma/art/Vorpol-Dawn-714213981");
+			add_location(a0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 52, 2, 1982);
+			attr_dev(a1, "href", "https://www.technochroma.art");
+			add_location(a1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 52, 50, 2077);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, a0, anchor);
+			insert_dev(target, t1, anchor);
+			insert_dev(target, a1, anchor);
+		},
+		p: utils_noop,
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(a0);
+				detach_dev(t1);
+				detach_dev(a1);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: _2023_08_17_flame_fractals_in_comp_shader_svelte_create_default_slot_1.name,
+		type: "slot",
+		source: "(52:0) <SubTitle>",
+		ctx
+	});
+
+	return block;
+}
+
+// (65:0) <SubTitle>
+function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_default_slot(ctx) {
+	let a0;
+	let t1;
+	let a1;
+
+	const block = {
+		c: function create() {
+			a0 = dom_element("a");
+			a0.textContent = "Terrarium";
+			t1 = dom_text(" by ");
+			a1 = dom_element("a");
+			a1.textContent = "Eos";
+			attr_dev(a0, "href", "https://www.pouet.net/prod.php?which=82417");
+			add_location(a0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 65, 0, 2525);
+			attr_dev(a1, "href", "https://www.pouet.net/groups.php?which=12701");
+			add_location(a1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 65, 65, 2595);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, a0, anchor);
+			insert_dev(target, t1, anchor);
+			insert_dev(target, a1, anchor);
+		},
+		p: utils_noop,
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(a0);
+				detach_dev(t1);
+				detach_dev(a1);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: _2023_08_17_flame_fractals_in_comp_shader_svelte_create_default_slot.name,
+		type: "slot",
+		source: "(65:0) <SubTitle>",
+		ctx
+	});
+
+	return block;
+}
+
+function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
+	let blogtitle;
+	let t0;
 	let br0;
-	let t8;
+	let t1;
 	let br1;
-	let t9;
+	let t2;
 	let h20;
-	let strong1;
-	let t11;
+	let strong0;
+	let t4;
 	let p0;
 	let a0;
-	let t13;
+	let t6;
 	let a1;
-	let t15;
+	let t8;
 	let a2;
-	let t17;
+	let t10;
 	let a3;
-	let t19;
+	let t12;
 	let a4;
-	let t21;
-	let t22;
+	let t14;
+	let t15;
 	let p1;
-	let t23;
+	let t16;
 	let a5;
 	let a6;
 	let a7;
-	let t27;
-	let t28;
+	let t20;
+	let t21;
 	let br2;
-	let t29;
+	let t22;
 	let br3;
-	let t30;
-	let img;
-	let img_src_value;
-	let t31;
-	let div1;
-	let a8;
-	let t33;
-	let a9;
-	let t35;
-	let br4;
-	let t36;
+	let t23;
+	let image;
+	let t24;
+	let subtitle0;
+	let t25;
 	let p2;
-	let t37;
-	let a10;
-	let t39;
-	let a11;
-	let t41;
-	let t42;
+	let t26;
+	let a8;
+	let t28;
+	let a9;
+	let t30;
+	let t31;
+	let br4;
+	let t32;
 	let br5;
-	let t43;
+	let t33;
+	let youtubevideo0;
+	let t34;
+	let subtitle1;
+	let t35;
 	let br6;
-	let t44;
-	let div3;
-	let div2;
-	let iframe0;
-	let iframe0_src_value;
-	let t45;
-	let div4;
-	let a12;
-	let t47;
-	let a13;
-	let t49;
+	let t36;
 	let br7;
-	let t50;
-	let br8;
-	let t51;
+	let t37;
 	let p3;
-	let t52;
-	let a14;
-	let t54;
-	let t55;
+	let t38;
+	let a10;
+	let t40;
+	let t41;
 	let p4;
-	let t57;
+	let t43;
 	let ul1;
 	let li0;
-	let t59;
+	let t45;
 	let li1;
-	let t60;
+	let t46;
 	let em0;
-	let t62;
-	let t63;
+	let t48;
+	let t49;
 	let li2;
-	let t65;
+	let t51;
 	let li6;
-	let t66;
+	let t52;
 	let ul0;
 	let li3;
-	let t68;
+	let t54;
 	let li4;
-	let t69;
+	let t55;
 	let em1;
-	let t71;
-	let t72;
+	let t57;
+	let t58;
 	let li5;
-	let t74;
+	let t60;
 	let li7;
-	let t76;
-	let br9;
-	let t77;
+	let t62;
+	let br8;
+	let t63;
 	let p5;
-	let t79;
+	let t65;
+	let br9;
+	let t66;
 	let br10;
-	let t80;
+	let t67;
+	let youtubevideo1;
+	let t68;
 	let br11;
-	let t81;
-	let div6;
-	let div5;
-	let iframe1;
-	let iframe1_src_value;
-	let t82;
+	let t69;
 	let br12;
-	let t83;
-	let br13;
-	let t84;
+	let t70;
 	let p6;
-	let t85;
-	let a15;
-	let t87;
-	let a16;
-	let t89;
-	let t90;
+	let t71;
+	let a11;
+	let t73;
+	let a12;
+	let t75;
+	let t76;
 	let ul2;
 	let li8;
-	let a17;
-	let t92;
-	let t93;
+	let a13;
+	let t78;
+	let t79;
 	let li9;
-	let t95;
+	let t81;
 	let p7;
-	let t96;
-	let a18;
-	let t98;
-	let t99;
+	let t82;
+	let a14;
+	let t84;
+	let t85;
+	let br13;
+	let t86;
 	let br14;
-	let t100;
-	let br15;
-	let t101;
+	let t87;
 	let h21;
-	let strong2;
-	let t103;
+	let strong1;
+	let t89;
 	let pre0;
 
 	let raw0_value = `<code class="language-glsl"><span class="token keyword">layout</span><span class="token punctuation">(</span>r32ui<span class="token punctuation">)</span> <span class="token keyword">uniform</span> <span class="token keyword">coherent</span> <span class="token keyword">restrict</span> <span class="token keyword">writeonly</span> <span class="token keyword">uimage2D</span> density_image<span class="token punctuation">;</span>
@@ -6494,46 +7172,46 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 	<span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span></code>` + "";
 
-	let t104;
-	let br16;
-	let t105;
+	let t90;
+	let br15;
+	let t91;
 	let pre1;
 	let raw1_value = `<code class="language-glsl"><span class="token keyword">layout</span><span class="token punctuation">(</span>r32ui<span class="token punctuation">)</span> <span class="token keyword">uniform</span> <span class="token keyword">coherent</span> <span class="token keyword">restrict</span> <span class="token keyword">writeonly</span> <span class="token keyword">uimage2D</span> density_image<span class="token punctuation">;</span></code>` + "";
-	let t106;
+	let t92;
 	let p8;
-	let t107;
-	let a19;
-	let t109;
-	let a20;
-	let t111;
-	let t112;
-	let br17;
-	let t113;
+	let t93;
+	let a15;
+	let t95;
+	let a16;
+	let t97;
+	let t98;
+	let br16;
+	let t99;
 	let pre2;
 	let raw2_value = `<code class="language-glsl"><span class="token keyword">layout</span><span class="token punctuation">(</span>r32ui<span class="token punctuation">)</span> <span class="token keyword">uniform</span> <span class="token keyword">coherent</span> <span class="token keyword">restrict</span> <span class="token keyword">writeonly</span> <span class="token keyword">uimage2D</span> i_flameCounter<span class="token punctuation">;</span></code>` + "";
-	let t114;
+	let t100;
 	let ul3;
 	let li10;
-	let t115;
-	let a21;
-	let t117;
-	let a22;
-	let t119;
-	let t120;
+	let t101;
+	let a17;
+	let t103;
+	let a18;
+	let t105;
+	let t106;
 	let li11;
-	let t122;
+	let t108;
 	let li12;
-	let t124;
+	let t110;
 	let p9;
-	let t125;
-	let a23;
-	let t127;
-	let t128;
-	let br18;
-	let t129;
+	let t111;
+	let a19;
+	let t113;
+	let t114;
+	let br17;
+	let t115;
 	let h22;
-	let strong3;
-	let t131;
+	let strong2;
+	let t117;
 	let pre3;
 
 	let raw3_value = `<code class="language-glsl"><span class="token keyword">if</span><span class="token punctuation">(</span>r<span class="token operator">&lt;</span><span class="token number">.3</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
@@ -6553,67 +7231,64 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 	p <span class="token operator">*=</span> <span class="token keyword">vec3</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1.5</span><span class="token punctuation">,</span><span class="token number">1.2</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">3.1</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span></code>` + "";
 
-	let t132;
-	let br19;
-	let t133;
+	let t118;
+	let br18;
+	let t119;
 	let p10;
-	let t135;
+	let t121;
 	let p11;
-	let t136;
-	let a24;
-	let t138;
-	let t139;
+	let t122;
+	let a20;
+	let t124;
+	let t125;
 	let p12;
-	let a25;
-	let t141;
+	let a21;
+	let t127;
 	let code;
-	let t143;
-	let a26;
-	let t145;
-	let a27;
-	let t147;
-	let t148;
+	let t129;
+	let a22;
+	let t131;
+	let a23;
+	let t133;
+	let t134;
+	let br19;
+	let t135;
+	let youtubevideo2;
+	let t136;
 	let br20;
-	let t149;
-	let div8;
-	let div7;
-	let iframe2;
-	let iframe2_src_value;
-	let t150;
+	let t137;
 	let br21;
-	let t151;
-	let br22;
-	let t152;
+	let t138;
 	let p13;
-	let a28;
-	let t154;
-	let a29;
-	let t156;
-	let t157;
-	let br23;
-	let t158;
+	let a24;
+	let t140;
+	let a25;
+	let t142;
+	let t143;
+	let br22;
+	let t144;
 	let h23;
-	let strong4;
-	let t160;
+	let strong3;
+	let t146;
 	let p14;
-	let t161;
-	let a30;
-	let t163;
-	let t164;
+	let t147;
+	let a26;
+	let t149;
+	let t150;
 	let p15;
-	let t166;
+	let t152;
 	let p16;
-	let t167;
-	let a31;
-	let t169;
-	let t170;
+	let t153;
+	let a27;
+	let t155;
+	let t156;
 	let p17;
-	let t171;
-	let a32;
-	let t173;
-	let t174;
-	let br24;
-	let t175;
+	let t157;
+	let a28;
+	let t159;
+	let t160;
+	let br23;
+	let t161;
 	let pre4;
 
 	let raw4_value = `<code class="language-glsl"><span class="token keyword">layout</span><span class="token punctuation">(</span>r32ui<span class="token punctuation">)</span> <span class="token keyword">uniform</span> <span class="token keyword">coherent</span> <span class="token keyword">restrict</span> <span class="token keyword">uimage2D</span> density_image<span class="token punctuation">;</span>
@@ -6641,16 +7316,16 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 <span class="token punctuation">&#125;</span>
 </code>` + "";
 
-	let t176;
+	let t162;
 	let h24;
-	let strong5;
-	let t178;
+	let strong4;
+	let t164;
 	let p18;
-	let a33;
-	let t180;
-	let t181;
-	let br25;
-	let t182;
+	let a29;
+	let t166;
+	let t167;
+	let br24;
+	let t168;
 	let pre5;
 
 	let raw5_value = `<code class="language-glsl"><span class="token keyword">const</span> <span class="token keyword">float</span> focus_dist <span class="token operator">=</span> <span class="token number">0.7</span><span class="token punctuation">;</span>
@@ -6659,988 +7334,960 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 <span class="token keyword">vec2</span> anti_aliasing <span class="token operator">=</span> <span class="token function">random_point_in_disk</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">/</span><span class="token function">min</span><span class="token punctuation">(</span>resolution<span class="token punctuation">.</span>x<span class="token punctuation">,</span> resolution<span class="token punctuation">.</span>y<span class="token punctuation">)</span><span class="token punctuation">;</span> 
 <span class="token keyword">ivec2</span> int_p <span class="token operator">=</span> <span class="token keyword">ivec2</span><span class="token punctuation">(</span>uv <span class="token operator">+</span> anti_aliasing <span class="token operator">+</span> dof_sample<span class="token punctuation">)</span><span class="token operator">*</span><span class="token keyword">ivec2</span><span class="token punctuation">(</span>resolution<span class="token punctuation">)</span><span class="token punctuation">;</span></code>` + "";
 
-	let t183;
-	let br26;
-	let t184;
+	let t169;
+	let br25;
+	let t170;
 	let p19;
+	let current;
+
+	blogtitle = new BlogTitle_svelte({
+			props: {
+				title: /*title*/ ctx[1],
+				date: /*date*/ ctx[0]
+			},
+			$$inline: true
+		});
+
+	image = new Image_svelte({
+			props: {
+				src: `/blog/vorpol_dawn_by_technochroma.jpg`
+			},
+			$$inline: true
+		});
+
+	subtitle0 = new SubTitle_svelte({
+			props: {
+				$$slots: { default: [_2023_08_17_flame_fractals_in_comp_shader_svelte_create_default_slot_1] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
+
+	youtubevideo0 = new YoutubeVideo_svelte({
+			props: { src: `xLN3mTRlugs` },
+			$$inline: true
+		});
+
+	subtitle1 = new SubTitle_svelte({
+			props: {
+				$$slots: { default: [_2023_08_17_flame_fractals_in_comp_shader_svelte_create_default_slot] },
+				$$scope: { ctx }
+			},
+			$$inline: true
+		});
+
+	youtubevideo1 = new YoutubeVideo_svelte({
+			props: { src: `kbKtFN71Lfs` },
+			$$inline: true
+		});
+
+	youtubevideo2 = new YoutubeVideo_svelte({
+			props: { src: `IAPf1ZYfm-s` },
+			$$inline: true
+		});
 
 	const block = {
 		c: function create() {
-			header = dom_element("header");
-			h1 = dom_element("h1");
-			strong0 = dom_element("strong");
-			t0 = dom_text(/*title*/ ctx[1]);
-			t1 = space();
-			div0 = dom_element("div");
-			t2 = dom_text(t2_value);
-			t3 = dom_text("\n— \n");
-			t4 = dom_text(t4_value);
-			t5 = dom_text(" \n— \n");
-			t6 = dom_text(t6_value);
-			t7 = space();
+			create_component(blogtitle.$$.fragment);
+			t0 = space();
 			br0 = dom_element("br");
-			t8 = space();
+			t1 = space();
 			br1 = dom_element("br");
-			t9 = space();
+			t2 = space();
 			h20 = dom_element("h2");
-			strong1 = dom_element("strong");
-			strong1.textContent = "Introduction";
-			t11 = space();
+			strong0 = dom_element("strong");
+			strong0.textContent = "Introduction";
+			t4 = space();
 			p0 = dom_element("p");
 			a0 = dom_element("a");
 			a0.textContent = "Flame fractals";
-			t13 = dom_text(" are generative systems for producing mesmerizing images with intricate details.\nThey were introduced by ");
+			t6 = dom_text(" are generative systems for producing mesmerizing images with intricate details.\nThey were introduced by ");
 			a1 = dom_element("a");
 			a1.textContent = "Scott Draves";
-			t15 = dom_text(" in a ");
+			t8 = dom_text(" in a ");
 			a2 = dom_element("a");
 			a2.textContent = "paper";
-			t17 = dom_text(" back in 1992.\nIt’s an extension of ");
+			t10 = dom_text(" back in 1992.\nIt’s an extension of ");
 			a3 = dom_element("a");
 			a3.textContent = "Iterated Function System fractals";
-			t19 = dom_text(", discovered in ");
+			t12 = dom_text(", discovered in ");
 			a4 = dom_element("a");
 			a4.textContent = "1992 by John E Hutchinson";
-			t21 = dom_text(".");
-			t22 = space();
+			t14 = dom_text(".");
+			t15 = space();
 			p1 = dom_element("p");
-			t23 = dom_text("There’s a thriving community of fractal artists utilizing a variety of\n");
+			t16 = dom_text("There’s a thriving community of fractal artists utilizing a variety of\n");
 			a5 = dom_element("a");
 			a5.textContent = "sof";
 			a6 = dom_element("a");
 			a6.textContent = "tw";
 			a7 = dom_element("a");
 			a7.textContent = "are";
-			t27 = dom_text(" to generate them.");
-			t28 = space();
+			t20 = dom_text(" to generate them.");
+			t21 = space();
 			br2 = dom_element("br");
-			t29 = space();
+			t22 = space();
 			br3 = dom_element("br");
-			t30 = space();
-			img = dom_element("img");
-			t31 = space();
-			div1 = dom_element("div");
-			a8 = dom_element("a");
-			a8.textContent = "Vorpol Dawn";
-			t33 = dom_text(" by ");
-			a9 = dom_element("a");
-			a9.textContent = "technochroma";
-			t35 = space();
-			br4 = dom_element("br");
-			t36 = space();
+			t23 = space();
+			create_component(image.$$.fragment);
+			t24 = space();
+			create_component(subtitle0.$$.fragment);
+			t25 = space();
 			p2 = dom_element("p");
-			t37 = dom_text("One of my favourite fractal pieces is this realtime ");
-			a10 = dom_element("a");
-			a10.textContent = "demo";
-			t39 = dom_text(". It measures at a filesize of only 4kb and you can run it locally ");
-			a11 = dom_element("a");
-			a11.textContent = "here";
-			t41 = dom_text(".");
-			t42 = space();
+			t26 = dom_text("One of my favourite fractal pieces is this realtime ");
+			a8 = dom_element("a");
+			a8.textContent = "demo";
+			t28 = dom_text(". It measures at a filesize of only 4kb and you can run it locally ");
+			a9 = dom_element("a");
+			a9.textContent = "here";
+			t30 = dom_text(".");
+			t31 = space();
+			br4 = dom_element("br");
+			t32 = space();
 			br5 = dom_element("br");
-			t43 = space();
+			t33 = space();
+			create_component(youtubevideo0.$$.fragment);
+			t34 = space();
+			create_component(subtitle1.$$.fragment);
+			t35 = space();
 			br6 = dom_element("br");
-			t44 = space();
-			div3 = dom_element("div");
-			div2 = dom_element("div");
-			iframe0 = dom_element("iframe");
-			t45 = space();
-			div4 = dom_element("div");
-			a12 = dom_element("a");
-			a12.textContent = "Terrarium";
-			t47 = dom_text(" by ");
-			a13 = dom_element("a");
-			a13.textContent = "Eos";
-			t49 = space();
+			t36 = space();
 			br7 = dom_element("br");
-			t50 = space();
-			br8 = dom_element("br");
-			t51 = space();
+			t37 = space();
 			p3 = dom_element("p");
-			t52 = dom_text("I learned the algorithm by reading the demo’s ");
-			a14 = dom_element("a");
-			a14.textContent = "source code";
-			t54 = dom_text(".");
-			t55 = space();
+			t38 = dom_text("I learned the algorithm by reading the demo’s ");
+			a10 = dom_element("a");
+			a10.textContent = "source code";
+			t40 = dom_text(".");
+			t41 = space();
 			p4 = dom_element("p");
 			p4.textContent = "Fundamentally quite simple and beautiful, the gist of it is:";
-			t57 = space();
+			t43 = space();
 			ul1 = dom_element("ul");
 			li0 = dom_element("li");
 			li0.textContent = "create 2 images - one you are accumulating to(density map) and one you are displaying";
-			t59 = space();
+			t45 = space();
 			li1 = dom_element("li");
-			t60 = dom_text("write some transformations ");
+			t46 = dom_text("write some transformations ");
 			em0 = dom_element("em");
 			em0.textContent = "f";
-			t62 = dom_text("(p). can be anything");
-			t63 = space();
+			t48 = dom_text("(p). can be anything");
+			t49 = space();
 			li2 = dom_element("li");
 			li2.textContent = "generate a bunch of points";
-			t65 = space();
+			t51 = space();
 			li6 = dom_element("li");
-			t66 = dom_text("infinitely, for each point");
+			t52 = dom_text("infinitely, for each point");
 			ul0 = dom_element("ul");
 			li3 = dom_element("li");
 			li3.textContent = "pick a random transformation";
-			t68 = space();
+			t54 = space();
 			li4 = dom_element("li");
-			t69 = dom_text("run the point through it and set its value to the output.  p = ");
+			t55 = dom_text("run the point through it and set its value to the output.  p = ");
 			em1 = dom_element("em");
 			em1.textContent = "f";
-			t71 = dom_text("(p)");
-			t72 = space();
+			t57 = dom_text("(p)");
+			t58 = space();
 			li5 = dom_element("li");
 			li5.textContent = "add 1 to the pixel of the accumulation image where the point landed";
-			t74 = space();
+			t60 = space();
 			li7 = dom_element("li");
 			li7.textContent = "display by applying a tonemap and writing to the output image";
-			t76 = space();
-			br9 = dom_element("br");
-			t77 = space();
+			t62 = space();
+			br8 = dom_element("br");
+			t63 = space();
 			p5 = dom_element("p");
 			p5.textContent = "It’s explained excellently in the following video:";
-			t79 = space();
+			t65 = space();
+			br9 = dom_element("br");
+			t66 = space();
 			br10 = dom_element("br");
-			t80 = space();
+			t67 = space();
+			create_component(youtubevideo1.$$.fragment);
+			t68 = space();
 			br11 = dom_element("br");
-			t81 = space();
-			div6 = dom_element("div");
-			div5 = dom_element("div");
-			iframe1 = dom_element("iframe");
-			t82 = space();
+			t69 = space();
 			br12 = dom_element("br");
-			t83 = space();
-			br13 = dom_element("br");
-			t84 = space();
+			t70 = space();
 			p6 = dom_element("p");
-			t85 = dom_text("Flame fractals are pretty much ");
-			a15 = dom_element("a");
-			a15.textContent = "chaos game";
-			t87 = dom_text(", but with arbitrary transforms. Chaos game is a method of rendering ");
-			a16 = dom_element("a");
-			a16.textContent = "IFSs";
-			t89 = dom_text(".\nThe other ways flame fractals differ from chaos game are:");
-			t90 = space();
+			t71 = dom_text("Flame fractals are pretty much ");
+			a11 = dom_element("a");
+			a11.textContent = "chaos game";
+			t73 = dom_text(", but with arbitrary transforms. Chaos game is a method of rendering ");
+			a12 = dom_element("a");
+			a12.textContent = "IFSs";
+			t75 = dom_text(".\nThe other ways flame fractals differ from chaos game are:");
+			t76 = space();
 			ul2 = dom_element("ul");
 			li8 = dom_element("li");
-			a17 = dom_element("a");
-			a17.textContent = "Tonemapping";
-			t92 = dom_text(" is done through a log-density function.");
-			t93 = space();
+			a13 = dom_element("a");
+			a13.textContent = "Tonemapping";
+			t78 = dom_text(" is done through a log-density function.");
+			t79 = space();
 			li9 = dom_element("li");
 			li9.textContent = "Colouring is done by “sliding” an index into a colour palette, depending on which transform gets picked in each recursive iteration.";
-			t95 = space();
+			t81 = space();
 			p7 = dom_element("p");
-			t96 = dom_text("This is explained in the flame fractal ");
-			a18 = dom_element("a");
-			a18.textContent = "paper";
-			t98 = dom_text(", but I’ll showcase a simplified “creative coding”-friendly method, where you can make your own algorithms.");
-			t99 = space();
+			t82 = dom_text("This is explained in the flame fractal ");
+			a14 = dom_element("a");
+			a14.textContent = "paper";
+			t84 = dom_text(", but I’ll showcase a simplified “creative coding”-friendly method, where you can make your own algorithms.");
+			t85 = space();
+			br13 = dom_element("br");
+			t86 = space();
 			br14 = dom_element("br");
-			t100 = space();
-			br15 = dom_element("br");
-			t101 = space();
+			t87 = space();
 			h21 = dom_element("h2");
-			strong2 = dom_element("strong");
-			strong2.textContent = "Splatting";
-			t103 = space();
+			strong1 = dom_element("strong");
+			strong1.textContent = "Splatting";
+			t89 = space();
 			pre0 = dom_element("pre");
-			t104 = space();
-			br16 = dom_element("br");
-			t105 = space();
+			t90 = space();
+			br15 = dom_element("br");
+			t91 = space();
 			pre1 = dom_element("pre");
-			t106 = space();
+			t92 = space();
 			p8 = dom_element("p");
-			t107 = dom_text("“image");
-			a19 = dom_element("a");
-			a19.textContent = "Atomic";
-			t109 = dom_text("Add” lets multiple threads write/read a location without ");
-			a20 = dom_element("a");
-			a20.textContent = "data racing";
-			t111 = dom_text(".");
-			t112 = space();
-			br17 = dom_element("br");
-			t113 = space();
+			t93 = dom_text("“image");
+			a15 = dom_element("a");
+			a15.textContent = "Atomic";
+			t95 = dom_text("Add” lets multiple threads write/read a location without ");
+			a16 = dom_element("a");
+			a16.textContent = "data racing";
+			t97 = dom_text(".");
+			t98 = space();
+			br16 = dom_element("br");
+			t99 = space();
 			pre2 = dom_element("pre");
-			t114 = space();
+			t100 = space();
 			ul3 = dom_element("ul");
 			li10 = dom_element("li");
-			t115 = dom_text("“coherent” is needed when different ");
-			a21 = dom_element("a");
-			a21.textContent = "shader invocations";
-			t117 = dom_text("\n(single pixel in a frag shader, single thread in a compute shader) write/read to locations potentially read/written from other invocations.\nIt enforces ");
-			a22 = dom_element("a");
-			a22.textContent = "coherent memory access";
-			t119 = dom_text(". It can look cool if you don’t enable it :)");
-			t120 = space();
+			t101 = dom_text("“coherent” is needed when different ");
+			a17 = dom_element("a");
+			a17.textContent = "shader invocations";
+			t103 = dom_text("\n(single pixel in a frag shader, single thread in a compute shader) write/read to locations potentially read/written from other invocations.\nIt enforces ");
+			a18 = dom_element("a");
+			a18.textContent = "coherent memory access";
+			t105 = dom_text(". It can look cool if you don’t enable it :)");
+			t106 = space();
 			li11 = dom_element("li");
 			li11.textContent = "“restrict” is a hint to the compiler that you will only use a single variable to read from the memory buffer and you won’t use another varaible to read the first one. This leads to performance optimizations.";
-			t122 = space();
+			t108 = space();
 			li12 = dom_element("li");
 			li12.textContent = "“writeonly” doesn’t let you read from the memory. I’m not sure if it leads to any optimizations.";
-			t124 = space();
+			t110 = space();
 			p9 = dom_element("p");
-			t125 = dom_text("More info on the ");
-			a23 = dom_element("a");
-			a23.textContent = "khronos wiki";
-			t127 = dom_text(".");
-			t128 = space();
-			br18 = dom_element("br");
-			t129 = space();
+			t111 = dom_text("More info on the ");
+			a19 = dom_element("a");
+			a19.textContent = "khronos wiki";
+			t113 = dom_text(".");
+			t114 = space();
+			br17 = dom_element("br");
+			t115 = space();
 			h22 = dom_element("h2");
-			strong3 = dom_element("strong");
-			strong3.textContent = "Transformations";
-			t131 = space();
+			strong2 = dom_element("strong");
+			strong2.textContent = "Transformations";
+			t117 = space();
 			pre3 = dom_element("pre");
-			t132 = space();
-			br19 = dom_element("br");
-			t133 = space();
+			t118 = space();
+			br18 = dom_element("br");
+			t119 = space();
 			p10 = dom_element("p");
 			p10.textContent = "What about the transformations?";
-			t135 = space();
+			t121 = space();
 			p11 = dom_element("p");
-			t136 = dom_text("They are totally arbitrary, but what’s being done here is ");
-			a24 = dom_element("a");
-			a24.textContent = "affine";
-			t138 = dom_text(" transformations + sphere inversion.");
-			t139 = space();
+			t122 = dom_text("They are totally arbitrary, but what’s being done here is ");
+			a20 = dom_element("a");
+			a20.textContent = "affine";
+			t124 = dom_text(" transformations + sphere inversion.");
+			t125 = space();
 			p12 = dom_element("p");
-			a25 = dom_element("a");
-			a25.textContent = "Circle inversion";
-			t141 = dom_text(" is ");
+			a21 = dom_element("a");
+			a21.textContent = "Circle inversion";
+			t127 = dom_text(" is ");
 			code = dom_element("code");
 			code.textContent = "p /= dot(p,p);";
-			t143 = dom_text(" and is a case of the ");
-			a26 = dom_element("a");
-			a26.textContent = "Möbius transform";
-			t145 = dom_text(".\nIt’s very commonly used in fractals. Sphere inversion is its extension to 3D. It’s a ");
-			a27 = dom_element("a");
-			a27.textContent = "conformal";
-			t147 = dom_text(" mapping, which means it preserves angles.");
-			t148 = space();
+			t129 = dom_text(" and is a case of the ");
+			a22 = dom_element("a");
+			a22.textContent = "Möbius transform";
+			t131 = dom_text(".\nIt’s very commonly used in fractals. Sphere inversion is its extension to 3D. It’s a ");
+			a23 = dom_element("a");
+			a23.textContent = "conformal";
+			t133 = dom_text(" mapping, which means it preserves angles.");
+			t134 = space();
+			br19 = dom_element("br");
+			t135 = space();
+			create_component(youtubevideo2.$$.fragment);
+			t136 = space();
 			br20 = dom_element("br");
-			t149 = space();
-			div8 = dom_element("div");
-			div7 = dom_element("div");
-			iframe2 = dom_element("iframe");
-			t150 = space();
+			t137 = space();
 			br21 = dom_element("br");
-			t151 = space();
-			br22 = dom_element("br");
-			t152 = space();
+			t138 = space();
 			p13 = dom_element("p");
-			a28 = dom_element("a");
-			a28.textContent = "IFSRenderer";
-			t154 = dom_text("’s ");
-			a29 = dom_element("a");
-			a29.textContent = "Transforms repo";
-			t156 = dom_text(" is a cool source of transforms written in glsl.");
-			t157 = space();
-			br23 = dom_element("br");
-			t158 = space();
+			a24 = dom_element("a");
+			a24.textContent = "IFSRenderer";
+			t140 = dom_text("’s ");
+			a25 = dom_element("a");
+			a25.textContent = "Transforms repo";
+			t142 = dom_text(" is a cool source of transforms written in glsl.");
+			t143 = space();
+			br22 = dom_element("br");
+			t144 = space();
 			h23 = dom_element("h2");
-			strong4 = dom_element("strong");
-			strong4.textContent = "Rendering + colouring";
-			t160 = space();
+			strong3 = dom_element("strong");
+			strong3.textContent = "Rendering + colouring";
+			t146 = space();
 			p14 = dom_element("p");
-			t161 = dom_text("Flame fractals, as per Scott Draves’s ");
-			a30 = dom_element("a");
-			a30.textContent = "paper";
-			t163 = dom_text(", are coloured by sliding each particle over a palette, while it’s being transformed. In the end, it’s post processed using a log-density function.");
-			t164 = space();
+			t147 = dom_text("Flame fractals, as per Scott Draves’s ");
+			a26 = dom_element("a");
+			a26.textContent = "paper";
+			t149 = dom_text(", are coloured by sliding each particle over a palette, while it’s being transformed. In the end, it’s post processed using a log-density function.");
+			t150 = space();
 			p15 = dom_element("p");
 			p15.textContent = "I won’t explain that in this article.";
-			t166 = space();
+			t152 = space();
 			p16 = dom_element("p");
-			t167 = dom_text("An easy way to post process is by scaling brightness with the reciprocal of the total splats you did, then applying an ");
-			a31 = dom_element("a");
-			a31.textContent = "HDR->LDR tonemap";
-			t169 = dom_text(".");
-			t170 = space();
+			t153 = dom_text("An easy way to post process is by scaling brightness with the reciprocal of the total splats you did, then applying an ");
+			a27 = dom_element("a");
+			a27.textContent = "HDR->LDR tonemap";
+			t155 = dom_text(".");
+			t156 = space();
 			p17 = dom_element("p");
-			t171 = dom_text("Here I use Inigo Quilez’s palette function, then multiply it by the scaled density and apply the ");
-			a32 = dom_element("a");
-			a32.textContent = "Reinhard tonemap";
-			t173 = dom_text(".\nReinhard tonemap is really not ideal if you want a nice filmic-looking image, in big part (but not limited to) because it doesn’t desaturate bright regions. That might not be what you want in generative art though.");
-			t174 = space();
-			br24 = dom_element("br");
-			t175 = space();
+			t157 = dom_text("Here I use Inigo Quilez’s palette function, then multiply it by the scaled density and apply the ");
+			a28 = dom_element("a");
+			a28.textContent = "Reinhard tonemap";
+			t159 = dom_text(".\nReinhard tonemap is really not ideal if you want a nice filmic-looking image, in big part (but not limited to) because it doesn’t desaturate bright regions. That might not be what you want in generative art though.");
+			t160 = space();
+			br23 = dom_element("br");
+			t161 = space();
 			pre4 = dom_element("pre");
-			t176 = space();
+			t162 = space();
 			h24 = dom_element("h2");
-			strong5 = dom_element("strong");
-			strong5.textContent = "Depth of field";
-			t178 = space();
+			strong4 = dom_element("strong");
+			strong4.textContent = "Depth of field";
+			t164 = space();
 			p18 = dom_element("p");
-			a33 = dom_element("a");
-			a33.textContent = "Terrarium";
-			t180 = dom_text(" complements the beautiful abstract shapes with depth of field.\nThat is easy to achieve by offsetting the position by a disk (or any other distribution) when splatting.");
-			t181 = space();
-			br25 = dom_element("br");
-			t182 = space();
+			a29 = dom_element("a");
+			a29.textContent = "Terrarium";
+			t166 = dom_text(" complements the beautiful abstract shapes with depth of field.\nThat is easy to achieve by offsetting the position by a disk (or any other distribution) when splatting.");
+			t167 = space();
+			br24 = dom_element("br");
+			t168 = space();
 			pre5 = dom_element("pre");
-			t183 = space();
-			br26 = dom_element("br");
-			t184 = space();
+			t169 = space();
+			br25 = dom_element("br");
+			t170 = space();
 			p19 = dom_element("p");
 			p19.textContent = "Thanks for reading and I’d love to see what you make!";
-			add_location(strong0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 14, 4, 589);
-			add_location(h1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 14, 4, 585);
-			add_location(header, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 14, 0, 577);
-			attr_dev(div0, "class", "date");
-			add_location(div0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 15, 0, 628);
-			add_location(br0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 22, 0, 731);
-			add_location(br1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 23, 0, 736);
-			add_location(strong1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 24, 4, 745);
-			add_location(h20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 24, 0, 741);
+			add_location(br0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 18, 0, 804);
+			add_location(br1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 19, 0, 809);
+			add_location(strong0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 20, 1, 818);
+			add_location(h20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 20, 0, 814);
 			attr_dev(a0, "href", "https://en.wikipedia.org/wiki/Fractal_flame");
 			attr_dev(a0, "rel", "nofollow");
-			add_location(a0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 25, 3, 783);
+			add_location(a0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 21, 1, 856);
 			attr_dev(a1, "href", "https://en.wikipedia.org/wiki/Scott_Draves");
 			attr_dev(a1, "rel", "nofollow");
-			add_location(a1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 29, 24, 980);
+			add_location(a1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 25, 0, 1053);
 			attr_dev(a2, "href", "https://flam3.com/flame_draves.pdf");
 			attr_dev(a2, "rel", "nofollow");
-			add_location(a2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 32, 4, 1075);
+			add_location(a2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 28, 4, 1148);
 			attr_dev(a3, "href", "https://maths-people.anu.edu.au/~john/Assets/Research%20Papers/fractals_self-similarity.pdf");
 			attr_dev(a3, "rel", "nofollow");
-			add_location(a3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 33, 0, 1180);
+			add_location(a3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 29, 0, 1253);
 			attr_dev(a4, "href", "https://maths-people.anu.edu.au/~john/Assets/Research%20Papers/fractals_self-similarity.pdf");
 			attr_dev(a4, "rel", "nofollow");
-			add_location(a4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 36, 4, 1355);
-			add_location(p0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 25, 0, 780);
+			add_location(a4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 32, 10, 1428);
+			add_location(p0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 21, 0, 853);
 			attr_dev(a5, "href", "https://github.com/bezo97/IFSRenderer");
 			attr_dev(a5, "rel", "nofollow");
-			add_location(a5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 41, 0, 1586);
+			add_location(a5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 37, 0, 1659);
 			attr_dev(a6, "href", "https://www.chaoticafractals.com");
 			attr_dev(a6, "rel", "nofollow");
-			add_location(a6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 44, 5, 1661);
+			add_location(a6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 40, 0, 1734);
 			attr_dev(a7, "href", "https://github.com/3Dickulus/FragM");
 			attr_dev(a7, "rel", "nofollow");
-			add_location(a7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 47, 4, 1730);
-			add_location(p1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 40, 0, 1512);
-			add_location(br2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 51, 0, 1825);
-			add_location(br3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 52, 0, 1830);
-			if (!src_url_equal(img.src, img_src_value = `${window.LFS_PREPEND}/blog/vorpol_dawn_by_technochroma.jpg`)) attr_dev(img, "src", img_src_value);
-			add_location(img, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 54, 0, 1840);
-			attr_dev(a8, "href", "https://www.deviantart.com/technochroma/art/Vorpol-Dawn-714213981");
-			add_location(a8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 56, 2, 1991);
-			attr_dev(a9, "href", "https://www.technochroma.art");
-			add_location(a9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 56, 30, 2086);
-			set_style(div1, "margin-left", "auto");
-			set_style(div1, "margin-right", "auto");
-			set_style(div1, "margin-top", "0.5rem");
-			add_location(div1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 55, 0, 1917);
-			add_location(br4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 58, 0, 2149);
-			attr_dev(a10, "href", "https://en.wikipedia.org/wiki/Demoscene");
+			add_location(a7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 43, 4, 1803);
+			add_location(p1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 36, 0, 1585);
+			add_location(br2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 47, 0, 1898);
+			add_location(br3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 48, 0, 1903);
+			attr_dev(a8, "href", "https://en.wikipedia.org/wiki/Demoscene");
+			attr_dev(a8, "rel", "nofollow");
+			add_location(a8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 54, 4, 2200);
+			attr_dev(a9, "href", "https://files.scene.org/view/parties/2019/assembly19/4k/terrarium_by_eos.zip");
+			attr_dev(a9, "rel", "nofollow");
+			add_location(a9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 57, 4, 2345);
+			add_location(p2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 54, 0, 2145);
+			add_location(br4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 61, 0, 2466);
+			add_location(br5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 62, 0, 2471);
+			add_location(br6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 67, 0, 2670);
+			add_location(br7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 68, 0, 2675);
+			attr_dev(a10, "href", "https://github.com/demoscene-source-archive/terrarium/blob/master/src/shaders/fragment.glsl");
 			attr_dev(a10, "rel", "nofollow");
-			add_location(a10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 59, 51, 2209);
-			attr_dev(a11, "href", "https://files.scene.org/view/parties/2019/assembly19/4k/terrarium_by_eos.zip");
+			add_location(a10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 69, 0, 2729);
+			add_location(p3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 69, 0, 2680);
+			add_location(p4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 73, 0, 2872);
+			add_location(li0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 75, 0, 2945);
+			add_location(em0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 76, 30, 3071);
+			add_location(li1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 76, 0, 3040);
+			add_location(li2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 77, 0, 3107);
+			add_location(li3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 79, 0, 3179);
+			add_location(em1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 80, 22, 3284);
+			add_location(li4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 80, 0, 3217);
+			add_location(li5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 81, 0, 3303);
+			add_location(ul0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 78, 30, 3174);
+			add_location(li6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 78, 0, 3144);
+			add_location(li7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 83, 0, 3391);
+			add_location(ul1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 74, 0, 2940);
+			add_location(br8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 85, 0, 3468);
+			add_location(p5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 86, 0, 3473);
+			add_location(br9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 87, 0, 3532);
+			add_location(br10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 88, 0, 3537);
+			add_location(br11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 90, 0, 3578);
+			add_location(br12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 91, 0, 3583);
+			attr_dev(a11, "href", "https://en.wikipedia.org/wiki/Chaos_game");
 			attr_dev(a11, "rel", "nofollow");
-			add_location(a11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 62, 4, 2354);
-			add_location(p2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 59, 0, 2154);
-			add_location(br5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 66, 0, 2475);
-			add_location(br6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 67, 0, 2480);
-			attr_dev(iframe0, "title", "Youtube video");
-			if (!src_url_equal(iframe0.src, iframe0_src_value = `https://www.youtube.com/embed/xLN3mTRlugs?rel=0&modestbranding=1`)) attr_dev(iframe0, "src", iframe0_src_value);
-			attr_dev(iframe0, "frameborder", "0");
-			attr_dev(iframe0, "allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
-			iframe0.allowFullscreen = true;
-			add_location(iframe0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 70, 4, 2527);
-			add_location(div2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 69, 0, 2517);
-			attr_dev(div3, "class", "video-container");
-			add_location(div3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 68, 0, 2485);
-			attr_dev(a12, "href", "https://www.pouet.net/prod.php?which=82417");
-			add_location(a12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 74, 0, 2842);
-			attr_dev(a13, "href", "https://www.pouet.net/groups.php?which=12701");
-			add_location(a13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 74, 0, 2912);
-			set_style(div4, "margin-left", "auto");
-			set_style(div4, "margin-right", "auto");
-			set_style(div4, "margin-top", "0.5rem");
-			add_location(div4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 73, 0, 2768);
-			add_location(br7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 76, 0, 2982);
-			add_location(br8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 77, 0, 2987);
-			attr_dev(a14, "href", "https://github.com/demoscene-source-archive/terrarium/blob/master/src/shaders/fragment.glsl");
+			add_location(a11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 92, 0, 3622);
+			attr_dev(a12, "href", "https://en.wikipedia.org/wiki/Iterated_function_system");
+			attr_dev(a12, "rel", "nofollow");
+			add_location(a12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 95, 0, 3776);
+			add_location(p6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 92, 0, 3588);
+			attr_dev(a13, "href", "https://en.wikipedia.org/wiki/Tone_mapping");
+			attr_dev(a13, "rel", "nofollow");
+			add_location(a13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 101, 4, 3942);
+			add_location(li8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 101, 0, 3938);
+			add_location(li9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 102, 0, 4071);
+			add_location(ul2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 100, 0, 3933);
+			attr_dev(a14, "href", "https://flam3.com/flame_draves.pdf");
 			attr_dev(a14, "rel", "nofollow");
-			add_location(a14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 78, 49, 3041);
-			add_location(p3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 78, 0, 2992);
-			add_location(p4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 82, 0, 3184);
-			add_location(li0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 84, 0, 3257);
-			add_location(em0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 85, 16, 3383);
-			add_location(li1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 85, 0, 3352);
-			add_location(li2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 86, 0, 3419);
-			add_location(li3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 88, 0, 3491);
-			add_location(em1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 89, 59, 3596);
-			add_location(li4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 89, 0, 3529);
-			add_location(li5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 90, 0, 3615);
-			add_location(ul0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 87, 0, 3486);
-			add_location(li6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 87, 0, 3456);
-			add_location(li7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 92, 0, 3703);
-			add_location(ul1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 83, 0, 3252);
-			add_location(br9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 94, 0, 3780);
-			add_location(p5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 95, 0, 3785);
-			add_location(br10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 96, 0, 3844);
-			add_location(br11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 97, 0, 3849);
-			attr_dev(iframe1, "title", "Youtube video");
-			if (!src_url_equal(iframe1.src, iframe1_src_value = `https://www.youtube.com/embed/kbKtFN71Lfs?rel=0&modestbranding=1`)) attr_dev(iframe1, "src", iframe1_src_value);
-			attr_dev(iframe1, "frameborder", "0");
-			attr_dev(iframe1, "allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
-			iframe1.allowFullscreen = true;
-			add_location(iframe1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 100, 4, 3896);
-			add_location(div5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 99, 0, 3886);
-			attr_dev(div6, "class", "video-container");
-			add_location(div6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 98, 0, 3854);
-			add_location(br12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 103, 0, 4171);
-			add_location(br13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 104, 0, 4176);
-			attr_dev(a15, "href", "https://en.wikipedia.org/wiki/Chaos_game");
-			attr_dev(a15, "rel", "nofollow");
-			add_location(a15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 105, 30, 4215);
-			attr_dev(a16, "href", "https://en.wikipedia.org/wiki/Iterated_function_system");
-			attr_dev(a16, "rel", "nofollow");
-			add_location(a16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 108, 41, 4369);
-			add_location(p6, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 105, 0, 4181);
-			attr_dev(a17, "href", "https://en.wikipedia.org/wiki/Tone_mapping");
-			attr_dev(a17, "rel", "nofollow");
-			add_location(a17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 114, 2, 4535);
-			add_location(li8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 114, 0, 4531);
-			add_location(li9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 115, 0, 4664);
-			add_location(ul2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 113, 0, 4526);
-			attr_dev(a18, "href", "https://flam3.com/flame_draves.pdf");
-			attr_dev(a18, "rel", "nofollow");
-			add_location(a18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 117, 11, 4856);
-			add_location(p7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 117, 0, 4814);
-			add_location(br14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 121, 0, 5042);
-			add_location(br15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 122, 0, 5047);
-			add_location(strong2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 123, 4, 5056);
-			add_location(h21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 123, 0, 5052);
+			add_location(a14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 104, 19, 4263);
+			add_location(p7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 104, 0, 4221);
+			add_location(br13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 108, 0, 4449);
+			add_location(br14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 109, 0, 4454);
+			add_location(strong1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 110, 4, 4463);
+			add_location(h21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 110, 0, 4459);
 			attr_dev(pre0, "class", "language-glsl");
-			add_location(pre0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 124, 0, 5088);
-			add_location(br16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 189, 0, 18558);
+			add_location(pre0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 111, 0, 4495);
+			add_location(br15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 176, 0, 17965);
 			attr_dev(pre1, "class", "language-glsl");
-			add_location(pre1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 190, 0, 18563);
-			attr_dev(a19, "href", "https://en.wikipedia.org/wiki/Linearizability");
-			attr_dev(a19, "rel", "nofollow");
-			add_location(a19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 191, 9, 19051);
-			attr_dev(a20, "href", "https://en.wikipedia.org/wiki/Race_condition");
-			attr_dev(a20, "rel", "nofollow");
-			add_location(a20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 194, 26, 19194);
-			add_location(p8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 191, 0, 19042);
-			add_location(br17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 198, 0, 19290);
+			add_location(pre1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 177, 0, 17970);
+			attr_dev(a15, "href", "https://en.wikipedia.org/wiki/Linearizability");
+			attr_dev(a15, "rel", "nofollow");
+			add_location(a15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 178, 6, 18458);
+			attr_dev(a16, "href", "https://en.wikipedia.org/wiki/Race_condition");
+			attr_dev(a16, "rel", "nofollow");
+			add_location(a16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 181, 6, 18601);
+			add_location(p8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 178, 0, 18449);
+			add_location(br16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 185, 0, 18697);
 			attr_dev(pre2, "class", "language-glsl");
-			add_location(pre2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 199, 0, 19295);
-			attr_dev(a21, "href", "https://www.khronos.org/opengl/wiki/Shader#Execution_and_invocations");
-			attr_dev(a21, "rel", "nofollow");
-			add_location(a21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 201, 3, 19820);
-			attr_dev(a22, "href", "https://www.khronos.org/opengl/wiki/Memory_Model#Ensuring_visibility");
-			attr_dev(a22, "rel", "nofollow");
-			add_location(a22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 206, 9, 20094);
-			add_location(li10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 201, 0, 19780);
-			add_location(li11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 211, 0, 20270);
-			add_location(li12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 213, 0, 20488);
-			add_location(ul3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 200, 0, 19775);
-			attr_dev(a23, "href", "https://www.khronos.org/opengl/wiki/Type_Qualifier_(GLSL)");
-			attr_dev(a23, "rel", "nofollow");
-			add_location(a23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 216, 8, 20621);
-			add_location(p9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 216, 0, 20601);
-			add_location(br18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 220, 0, 20731);
-			add_location(strong3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 221, 4, 20740);
-			add_location(h22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 221, 0, 20736);
+			add_location(pre2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 186, 0, 18702);
+			attr_dev(a17, "href", "https://www.khronos.org/opengl/wiki/Shader#Execution_and_invocations");
+			attr_dev(a17, "rel", "nofollow");
+			add_location(a17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 188, 0, 19227);
+			attr_dev(a18, "href", "https://www.khronos.org/opengl/wiki/Memory_Model#Ensuring_visibility");
+			attr_dev(a18, "rel", "nofollow");
+			add_location(a18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 193, 8, 19501);
+			add_location(li10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 188, 0, 19187);
+			add_location(li11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 198, 0, 19677);
+			add_location(li12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 200, 0, 19895);
+			add_location(ul3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 187, 0, 19182);
+			attr_dev(a19, "href", "https://www.khronos.org/opengl/wiki/Type_Qualifier_(GLSL)");
+			attr_dev(a19, "rel", "nofollow");
+			add_location(a19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 203, 4, 20028);
+			add_location(p9, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 203, 0, 20008);
+			add_location(br17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 207, 0, 20138);
+			add_location(strong2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 208, 4, 20147);
+			add_location(h22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 208, 0, 20143);
 			attr_dev(pre3, "class", "language-glsl");
-			add_location(pre3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 222, 0, 20778);
-			add_location(br19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 238, 0, 26463);
-			add_location(p10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 239, 0, 26468);
-			attr_dev(a24, "href", "https://en.wikipedia.org/wiki/Affine_transformation");
+			add_location(pre3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 209, 0, 20185);
+			add_location(br18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 225, 0, 25870);
+			add_location(p10, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 226, 0, 25875);
+			attr_dev(a20, "href", "https://en.wikipedia.org/wiki/Affine_transformation");
+			attr_dev(a20, "rel", "nofollow");
+			add_location(a20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 227, 30, 25977);
+			add_location(p11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 227, 0, 25916);
+			attr_dev(a21, "href", "https://en.wikipedia.org/wiki/Inversive_geometry");
+			attr_dev(a21, "rel", "nofollow");
+			add_location(a21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 231, 0, 26116);
+			add_location(code, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 234, 24, 26219);
+			attr_dev(a22, "href", "https://en.wikipedia.org/wiki/M%C3%B6bius_transformation");
+			attr_dev(a22, "rel", "nofollow");
+			add_location(a22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 234, 56, 26268);
+			attr_dev(a23, "href", "https://en.wikipedia.org/wiki/Conformal_map");
+			attr_dev(a23, "rel", "nofollow");
+			add_location(a23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 238, 26, 26462);
+			add_location(p12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 231, 0, 26113);
+			add_location(br19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 242, 0, 26596);
+			add_location(br20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 244, 0, 26637);
+			add_location(br21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 245, 0, 26642);
+			attr_dev(a24, "href", "https://github.com/bezo97/IFSRenderer");
 			attr_dev(a24, "rel", "nofollow");
-			add_location(a24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 240, 25, 26570);
-			add_location(p11, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 240, 0, 26509);
-			attr_dev(a25, "href", "https://en.wikipedia.org/wiki/Inversive_geometry");
+			add_location(a24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 246, 1, 26650);
+			attr_dev(a25, "href", "https://github.com/bezo97/IFSTransforms/tree/3ad08c70a1149dbc946baca68708a3beb05f2e9f/Transforms");
 			attr_dev(a25, "rel", "nofollow");
-			add_location(a25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 244, 3, 26709);
-			add_location(code, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 247, 1, 26812);
-			attr_dev(a26, "href", "https://en.wikipedia.org/wiki/M%C3%B6bius_transformation");
+			add_location(a25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 246, 82, 26731);
+			add_location(p13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 246, 0, 26647);
+			add_location(br22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 250, 0, 26930);
+			add_location(strong3, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 251, 3, 26939);
+			add_location(h23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 251, 0, 26935);
+			attr_dev(a26, "href", "https://flam3.com/flame_draves.pdf");
 			attr_dev(a26, "rel", "nofollow");
-			add_location(a26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 247, 1, 26861);
-			attr_dev(a27, "href", "https://en.wikipedia.org/wiki/Conformal_map");
+			add_location(a26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 252, 29, 27024);
+			add_location(p14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 252, 0, 26983);
+			add_location(p15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 256, 0, 27250);
+			attr_dev(a27, "href", "https://64.github.io/tonemapping/");
 			attr_dev(a27, "rel", "nofollow");
-			add_location(a27, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 251, 0, 27055);
-			add_location(p12, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 244, 0, 26706);
-			add_location(br20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 255, 0, 27189);
-			attr_dev(iframe2, "title", "Youtube video");
-			if (!src_url_equal(iframe2.src, iframe2_src_value = `https://www.youtube.com/embed/IAPf1ZYfm-s?rel=0&modestbranding=1`)) attr_dev(iframe2, "src", iframe2_src_value);
-			attr_dev(iframe2, "frameborder", "0");
-			attr_dev(iframe2, "allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
-			iframe2.allowFullscreen = true;
-			add_location(iframe2, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 258, 0, 27236);
-			add_location(div7, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 257, 1, 27226);
-			attr_dev(div8, "class", "video-container");
-			add_location(div8, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 256, 0, 27194);
-			add_location(br21, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 261, 0, 27477);
-			add_location(br22, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 262, 0, 27482);
-			attr_dev(a28, "href", "https://github.com/bezo97/IFSRenderer");
+			add_location(a27, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 257, 3, 27417);
+			add_location(p16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 257, 0, 27295);
+			attr_dev(a28, "href", "https://www-old.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf");
 			attr_dev(a28, "rel", "nofollow");
-			add_location(a28, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 263, 3, 27490);
-			attr_dev(a29, "href", "https://github.com/bezo97/IFSTransforms/tree/3ad08c70a1149dbc946baca68708a3beb05f2e9f/Transforms");
-			attr_dev(a29, "rel", "nofollow");
-			add_location(a29, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 263, 21, 27571);
-			add_location(p13, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 263, 0, 27487);
-			add_location(br23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 267, 0, 27770);
-			add_location(strong4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 268, 0, 27779);
-			add_location(h23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 268, 0, 27775);
-			attr_dev(a30, "href", "https://flam3.com/flame_draves.pdf");
-			attr_dev(a30, "rel", "nofollow");
-			add_location(a30, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 269, 7, 27864);
-			add_location(p14, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 269, 0, 27823);
-			add_location(p15, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 273, 0, 28090);
-			attr_dev(a31, "href", "https://64.github.io/tonemapping/");
-			attr_dev(a31, "rel", "nofollow");
-			add_location(a31, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 274, 71, 28257);
-			add_location(p16, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 274, 0, 28135);
-			attr_dev(a32, "href", "https://www-old.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf");
-			attr_dev(a32, "rel", "nofollow");
-			add_location(a32, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 278, 0, 28449);
-			add_location(p17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 278, 0, 28349);
-			add_location(br24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 284, 1, 28791);
+			add_location(a28, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 261, 53, 27609);
+			add_location(p17, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 261, 0, 27509);
+			add_location(br23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 267, 1, 27951);
 			attr_dev(pre4, "class", "language-glsl");
-			add_location(pre4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 286, 1, 28796);
-			add_location(strong5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32883);
-			add_location(h24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32879);
-			attr_dev(a33, "href", "https://www.pouet.net/prod.php?which=82417");
-			attr_dev(a33, "rel", "nofollow");
-			add_location(a33, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32923);
-			add_location(p18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32920);
-			add_location(br25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 33177);
+			add_location(pre4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 268, 1, 27956);
+			add_location(strong4, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32043);
+			add_location(h24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32039);
+			attr_dev(a29, "href", "https://www.pouet.net/prod.php?which=82417");
+			attr_dev(a29, "rel", "nofollow");
+			add_location(a29, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32083);
+			add_location(p18, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32080);
+			add_location(br24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32337);
 			attr_dev(pre5, "class", "language-glsl");
-			add_location(pre5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 33182);
-			add_location(br26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 35253);
-			add_location(p19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 35258);
+			add_location(pre5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 32342);
+			add_location(br25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 34413);
+			add_location(p19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, -1, 34418);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, header, anchor);
-			append_dev(header, h1);
-			append_dev(h1, strong0);
-			append_dev(strong0, t0);
-			insert_dev(target, t1, anchor);
-			insert_dev(target, div0, anchor);
-			append_dev(div0, t2);
-			append_dev(div0, t3);
-			append_dev(div0, t4);
-			append_dev(div0, t5);
-			append_dev(div0, t6);
-			insert_dev(target, t7, anchor);
+			mount_component(blogtitle, target, anchor);
+			insert_dev(target, t0, anchor);
 			insert_dev(target, br0, anchor);
-			insert_dev(target, t8, anchor);
+			insert_dev(target, t1, anchor);
 			insert_dev(target, br1, anchor);
-			insert_dev(target, t9, anchor);
+			insert_dev(target, t2, anchor);
 			insert_dev(target, h20, anchor);
-			append_dev(h20, strong1);
-			insert_dev(target, t11, anchor);
+			append_dev(h20, strong0);
+			insert_dev(target, t4, anchor);
 			insert_dev(target, p0, anchor);
 			append_dev(p0, a0);
-			append_dev(p0, t13);
+			append_dev(p0, t6);
 			append_dev(p0, a1);
-			append_dev(p0, t15);
+			append_dev(p0, t8);
 			append_dev(p0, a2);
-			append_dev(p0, t17);
+			append_dev(p0, t10);
 			append_dev(p0, a3);
-			append_dev(p0, t19);
+			append_dev(p0, t12);
 			append_dev(p0, a4);
-			append_dev(p0, t21);
-			insert_dev(target, t22, anchor);
+			append_dev(p0, t14);
+			insert_dev(target, t15, anchor);
 			insert_dev(target, p1, anchor);
-			append_dev(p1, t23);
+			append_dev(p1, t16);
 			append_dev(p1, a5);
 			append_dev(p1, a6);
 			append_dev(p1, a7);
-			append_dev(p1, t27);
-			insert_dev(target, t28, anchor);
+			append_dev(p1, t20);
+			insert_dev(target, t21, anchor);
 			insert_dev(target, br2, anchor);
-			insert_dev(target, t29, anchor);
+			insert_dev(target, t22, anchor);
 			insert_dev(target, br3, anchor);
-			insert_dev(target, t30, anchor);
-			insert_dev(target, img, anchor);
-			insert_dev(target, t31, anchor);
-			insert_dev(target, div1, anchor);
-			append_dev(div1, a8);
-			append_dev(div1, t33);
-			append_dev(div1, a9);
-			insert_dev(target, t35, anchor);
-			insert_dev(target, br4, anchor);
-			insert_dev(target, t36, anchor);
+			insert_dev(target, t23, anchor);
+			mount_component(image, target, anchor);
+			insert_dev(target, t24, anchor);
+			mount_component(subtitle0, target, anchor);
+			insert_dev(target, t25, anchor);
 			insert_dev(target, p2, anchor);
-			append_dev(p2, t37);
-			append_dev(p2, a10);
-			append_dev(p2, t39);
-			append_dev(p2, a11);
-			append_dev(p2, t41);
-			insert_dev(target, t42, anchor);
+			append_dev(p2, t26);
+			append_dev(p2, a8);
+			append_dev(p2, t28);
+			append_dev(p2, a9);
+			append_dev(p2, t30);
+			insert_dev(target, t31, anchor);
+			insert_dev(target, br4, anchor);
+			insert_dev(target, t32, anchor);
 			insert_dev(target, br5, anchor);
-			insert_dev(target, t43, anchor);
+			insert_dev(target, t33, anchor);
+			mount_component(youtubevideo0, target, anchor);
+			insert_dev(target, t34, anchor);
+			mount_component(subtitle1, target, anchor);
+			insert_dev(target, t35, anchor);
 			insert_dev(target, br6, anchor);
-			insert_dev(target, t44, anchor);
-			insert_dev(target, div3, anchor);
-			append_dev(div3, div2);
-			append_dev(div2, iframe0);
-			insert_dev(target, t45, anchor);
-			insert_dev(target, div4, anchor);
-			append_dev(div4, a12);
-			append_dev(div4, t47);
-			append_dev(div4, a13);
-			insert_dev(target, t49, anchor);
+			insert_dev(target, t36, anchor);
 			insert_dev(target, br7, anchor);
-			insert_dev(target, t50, anchor);
-			insert_dev(target, br8, anchor);
-			insert_dev(target, t51, anchor);
+			insert_dev(target, t37, anchor);
 			insert_dev(target, p3, anchor);
-			append_dev(p3, t52);
-			append_dev(p3, a14);
-			append_dev(p3, t54);
-			insert_dev(target, t55, anchor);
+			append_dev(p3, t38);
+			append_dev(p3, a10);
+			append_dev(p3, t40);
+			insert_dev(target, t41, anchor);
 			insert_dev(target, p4, anchor);
-			insert_dev(target, t57, anchor);
+			insert_dev(target, t43, anchor);
 			insert_dev(target, ul1, anchor);
 			append_dev(ul1, li0);
-			append_dev(ul1, t59);
+			append_dev(ul1, t45);
 			append_dev(ul1, li1);
-			append_dev(li1, t60);
+			append_dev(li1, t46);
 			append_dev(li1, em0);
-			append_dev(li1, t62);
-			append_dev(ul1, t63);
+			append_dev(li1, t48);
+			append_dev(ul1, t49);
 			append_dev(ul1, li2);
-			append_dev(ul1, t65);
+			append_dev(ul1, t51);
 			append_dev(ul1, li6);
-			append_dev(li6, t66);
+			append_dev(li6, t52);
 			append_dev(li6, ul0);
 			append_dev(ul0, li3);
-			append_dev(ul0, t68);
+			append_dev(ul0, t54);
 			append_dev(ul0, li4);
-			append_dev(li4, t69);
+			append_dev(li4, t55);
 			append_dev(li4, em1);
-			append_dev(li4, t71);
-			append_dev(ul0, t72);
+			append_dev(li4, t57);
+			append_dev(ul0, t58);
 			append_dev(ul0, li5);
-			append_dev(ul1, t74);
+			append_dev(ul1, t60);
 			append_dev(ul1, li7);
-			insert_dev(target, t76, anchor);
-			insert_dev(target, br9, anchor);
-			insert_dev(target, t77, anchor);
+			insert_dev(target, t62, anchor);
+			insert_dev(target, br8, anchor);
+			insert_dev(target, t63, anchor);
 			insert_dev(target, p5, anchor);
-			insert_dev(target, t79, anchor);
+			insert_dev(target, t65, anchor);
+			insert_dev(target, br9, anchor);
+			insert_dev(target, t66, anchor);
 			insert_dev(target, br10, anchor);
-			insert_dev(target, t80, anchor);
+			insert_dev(target, t67, anchor);
+			mount_component(youtubevideo1, target, anchor);
+			insert_dev(target, t68, anchor);
 			insert_dev(target, br11, anchor);
-			insert_dev(target, t81, anchor);
-			insert_dev(target, div6, anchor);
-			append_dev(div6, div5);
-			append_dev(div5, iframe1);
-			/*iframe1_binding*/ ctx[3](iframe1);
-			insert_dev(target, t82, anchor);
+			insert_dev(target, t69, anchor);
 			insert_dev(target, br12, anchor);
-			insert_dev(target, t83, anchor);
-			insert_dev(target, br13, anchor);
-			insert_dev(target, t84, anchor);
+			insert_dev(target, t70, anchor);
 			insert_dev(target, p6, anchor);
-			append_dev(p6, t85);
-			append_dev(p6, a15);
-			append_dev(p6, t87);
-			append_dev(p6, a16);
-			append_dev(p6, t89);
-			insert_dev(target, t90, anchor);
+			append_dev(p6, t71);
+			append_dev(p6, a11);
+			append_dev(p6, t73);
+			append_dev(p6, a12);
+			append_dev(p6, t75);
+			insert_dev(target, t76, anchor);
 			insert_dev(target, ul2, anchor);
 			append_dev(ul2, li8);
-			append_dev(li8, a17);
-			append_dev(li8, t92);
-			append_dev(ul2, t93);
+			append_dev(li8, a13);
+			append_dev(li8, t78);
+			append_dev(ul2, t79);
 			append_dev(ul2, li9);
-			insert_dev(target, t95, anchor);
+			insert_dev(target, t81, anchor);
 			insert_dev(target, p7, anchor);
-			append_dev(p7, t96);
-			append_dev(p7, a18);
-			append_dev(p7, t98);
-			insert_dev(target, t99, anchor);
+			append_dev(p7, t82);
+			append_dev(p7, a14);
+			append_dev(p7, t84);
+			insert_dev(target, t85, anchor);
+			insert_dev(target, br13, anchor);
+			insert_dev(target, t86, anchor);
 			insert_dev(target, br14, anchor);
-			insert_dev(target, t100, anchor);
-			insert_dev(target, br15, anchor);
-			insert_dev(target, t101, anchor);
+			insert_dev(target, t87, anchor);
 			insert_dev(target, h21, anchor);
-			append_dev(h21, strong2);
-			insert_dev(target, t103, anchor);
+			append_dev(h21, strong1);
+			insert_dev(target, t89, anchor);
 			insert_dev(target, pre0, anchor);
 			pre0.innerHTML = raw0_value;
-			insert_dev(target, t104, anchor);
-			insert_dev(target, br16, anchor);
-			insert_dev(target, t105, anchor);
+			insert_dev(target, t90, anchor);
+			insert_dev(target, br15, anchor);
+			insert_dev(target, t91, anchor);
 			insert_dev(target, pre1, anchor);
 			pre1.innerHTML = raw1_value;
-			insert_dev(target, t106, anchor);
+			insert_dev(target, t92, anchor);
 			insert_dev(target, p8, anchor);
-			append_dev(p8, t107);
-			append_dev(p8, a19);
-			append_dev(p8, t109);
-			append_dev(p8, a20);
-			append_dev(p8, t111);
-			insert_dev(target, t112, anchor);
-			insert_dev(target, br17, anchor);
-			insert_dev(target, t113, anchor);
+			append_dev(p8, t93);
+			append_dev(p8, a15);
+			append_dev(p8, t95);
+			append_dev(p8, a16);
+			append_dev(p8, t97);
+			insert_dev(target, t98, anchor);
+			insert_dev(target, br16, anchor);
+			insert_dev(target, t99, anchor);
 			insert_dev(target, pre2, anchor);
 			pre2.innerHTML = raw2_value;
-			insert_dev(target, t114, anchor);
+			insert_dev(target, t100, anchor);
 			insert_dev(target, ul3, anchor);
 			append_dev(ul3, li10);
-			append_dev(li10, t115);
-			append_dev(li10, a21);
-			append_dev(li10, t117);
-			append_dev(li10, a22);
-			append_dev(li10, t119);
-			append_dev(ul3, t120);
+			append_dev(li10, t101);
+			append_dev(li10, a17);
+			append_dev(li10, t103);
+			append_dev(li10, a18);
+			append_dev(li10, t105);
+			append_dev(ul3, t106);
 			append_dev(ul3, li11);
-			append_dev(ul3, t122);
+			append_dev(ul3, t108);
 			append_dev(ul3, li12);
-			insert_dev(target, t124, anchor);
+			insert_dev(target, t110, anchor);
 			insert_dev(target, p9, anchor);
-			append_dev(p9, t125);
-			append_dev(p9, a23);
-			append_dev(p9, t127);
-			insert_dev(target, t128, anchor);
-			insert_dev(target, br18, anchor);
-			insert_dev(target, t129, anchor);
+			append_dev(p9, t111);
+			append_dev(p9, a19);
+			append_dev(p9, t113);
+			insert_dev(target, t114, anchor);
+			insert_dev(target, br17, anchor);
+			insert_dev(target, t115, anchor);
 			insert_dev(target, h22, anchor);
-			append_dev(h22, strong3);
-			insert_dev(target, t131, anchor);
+			append_dev(h22, strong2);
+			insert_dev(target, t117, anchor);
 			insert_dev(target, pre3, anchor);
 			pre3.innerHTML = raw3_value;
-			insert_dev(target, t132, anchor);
-			insert_dev(target, br19, anchor);
-			insert_dev(target, t133, anchor);
+			insert_dev(target, t118, anchor);
+			insert_dev(target, br18, anchor);
+			insert_dev(target, t119, anchor);
 			insert_dev(target, p10, anchor);
-			insert_dev(target, t135, anchor);
+			insert_dev(target, t121, anchor);
 			insert_dev(target, p11, anchor);
-			append_dev(p11, t136);
-			append_dev(p11, a24);
-			append_dev(p11, t138);
-			insert_dev(target, t139, anchor);
+			append_dev(p11, t122);
+			append_dev(p11, a20);
+			append_dev(p11, t124);
+			insert_dev(target, t125, anchor);
 			insert_dev(target, p12, anchor);
-			append_dev(p12, a25);
-			append_dev(p12, t141);
+			append_dev(p12, a21);
+			append_dev(p12, t127);
 			append_dev(p12, code);
-			append_dev(p12, t143);
-			append_dev(p12, a26);
-			append_dev(p12, t145);
-			append_dev(p12, a27);
-			append_dev(p12, t147);
-			insert_dev(target, t148, anchor);
+			append_dev(p12, t129);
+			append_dev(p12, a22);
+			append_dev(p12, t131);
+			append_dev(p12, a23);
+			append_dev(p12, t133);
+			insert_dev(target, t134, anchor);
+			insert_dev(target, br19, anchor);
+			insert_dev(target, t135, anchor);
+			mount_component(youtubevideo2, target, anchor);
+			insert_dev(target, t136, anchor);
 			insert_dev(target, br20, anchor);
-			insert_dev(target, t149, anchor);
-			insert_dev(target, div8, anchor);
-			append_dev(div8, div7);
-			append_dev(div7, iframe2);
-			insert_dev(target, t150, anchor);
+			insert_dev(target, t137, anchor);
 			insert_dev(target, br21, anchor);
-			insert_dev(target, t151, anchor);
-			insert_dev(target, br22, anchor);
-			insert_dev(target, t152, anchor);
+			insert_dev(target, t138, anchor);
 			insert_dev(target, p13, anchor);
-			append_dev(p13, a28);
-			append_dev(p13, t154);
-			append_dev(p13, a29);
-			append_dev(p13, t156);
-			insert_dev(target, t157, anchor);
-			insert_dev(target, br23, anchor);
-			insert_dev(target, t158, anchor);
+			append_dev(p13, a24);
+			append_dev(p13, t140);
+			append_dev(p13, a25);
+			append_dev(p13, t142);
+			insert_dev(target, t143, anchor);
+			insert_dev(target, br22, anchor);
+			insert_dev(target, t144, anchor);
 			insert_dev(target, h23, anchor);
-			append_dev(h23, strong4);
-			insert_dev(target, t160, anchor);
+			append_dev(h23, strong3);
+			insert_dev(target, t146, anchor);
 			insert_dev(target, p14, anchor);
-			append_dev(p14, t161);
-			append_dev(p14, a30);
-			append_dev(p14, t163);
-			insert_dev(target, t164, anchor);
+			append_dev(p14, t147);
+			append_dev(p14, a26);
+			append_dev(p14, t149);
+			insert_dev(target, t150, anchor);
 			insert_dev(target, p15, anchor);
-			insert_dev(target, t166, anchor);
+			insert_dev(target, t152, anchor);
 			insert_dev(target, p16, anchor);
-			append_dev(p16, t167);
-			append_dev(p16, a31);
-			append_dev(p16, t169);
-			insert_dev(target, t170, anchor);
+			append_dev(p16, t153);
+			append_dev(p16, a27);
+			append_dev(p16, t155);
+			insert_dev(target, t156, anchor);
 			insert_dev(target, p17, anchor);
-			append_dev(p17, t171);
-			append_dev(p17, a32);
-			append_dev(p17, t173);
-			insert_dev(target, t174, anchor);
-			insert_dev(target, br24, anchor);
-			insert_dev(target, t175, anchor);
+			append_dev(p17, t157);
+			append_dev(p17, a28);
+			append_dev(p17, t159);
+			insert_dev(target, t160, anchor);
+			insert_dev(target, br23, anchor);
+			insert_dev(target, t161, anchor);
 			insert_dev(target, pre4, anchor);
 			pre4.innerHTML = raw4_value;
-			insert_dev(target, t176, anchor);
+			insert_dev(target, t162, anchor);
 			insert_dev(target, h24, anchor);
-			append_dev(h24, strong5);
-			insert_dev(target, t178, anchor);
+			append_dev(h24, strong4);
+			insert_dev(target, t164, anchor);
 			insert_dev(target, p18, anchor);
-			append_dev(p18, a33);
-			append_dev(p18, t180);
-			insert_dev(target, t181, anchor);
-			insert_dev(target, br25, anchor);
-			insert_dev(target, t182, anchor);
+			append_dev(p18, a29);
+			append_dev(p18, t166);
+			insert_dev(target, t167, anchor);
+			insert_dev(target, br24, anchor);
+			insert_dev(target, t168, anchor);
 			insert_dev(target, pre5, anchor);
 			pre5.innerHTML = raw5_value;
-			insert_dev(target, t183, anchor);
-			insert_dev(target, br26, anchor);
-			insert_dev(target, t184, anchor);
+			insert_dev(target, t169, anchor);
+			insert_dev(target, br25, anchor);
+			insert_dev(target, t170, anchor);
 			insert_dev(target, p19, anchor);
+			current = true;
 		},
 		p: function update(ctx, [dirty]) {
-			if (dirty & /*title*/ 2) set_data_dev(t0, /*title*/ ctx[1]);
-			if (dirty & /*date*/ 1 && t2_value !== (t2_value = /*date*/ ctx[0].getUTCFullYear() + "")) set_data_dev(t2, t2_value);
-			if (dirty & /*date*/ 1 && t4_value !== (t4_value = /*date*/ ctx[0].getUTCMonth() + 1 + "")) set_data_dev(t4, t4_value);
-			if (dirty & /*date*/ 1 && t6_value !== (t6_value = /*date*/ ctx[0].getUTCDate() + "")) set_data_dev(t6, t6_value);
+			const blogtitle_changes = {};
+			if (dirty & /*title*/ 2) blogtitle_changes.title = /*title*/ ctx[1];
+			if (dirty & /*date*/ 1) blogtitle_changes.date = /*date*/ ctx[0];
+			blogtitle.$set(blogtitle_changes);
+			const subtitle0_changes = {};
+
+			if (dirty & /*$$scope*/ 4) {
+				subtitle0_changes.$$scope = { dirty, ctx };
+			}
+
+			subtitle0.$set(subtitle0_changes);
+			const subtitle1_changes = {};
+
+			if (dirty & /*$$scope*/ 4) {
+				subtitle1_changes.$$scope = { dirty, ctx };
+			}
+
+			subtitle1.$set(subtitle1_changes);
 		},
-		i: utils_noop,
-		o: utils_noop,
+		i: function intro(local) {
+			if (current) return;
+			transitions_transition_in(blogtitle.$$.fragment, local);
+			transitions_transition_in(image.$$.fragment, local);
+			transitions_transition_in(subtitle0.$$.fragment, local);
+			transitions_transition_in(youtubevideo0.$$.fragment, local);
+			transitions_transition_in(subtitle1.$$.fragment, local);
+			transitions_transition_in(youtubevideo1.$$.fragment, local);
+			transitions_transition_in(youtubevideo2.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transitions_transition_out(blogtitle.$$.fragment, local);
+			transitions_transition_out(image.$$.fragment, local);
+			transitions_transition_out(subtitle0.$$.fragment, local);
+			transitions_transition_out(youtubevideo0.$$.fragment, local);
+			transitions_transition_out(subtitle1.$$.fragment, local);
+			transitions_transition_out(youtubevideo1.$$.fragment, local);
+			transitions_transition_out(youtubevideo2.$$.fragment, local);
+			current = false;
+		},
 		d: function destroy(detaching) {
 			if (detaching) {
-				detach_dev(header);
-				detach_dev(t1);
-				detach_dev(div0);
-				detach_dev(t7);
+				detach_dev(t0);
 				detach_dev(br0);
-				detach_dev(t8);
+				detach_dev(t1);
 				detach_dev(br1);
-				detach_dev(t9);
+				detach_dev(t2);
 				detach_dev(h20);
-				detach_dev(t11);
+				detach_dev(t4);
 				detach_dev(p0);
-				detach_dev(t22);
+				detach_dev(t15);
 				detach_dev(p1);
-				detach_dev(t28);
+				detach_dev(t21);
 				detach_dev(br2);
-				detach_dev(t29);
+				detach_dev(t22);
 				detach_dev(br3);
-				detach_dev(t30);
-				detach_dev(img);
-				detach_dev(t31);
-				detach_dev(div1);
-				detach_dev(t35);
-				detach_dev(br4);
-				detach_dev(t36);
+				detach_dev(t23);
+				detach_dev(t24);
+				detach_dev(t25);
 				detach_dev(p2);
-				detach_dev(t42);
+				detach_dev(t31);
+				detach_dev(br4);
+				detach_dev(t32);
 				detach_dev(br5);
-				detach_dev(t43);
+				detach_dev(t33);
+				detach_dev(t34);
+				detach_dev(t35);
 				detach_dev(br6);
-				detach_dev(t44);
-				detach_dev(div3);
-				detach_dev(t45);
-				detach_dev(div4);
-				detach_dev(t49);
+				detach_dev(t36);
 				detach_dev(br7);
-				detach_dev(t50);
-				detach_dev(br8);
-				detach_dev(t51);
+				detach_dev(t37);
 				detach_dev(p3);
-				detach_dev(t55);
+				detach_dev(t41);
 				detach_dev(p4);
-				detach_dev(t57);
+				detach_dev(t43);
 				detach_dev(ul1);
-				detach_dev(t76);
-				detach_dev(br9);
-				detach_dev(t77);
+				detach_dev(t62);
+				detach_dev(br8);
+				detach_dev(t63);
 				detach_dev(p5);
-				detach_dev(t79);
+				detach_dev(t65);
+				detach_dev(br9);
+				detach_dev(t66);
 				detach_dev(br10);
-				detach_dev(t80);
+				detach_dev(t67);
+				detach_dev(t68);
 				detach_dev(br11);
-				detach_dev(t81);
-				detach_dev(div6);
-				detach_dev(t82);
+				detach_dev(t69);
 				detach_dev(br12);
-				detach_dev(t83);
-				detach_dev(br13);
-				detach_dev(t84);
+				detach_dev(t70);
 				detach_dev(p6);
-				detach_dev(t90);
+				detach_dev(t76);
 				detach_dev(ul2);
-				detach_dev(t95);
+				detach_dev(t81);
 				detach_dev(p7);
-				detach_dev(t99);
+				detach_dev(t85);
+				detach_dev(br13);
+				detach_dev(t86);
 				detach_dev(br14);
-				detach_dev(t100);
-				detach_dev(br15);
-				detach_dev(t101);
+				detach_dev(t87);
 				detach_dev(h21);
-				detach_dev(t103);
+				detach_dev(t89);
 				detach_dev(pre0);
-				detach_dev(t104);
-				detach_dev(br16);
-				detach_dev(t105);
+				detach_dev(t90);
+				detach_dev(br15);
+				detach_dev(t91);
 				detach_dev(pre1);
-				detach_dev(t106);
+				detach_dev(t92);
 				detach_dev(p8);
-				detach_dev(t112);
-				detach_dev(br17);
-				detach_dev(t113);
+				detach_dev(t98);
+				detach_dev(br16);
+				detach_dev(t99);
 				detach_dev(pre2);
-				detach_dev(t114);
+				detach_dev(t100);
 				detach_dev(ul3);
-				detach_dev(t124);
+				detach_dev(t110);
 				detach_dev(p9);
-				detach_dev(t128);
-				detach_dev(br18);
-				detach_dev(t129);
+				detach_dev(t114);
+				detach_dev(br17);
+				detach_dev(t115);
 				detach_dev(h22);
-				detach_dev(t131);
+				detach_dev(t117);
 				detach_dev(pre3);
-				detach_dev(t132);
-				detach_dev(br19);
-				detach_dev(t133);
+				detach_dev(t118);
+				detach_dev(br18);
+				detach_dev(t119);
 				detach_dev(p10);
-				detach_dev(t135);
+				detach_dev(t121);
 				detach_dev(p11);
-				detach_dev(t139);
+				detach_dev(t125);
 				detach_dev(p12);
-				detach_dev(t148);
+				detach_dev(t134);
+				detach_dev(br19);
+				detach_dev(t135);
+				detach_dev(t136);
 				detach_dev(br20);
-				detach_dev(t149);
-				detach_dev(div8);
-				detach_dev(t150);
+				detach_dev(t137);
 				detach_dev(br21);
-				detach_dev(t151);
-				detach_dev(br22);
-				detach_dev(t152);
+				detach_dev(t138);
 				detach_dev(p13);
-				detach_dev(t157);
-				detach_dev(br23);
-				detach_dev(t158);
+				detach_dev(t143);
+				detach_dev(br22);
+				detach_dev(t144);
 				detach_dev(h23);
-				detach_dev(t160);
+				detach_dev(t146);
 				detach_dev(p14);
-				detach_dev(t164);
+				detach_dev(t150);
 				detach_dev(p15);
-				detach_dev(t166);
+				detach_dev(t152);
 				detach_dev(p16);
-				detach_dev(t170);
+				detach_dev(t156);
 				detach_dev(p17);
-				detach_dev(t174);
-				detach_dev(br24);
-				detach_dev(t175);
+				detach_dev(t160);
+				detach_dev(br23);
+				detach_dev(t161);
 				detach_dev(pre4);
-				detach_dev(t176);
+				detach_dev(t162);
 				detach_dev(h24);
-				detach_dev(t178);
+				detach_dev(t164);
 				detach_dev(p18);
-				detach_dev(t181);
-				detach_dev(br25);
-				detach_dev(t182);
+				detach_dev(t167);
+				detach_dev(br24);
+				detach_dev(t168);
 				detach_dev(pre5);
-				detach_dev(t183);
-				detach_dev(br26);
-				detach_dev(t184);
+				detach_dev(t169);
+				detach_dev(br25);
+				detach_dev(t170);
 				detach_dev(p19);
 			}
 
-			/*iframe1_binding*/ ctx[3](null);
+			destroy_component(blogtitle, detaching);
+			destroy_component(image, detaching);
+			destroy_component(subtitle0, detaching);
+			destroy_component(youtubevideo0, detaching);
+			destroy_component(subtitle1, detaching);
+			destroy_component(youtubevideo1, detaching);
+			destroy_component(youtubevideo2, detaching);
 		}
 	};
 
@@ -7660,7 +8307,6 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_instance($$self, $$pro
 	validate_slots('_2023_08_17_flame_fractals_in_comp_shader', slots, []);
 	let { date = new Date("2023-08-17") } = $$props;
 	let { title = "Rendering flame fractals with a compute shader" } = $$props;
-	let youtube_video_element;
 
 	onDestroy(() => {
 		
@@ -7676,13 +8322,6 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_instance($$self, $$pro
 		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<_2023_08_17_flame_fractals_in_comp_shader> was created with unknown prop '${key}'`);
 	});
 
-	function iframe1_binding($$value) {
-		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-			youtube_video_element = $$value;
-			$$invalidate(2, youtube_video_element);
-		});
-	}
-
 	$$self.$$set = $$props => {
 		if ('date' in $$props) $$invalidate(0, date = $$props.date);
 		if ('title' in $$props) $$invalidate(1, title = $$props.title);
@@ -7692,22 +8331,24 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_instance($$self, $$pro
 		onDestroy: onDestroy,
 		onMount: onMount,
 		Video: Video_svelte,
+		Image: Image_svelte,
+		SubTitle: SubTitle_svelte,
+		BlogTitle: BlogTitle_svelte,
 		date,
 		title,
-		youtube_video_element
+		YoutubeVideo: YoutubeVideo_svelte
 	});
 
 	$$self.$inject_state = $$props => {
 		if ('date' in $$props) $$invalidate(0, date = $$props.date);
 		if ('title' in $$props) $$invalidate(1, title = $$props.title);
-		if ('youtube_video_element' in $$props) $$invalidate(2, youtube_video_element = $$props.youtube_video_element);
 	};
 
 	if ($$props && "$$inject" in $$props) {
 		$$self.$inject_state($$props.$$inject);
 	}
 
-	return [date, title, youtube_video_element, iframe1_binding];
+	return [date, title];
 }
 
 class _2023_08_17_flame_fractals_in_comp_shader extends SvelteComponentDev {
@@ -7741,17 +8382,17 @@ class _2023_08_17_flame_fractals_in_comp_shader extends SvelteComponentDev {
 }
 
 /* harmony default export */ const _2023_08_17_flame_fractals_in_comp_shader_svelte = (_2023_08_17_flame_fractals_in_comp_shader);
-;// CONCATENATED MODULE: ./src/components/Link.svelte
-/* src\components\Link.svelte generated by Svelte v4.2.0 */
+;// CONCATENATED MODULE: ./src/components/utils/Link.svelte
+/* src\components\utils\Link.svelte generated by Svelte v4.2.0 */
 
 
 const { console: console_1 } = globals;
 
 
 
-const Link_svelte_file = "src\\components\\Link.svelte";
+const Link_svelte_file = "src\\components\\utils\\Link.svelte";
 
-function add_css(target) {
+function Link_svelte_add_css(target) {
 	append_styles(target, "svelte-1h8khkg", ".menu-item.svelte-1h8khkg{font-weight:600;font-style:italic;width:fit-content;color:var(--accent-dark)}.selected.svelte-1h8khkg{background:var(--accent-dark);color:var(--accent-light)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTGluay5zdmVsdGUiLCJtYXBwaW5ncyI6IkFBMEJvQiwwQkFDakIsZ0JBRUYsVUFBVSxDQUFHLE1BQU0sQ0FDbEIsTUFBTyxZQUNULHdCQUNBIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkxpbmsuc3ZlbHRlIl19 */");
 }
 
@@ -7889,7 +8530,7 @@ function Link_svelte_instance($$self, $$props, $$invalidate) {
 class Link extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init(this, options, Link_svelte_instance, Link_svelte_create_fragment, safe_not_equal, { text: 1, link: 0 }, add_css);
+		init(this, options, Link_svelte_instance, Link_svelte_create_fragment, safe_not_equal, { text: 1, link: 0 }, Link_svelte_add_css);
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -7917,53 +8558,643 @@ class Link extends SvelteComponentDev {
 }
 
 /* harmony default export */ const Link_svelte = (Link);
-;// CONCATENATED MODULE: ./src/components/Bar.svelte
-/* src\components\Bar.svelte generated by Svelte v4.2.0 */
+// EXTERNAL MODULE: ./public/brightness_6_FILL0_wght400_GRAD0_opsz48.svg
+var brightness_6_FILL0_wght400_GRAD0_opsz48 = __webpack_require__(567);
+var brightness_6_FILL0_wght400_GRAD0_opsz48_default = /*#__PURE__*/__webpack_require__.n(brightness_6_FILL0_wght400_GRAD0_opsz48);
+;// CONCATENATED MODULE: ./node_modules/svelte/src/runtime/store/index.js
 
 
-const { console: Bar_svelte_console_1 } = globals;
+const subscriber_queue = [];
 
-
-
-
-const Bar_svelte_file = "src\\components\\Bar.svelte";
-
-function Bar_svelte_add_css(target) {
-	append_styles(target, "svelte-1w4n5v7", "#bar.svelte-1w4n5v7.svelte-1w4n5v7{width:100%;margin-top:1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;width:100%}#bar.svelte-1w4n5v7 mark.svelte-1w4n5v7{background:var(--accent-dark)}#bar.svelte-1w4n5v7 .logo.svelte-1w4n5v7{font-size:4rem;margin-left:1rem;height:fit-content;text-decoration:none}#bar.svelte-1w4n5v7 .logo.logo-behind.svelte-1w4n5v7{position:absolute}#bar.svelte-1w4n5v7 .logo.hovered.svelte-1w4n5v7{color:var(--accent-dark) !important}#bar.svelte-1w4n5v7 .logo.hovered.hover-effect-0.svelte-1w4n5v7{animation:svelte-1w4n5v7-glitch-anim3 10s infinite linear alternate-reverse}@keyframes svelte-1w4n5v7-distort1{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0.5rem, 0rem)}25%{transform:translate(0.5rem, 1.5rem)}37.5%{transform:translate(0rem, 0.5rem)}50%{transform:translate(0.5rem, 0.5rem)}62.5%{transform:translate(0.5rem, 0rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0rem, 0.5rem)}100%{transform:translate(1.5rem, 0.5rem)}}@keyframes svelte-1w4n5v7-distort2{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0rem, 0.5rem)}25%{transform:translate(1.5rem, 0.5rem)}37.5%{transform:translate(1.5rem, 0rem)}50%{transform:translate(1.5rem, 0.5rem)}62.5%{transform:translate(0rem, 1.5rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0.5rem, 0rem)}100%{transform:translate(0.5rem, 0.5rem)}}@keyframes svelte-1w4n5v7-glitch-anim3{0%{clip:rect(2.8rem, 9999px, 4rem, 0);transform-origin:center}2%{clip:rect(1.3rem, 9999px, 3.5rem, 0);transform-origin:center}4%{clip:rect(0.4rem, 9999px, 3rem, 0);transform-origin:center}6%{clip:rect(1.8rem, 9999px, 4.5rem, 0);transform-origin:center}8%{clip:rect(1rem, 9999px, 5rem, 0);transform-origin:center}10%{clip:rect(1.2rem, 9999px, 2.5rem, 0);transform-origin:center}12%{clip:rect(0.7rem, 9999px, 1.5rem, 0);transform-origin:center}14%{clip:rect(1.2rem, 9999px, 4rem, 0);transform-origin:center}16%{clip:rect(2.7rem, 9999px, 4.5rem, 0);transform-origin:center}18%{clip:rect(3.3rem, 9999px, 1rem, 0);transform-origin:center}20%{clip:rect(0.2rem, 9999px, 2rem, 0);transform-origin:center}22%{clip:rect(0.7rem, 9999px, 4.5rem, 0);transform-origin:center}24%{clip:rect(3rem, 9999px, 0.5rem, 0);transform-origin:center}26%{clip:rect(2.6rem, 9999px, 0.5rem, 0);transform-origin:center}28%{clip:rect(3.2rem, 9999px, 4rem, 0);transform-origin:center}30%{clip:rect(2.5rem, 9999px, 0.5rem, 0);transform-origin:center}32%{clip:rect(3.4rem, 9999px, 0.5rem, 0);transform-origin:center}34%{clip:rect(1.3rem, 9999px, 3rem, 0);transform-origin:center}36%{clip:rect(0.9rem, 9999px, 1.5rem, 0);transform-origin:center}38%{clip:rect(1rem, 9999px, 3rem, 0);transform-origin:center}40%{clip:rect(3.5rem, 9999px, 2.5rem, 0);transform-origin:center}42%{clip:rect(1.2rem, 9999px, 5rem, 0);transform-origin:center}44%{clip:rect(1.9rem, 9999px, 1rem, 0);transform-origin:center}46%{clip:rect(2.7rem, 9999px, 1.5rem, 0);transform-origin:center}48%{clip:rect(0.2rem, 9999px, 4.5rem, 0);transform-origin:center}50%{clip:rect(1.5rem, 9999px, 2rem, 0);transform-origin:center}52%{clip:rect(3.3rem, 9999px, 1rem, 0);transform-origin:center}54%{clip:rect(1.3rem, 9999px, 2rem, 0);transform-origin:center}56%{clip:rect(3.6rem, 9999px, 1rem, 0);transform-origin:center}58%{clip:rect(3.7rem, 9999px, 5rem, 0);transform-origin:center}60%{clip:rect(1.5rem, 9999px, 2.5rem, 0);transform-origin:center}62%{clip:rect(1.5rem, 9999px, 3.5rem, 0);transform-origin:center}64%{clip:rect(3.1rem, 9999px, 4.5rem, 0);transform-origin:center}66%{clip:rect(1.3rem, 9999px, 2.5rem, 0);transform-origin:center}68%{clip:rect(1.4rem, 9999px, 3.5rem, 0);transform-origin:center}70%{clip:rect(1.2rem, 9999px, 3rem, 0);transform-origin:center}72%{clip:rect(1.2rem, 9999px, 1rem, 0);transform-origin:center}74%{clip:rect(2.6rem, 9999px, 4.5rem, 0);transform-origin:center}76%{clip:rect(0.7rem, 9999px, 0.5rem, 0);transform-origin:center}78%{clip:rect(3.3rem, 9999px, 1.5rem, 0);transform-origin:center}80%{clip:rect(0.6rem, 9999px, 1.5rem, 0);transform-origin:center}82%{clip:rect(3.9rem, 9999px, 2rem, 0);transform-origin:center}84%{clip:rect(1.3rem, 9999px, 5rem, 0);transform-origin:center}86%{clip:rect(1.4rem, 9999px, 1.5rem, 0);transform-origin:center}88%{clip:rect(1.9rem, 9999px, 2.5rem, 0);transform-origin:center}90%{clip:rect(3.2rem, 9999px, 1rem, 0);transform-origin:center}92%{clip:rect(1.7rem, 9999px, 3rem, 0);transform-origin:center}94%{clip:rect(3.9rem, 9999px, 3.5rem, 0);transform-origin:center}96%{clip:rect(2.3rem, 9999px, 4.5rem, 0);transform-origin:center}98%{clip:rect(0.6rem, 9999px, 4.5rem, 0);transform-origin:center}}@keyframes svelte-1w4n5v7-cooool{0%{color:red !important}2%{color:red !important}4%{color:red !important}6%{color:red !important}8%{color:red !important}10%{color:red !important}12%{color:red !important}14%{color:red !important}16%{color:red !important}18%{color:red !important}20%{color:red !important}22%{color:red !important}24%{color:red !important}26%{color:red !important}28%{color:red !important}30%{color:red !important}32%{color:red !important}34%{color:red !important}36%{color:red !important}38%{color:red !important}40%{color:red !important}42%{color:red !important}44%{color:red !important}46%{color:red !important}48%{color:red !important}50%{color:red !important}52%{color:red !important}54%{color:red !important}56%{color:red !important}58%{color:red !important}60%{color:red !important}62%{color:red !important}64%{color:red !important}66%{color:red !important}68%{color:red !important}70%{color:red !important}72%{color:red !important}74%{color:red !important}76%{color:red !important}78%{color:red !important}80%{color:red !important}82%{color:red !important}84%{color:red !important}86%{color:red !important}88%{color:red !important}90%{color:red !important}92%{color:red !important}94%{color:red !important}96%{color:red !important}98%{color:red !important}}#bar.svelte-1w4n5v7 .logo.hovered.hover-effect-0.logo-behind-a.svelte-1w4n5v7{color:#ffc800 !important;animation:svelte-1w4n5v7-distort1 300ms linear infinite, svelte-1w4n5v7-glitch-anim3 5s infinite linear alternate-reverse, svelte-1w4n5v7-cooool 5s infinite linear alternate-reverse}#bar.svelte-1w4n5v7 .logo.hovered.hover-effect-0.logo-behind-b.svelte-1w4n5v7{color:#aa10f2 !important;animation:svelte-1w4n5v7-distort2 300ms linear infinite, svelte-1w4n5v7-glitch-anim3 3s infinite linear alternate-reverse}#bar.svelte-1w4n5v7 .logo.hover-effect-1.svelte-1w4n5v7{animation:svelte-1w4n5v7-glitch-skew 1s infinite linear alternate-reverse}@keyframes svelte-1w4n5v7-glitch-anim{0%{clip:rect(0.7rem, 9999px, 1rem, 0);transform:skew(4.2deg);z-index:4}2%{clip:rect(0.2rem, 9999px, 4rem, 0);transform:skew(4.4deg);z-index:4}4%{clip:rect(2.7rem, 9999px, 3rem, 0);transform:skew(7.2deg);z-index:1}6%{clip:rect(0.1rem, 9999px, 3.5rem, 0);transform:skew(7.3deg);z-index:1}8%{clip:rect(2.1rem, 9999px, 4rem, 0);transform:skew(2.8deg);z-index:2}10%{clip:rect(2.2rem, 9999px, 2rem, 0);transform:skew(7.8deg);z-index:1}12%{clip:rect(1.2rem, 9999px, 5rem, 0);transform:skew(1deg);z-index:4}14%{clip:rect(1rem, 9999px, 4rem, 0);transform:skew(0.6deg);z-index:3}16%{clip:rect(1.9rem, 9999px, 1rem, 0);transform:skew(2.1deg);z-index:2}18%{clip:rect(1rem, 9999px, 5rem, 0);transform:skew(9.3deg);z-index:2}20%{clip:rect(2.2rem, 9999px, 5rem, 0);transform:skew(2.4deg);z-index:1}22%{clip:rect(3.4rem, 9999px, 4rem, 0);transform:skew(7.9deg);z-index:2}24%{clip:rect(0.4rem, 9999px, 0.5rem, 0);transform:skew(4.8deg);z-index:3}26%{clip:rect(0.8rem, 9999px, 5rem, 0);transform:skew(5.8deg);z-index:3}28%{clip:rect(2.3rem, 9999px, 5rem, 0);transform:skew(1.5deg);z-index:2}30%{clip:rect(0.3rem, 9999px, 0.5rem, 0);transform:skew(6.4deg);z-index:2}32%{clip:rect(2.1rem, 9999px, 1rem, 0);transform:skew(2.4deg);z-index:1}34%{clip:rect(2.2rem, 9999px, 3.5rem, 0);transform:skew(7.7deg);z-index:1}36%{clip:rect(2.2rem, 9999px, 4rem, 0);transform:skew(2.6deg);z-index:4}38%{clip:rect(3.5rem, 9999px, 4rem, 0);transform:skew(1.8deg);z-index:3}40%{clip:rect(1rem, 9999px, 1.5rem, 0);transform:skew(1.7deg);z-index:3}42%{clip:rect(3.1rem, 9999px, 4rem, 0);transform:skew(9.7deg);z-index:2}44%{clip:rect(1.1rem, 9999px, 1rem, 0);transform:skew(3.3deg);z-index:2}46%{clip:rect(1.7rem, 9999px, 4rem, 0);transform:skew(0.1deg);z-index:2}48%{clip:rect(1.8rem, 9999px, 5rem, 0);transform:skew(9.8deg);z-index:3}50%{clip:rect(2.5rem, 9999px, 3.5rem, 0);transform:skew(0.3deg);z-index:2}52%{clip:rect(3.7rem, 9999px, 3rem, 0);transform:skew(1.8deg);z-index:4}54%{clip:rect(2rem, 9999px, 3.5rem, 0);transform:skew(1.4deg);z-index:1}56%{clip:rect(1.9rem, 9999px, 4.5rem, 0);transform:skew(3.6deg);z-index:2}58%{clip:rect(3.2rem, 9999px, 4rem, 0);transform:skew(8.8deg);z-index:1}60%{clip:rect(1.6rem, 9999px, 2.5rem, 0);transform:skew(4.5deg);z-index:4}62%{clip:rect(3rem, 9999px, 3.5rem, 0);transform:skew(4deg);z-index:2}64%{clip:rect(3.3rem, 9999px, 1rem, 0);transform:skew(4.7deg);z-index:1}66%{clip:rect(2.7rem, 9999px, 5rem, 0);transform:skew(6.5deg);z-index:3}68%{clip:rect(2rem, 9999px, 2rem, 0);transform:skew(0.2deg);z-index:2}70%{clip:rect(1.6rem, 9999px, 2rem, 0);transform:skew(5.7deg);z-index:2}72%{clip:rect(2.6rem, 9999px, 4.5rem, 0);transform:skew(3.9deg);z-index:2}74%{clip:rect(1.1rem, 9999px, 1.5rem, 0);transform:skew(3deg);z-index:3}76%{clip:rect(1.2rem, 9999px, 3.5rem, 0);transform:skew(6.6deg);z-index:4}78%{clip:rect(1.6rem, 9999px, 1.5rem, 0);transform:skew(9.1deg);z-index:3}80%{clip:rect(3.2rem, 9999px, 1.5rem, 0);transform:skew(4.4deg);z-index:1}82%{clip:rect(1.9rem, 9999px, 4.5rem, 0);transform:skew(8.8deg);z-index:3}84%{clip:rect(1.7rem, 9999px, 5rem, 0);transform:skew(0.2deg);z-index:2}86%{clip:rect(1.1rem, 9999px, 1rem, 0);transform:skew(9.9deg);z-index:2}88%{clip:rect(0.1rem, 9999px, 2rem, 0);transform:skew(6.3deg);z-index:3}90%{clip:rect(2.1rem, 9999px, 2.5rem, 0);transform:skew(5.6deg);z-index:4}92%{clip:rect(2.2rem, 9999px, 3rem, 0);transform:skew(0.3deg);z-index:3}94%{clip:rect(3.8rem, 9999px, 1rem, 0);transform:skew(0.7deg);z-index:3}96%{clip:rect(0.2rem, 9999px, 1rem, 0);transform:skew(7.2deg);z-index:2}98%{clip:rect(2.9rem, 9999px, 2rem, 0);transform:skew(1.7deg);z-index:3}}@keyframes svelte-1w4n5v7-glitch-anim2{0%{clip:rect(0.12rem, 99999px, 1.1rem, 0);transform:skew(14.2deg);transform:translateX(0.4259259259rem)}0.6666666667%{clip:rect(0.12rem, 99999px, 6.4rem, 0);transform:skew(9.5deg);transform:translateX(0.3888888889rem)}1.3333333333%{clip:rect(0.12rem, 99999px, 6.9rem, 0);transform:skew(4.7deg);transform:translateX(0.462962963rem)}2%{clip:rect(0.08rem, 99999px, 7.9rem, 0);transform:skew(8.7deg);transform:translateX(-0.5rem)}2.6666666667%{clip:rect(0.08rem, 99999px, 9.8rem, 0);transform:skew(3.6deg);transform:translateX(0.462962963rem)}3.3333333333%{clip:rect(0.16rem, 99999px, 1.4rem, 0);transform:skew(3.2deg);transform:translateX(0.3888888889rem)}4%{clip:rect(0.14rem, 99999px, 8.9rem, 0);transform:skew(14.1deg);transform:translateX(0.0555555556rem)}4.6666666667%{clip:rect(0.06rem, 99999px, 0.5rem, 0);transform:skew(6deg);transform:translateX(0.4259259259rem)}5.3333333333%{clip:rect(0.1rem, 99999px, 1.2rem, 0);transform:skew(10.5deg);transform:translateX(0.3888888889rem)}6%{clip:rect(0.08rem, 99999px, 4.2rem, 0);transform:skew(9.2deg);transform:translateX(0.0555555556rem)}6.6666666667%{clip:rect(0.16rem, 99999px, 9.9rem, 0);transform:skew(2.1deg);transform:translateX(-0.1666666667rem)}7.3333333333%{clip:rect(0.02rem, 99999px, 6.9rem, 0);transform:skew(2.7deg);transform:translateX(0.1666666667rem)}8%{clip:rect(0.2rem, 99999px, 8.1rem, 0);transform:skew(12.7deg);transform:translateX(0.3888888889rem)}8.6666666667%{clip:rect(0.16rem, 99999px, 4.6rem, 0);transform:skew(5deg);transform:translateX(0.0555555556rem)}9.3333333333%{clip:rect(0.02rem, 99999px, 6.2rem, 0);transform:skew(5.6deg);transform:translateX(0.4259259259rem)}10%{clip:rect(0.16rem, 99999px, 5.6rem, 0);transform:skew(7.7deg);transform:translateX(0.0555555556rem)}10.6666666667%{clip:rect(0.04rem, 99999px, 6.7rem, 0);transform:skew(1deg);transform:translateX(0.462962963rem)}11.3333333333%{clip:rect(0.18rem, 99999px, 4.3rem, 0);transform:skew(7.8deg);transform:translateX(-0.1666666667rem)}12%{clip:rect(0.08rem, 99999px, 7.7rem, 0);transform:skew(2deg);transform:translateX(0.462962963rem)}12.6666666667%{clip:rect(0.16rem, 99999px, 2.9rem, 0);transform:skew(9.4deg);transform:translateX(0.4444444444rem)}13.3333333333%{clip:rect(0.18rem, 99999px, 9.7rem, 0);transform:skew(2.6deg);transform:translateX(0.0555555556rem)}14%{clip:rect(0.1rem, 99999px, 9.2rem, 0);transform:skew(14deg);transform:translateX(0.3888888889rem)}14.6666666667%{clip:rect(0.12rem, 99999px, 2.1rem, 0);transform:skew(0.6deg);transform:translateX(0.4259259259rem)}15.3333333333%{clip:rect(0.18rem, 99999px, 4rem, 0);transform:skew(10.8deg);transform:translateX(0.1666666667rem)}16%{clip:rect(0.08rem, 99999px, 7.9rem, 0);transform:skew(9.4deg);transform:translateX(0.3888888889rem)}16.6666666667%{clip:rect(0.06rem, 99999px, 6.8rem, 0);transform:skew(14.8deg);transform:translateX(-0.1666666667rem)}17.3333333333%{clip:rect(0.12rem, 99999px, 7.3rem, 0);transform:skew(7.1deg);transform:translateX(0.3888888889rem)}18%{clip:rect(0.04rem, 99999px, 3rem, 0);transform:skew(14.6deg);transform:translateX(0.3888888889rem)}18.6666666667%{clip:rect(0.04rem, 99999px, 9.3rem, 0);transform:skew(9.4deg);transform:translateX(0.1666666667rem)}19.3333333333%{clip:rect(0.18rem, 99999px, 6.8rem, 0);transform:skew(2.9deg);transform:translateX(0.2777777778rem)}20%{clip:rect(0.2rem, 99999px, 2.2rem, 0);transform:skew(3.1deg);transform:translateX(0.2777777778rem)}20.6666666667%{clip:rect(0.12rem, 99999px, 8.5rem, 0);transform:skew(8.7deg);transform:translateX(0.2777777778rem)}21.3333333333%{clip:rect(0.06rem, 99999px, 3.4rem, 0);transform:skew(1.5deg);transform:translateX(0.3888888889rem)}22%{clip:rect(0.06rem, 99999px, 9.3rem, 0);transform:skew(3deg);transform:translateX(0.0555555556rem)}22.6666666667%{clip:rect(0.06rem, 99999px, 9rem, 0);transform:skew(11.6deg);transform:translateX(0.3888888889rem)}23.3333333333%{clip:rect(0.12rem, 99999px, 1rem, 0);transform:skew(10.4deg);transform:translateX(0.462962963rem)}24%{clip:rect(0.08rem, 99999px, 4.4rem, 0);transform:skew(0.8deg);transform:translateX(0.1666666667rem)}24.6666666667%{clip:rect(0.2rem, 99999px, 0.1rem, 0);transform:skew(6.1deg);transform:translateX(0.3888888889rem)}25.3333333333%{clip:rect(0.04rem, 99999px, 8.1rem, 0);transform:skew(7.9deg);transform:translateX(0.4259259259rem)}26%{clip:rect(0.02rem, 99999px, 3.3rem, 0);transform:skew(6deg);transform:translateX(0.3888888889rem)}26.6666666667%{clip:rect(0.12rem, 99999px, 3rem, 0);transform:skew(5deg);transform:translateX(0.4444444444rem)}27.3333333333%{clip:rect(0.12rem, 99999px, 6.7rem, 0);transform:skew(4.3deg);transform:translateX(0.2777777778rem)}28%{clip:rect(0.14rem, 99999px, 0.2rem, 0);transform:skew(10.6deg);transform:translateX(0.462962963rem)}28.6666666667%{clip:rect(0.14rem, 99999px, 4.9rem, 0);transform:skew(12deg);transform:translateX(0.462962963rem)}29.3333333333%{clip:rect(0.06rem, 99999px, 5.9rem, 0);transform:skew(9.6deg);transform:translateX(0.2777777778rem)}30%{clip:rect(0.08rem, 99999px, 3.3rem, 0);transform:skew(12.4deg);transform:translateX(0.4444444444rem)}30.6666666667%{clip:rect(0.16rem, 99999px, 5.9rem, 0);transform:skew(11.2deg);transform:translateX(-0.1666666667rem)}31.3333333333%{clip:rect(0.14rem, 99999px, 8.7rem, 0);transform:skew(10.3deg);transform:translateX(0.4259259259rem)}32%{clip:rect(0.12rem, 99999px, 1rem, 0);transform:skew(5deg);transform:translateX(0.1666666667rem)}32.6666666667%{clip:rect(0.16rem, 99999px, 7.9rem, 0);transform:skew(4.1deg);transform:translateX(0.3518518519rem)}33.3333333333%{clip:rect(0.08rem, 99999px, 5.5rem, 0);transform:skew(2.7deg);transform:translateX(0.4444444444rem)}34%{clip:rect(0.14rem, 99999px, 9.7rem, 0);transform:skew(10.8deg);transform:translateX(0.1666666667rem)}34.6666666667%{clip:rect(0.04rem, 99999px, 5.9rem, 0);transform:skew(10deg);transform:translateX(0.3888888889rem)}35.3333333333%{clip:rect(0.08rem, 99999px, 1.7rem, 0);transform:skew(2.6deg);transform:translateX(0.1666666667rem)}36%{clip:rect(0.18rem, 99999px, 7.2rem, 0);transform:skew(9.8deg);transform:translateX(0.4444444444rem)}36.6666666667%{clip:rect(0.16rem, 99999px, 1rem, 0);transform:skew(1.9deg);transform:translateX(0.3888888889rem)}37.3333333333%{clip:rect(0.02rem, 99999px, 6.9rem, 0);transform:skew(9.6deg);transform:translateX(0.3333333333rem)}38%{clip:rect(0.02rem, 99999px, 7.3rem, 0);transform:skew(8.8deg);transform:translateX(0.3333333333rem)}38.6666666667%{clip:rect(0.16rem, 99999px, 3.5rem, 0);transform:skew(2.1deg);transform:translateX(0rem)}39.3333333333%{clip:rect(0.18rem, 99999px, 1.1rem, 0);transform:skew(5.1deg);transform:translateX(0.4814814815rem)}40%{clip:rect(0.04rem, 99999px, 0.6rem, 0);transform:skew(5.6deg);transform:translateX(0.4259259259rem)}40.6666666667%{clip:rect(0.16rem, 99999px, 5.3rem, 0);transform:skew(1.5deg);transform:translateX(0.2037037037rem)}41.3333333333%{clip:rect(0.08rem, 99999px, 8.7rem, 0);transform:skew(14.4deg);transform:translateX(0.2777777778rem)}42%{clip:rect(0.02rem, 99999px, 5.8rem, 0);transform:skew(5.2deg);transform:translateX(0.4259259259rem)}42.6666666667%{clip:rect(0.16rem, 99999px, 8.6rem, 0);transform:skew(8.2deg);transform:translateX(0.3333333333rem)}43.3333333333%{clip:rect(0.02rem, 99999px, 2.1rem, 0);transform:skew(4.3deg);transform:translateX(0.0555555556rem)}44%{clip:rect(0.08rem, 99999px, 2.7rem, 0);transform:skew(2.5deg);transform:translateX(0.3888888889rem)}44.6666666667%{clip:rect(0.1rem, 99999px, 3rem, 0);transform:skew(12.5deg);transform:translateX(0.4444444444rem)}45.3333333333%{clip:rect(0.08rem, 99999px, 3.6rem, 0);transform:skew(1.3deg);transform:translateX(0.462962963rem)}46%{clip:rect(0.04rem, 99999px, 4rem, 0);transform:skew(10.6deg);transform:translateX(0.3518518519rem)}46.6666666667%{clip:rect(0.02rem, 99999px, 7.2rem, 0);transform:skew(14.1deg);transform:translateX(0.4444444444rem)}47.3333333333%{clip:rect(0.16rem, 99999px, 3.6rem, 0);transform:skew(8.7deg);transform:translateX(0.2777777778rem)}48%{clip:rect(0.16rem, 99999px, 2.7rem, 0);transform:skew(1.9deg);transform:translateX(0.2777777778rem)}48.6666666667%{clip:rect(0.1rem, 99999px, 6.2rem, 0);transform:skew(10.4deg);transform:translateX(0.2777777778rem)}49.3333333333%{clip:rect(0.18rem, 99999px, 1.6rem, 0);transform:skew(13.7deg);transform:translateX(0rem)}50%{clip:rect(0.06rem, 99999px, 9.9rem, 0);transform:skew(0.7deg);transform:translateX(-0.1666666667rem)}50.6666666667%{clip:rect(0.06rem, 99999px, 4.8rem, 0);transform:skew(13.4deg);transform:translateX(0.0555555556rem)}51.3333333333%{clip:rect(0.04rem, 99999px, 5.3rem, 0);transform:skew(8.4deg);transform:translateX(0.0555555556rem)}52%{clip:rect(0.1rem, 99999px, 6.3rem, 0);transform:skew(11.3deg);transform:translateX(0.2777777778rem)}52.6666666667%{clip:rect(0.18rem, 99999px, 2.1rem, 0);transform:skew(2.4deg);transform:translateX(0.4814814815rem)}53.3333333333%{clip:rect(0.06rem, 99999px, 5.3rem, 0);transform:skew(3.2deg);transform:translateX(0.1666666667rem)}54%{clip:rect(0.14rem, 99999px, 2.4rem, 0);transform:skew(2deg);transform:translateX(0.1666666667rem)}54.6666666667%{clip:rect(0.04rem, 99999px, 5.4rem, 0);transform:skew(2.4deg);transform:translateX(0.462962963rem)}55.3333333333%{clip:rect(0.02rem, 99999px, 1.4rem, 0);transform:skew(13.3deg);transform:translateX(0.2777777778rem)}56%{clip:rect(0.16rem, 99999px, 3rem, 0);transform:skew(0.8deg);transform:translateX(0.2777777778rem)}56.6666666667%{clip:rect(0.12rem, 99999px, 2.7rem, 0);transform:skew(12deg);transform:translateX(0.3888888889rem)}57.3333333333%{clip:rect(0.18rem, 99999px, 8.2rem, 0);transform:skew(9.6deg);transform:translateX(0.3888888889rem)}58%{clip:rect(0.06rem, 99999px, 0.4rem, 0);transform:skew(14.6deg);transform:translateX(0.1666666667rem)}58.6666666667%{clip:rect(0.02rem, 99999px, 0.4rem, 0);transform:skew(7.1deg);transform:translateX(0.1666666667rem)}59.3333333333%{clip:rect(0.06rem, 99999px, 2.6rem, 0);transform:skew(13.7deg);transform:translateX(0.3333333333rem)}60%{clip:rect(0.12rem, 99999px, 3.2rem, 0);transform:skew(5.3deg);transform:translateX(0.3888888889rem)}60.6666666667%{clip:rect(0.06rem, 99999px, 2.2rem, 0);transform:skew(3.6deg);transform:translateX(0.4444444444rem)}61.3333333333%{clip:rect(0.1rem, 99999px, 2.1rem, 0);transform:skew(14.3deg);transform:translateX(0.0555555556rem)}62%{clip:rect(0.12rem, 99999px, 6.6rem, 0);transform:skew(7.9deg);transform:translateX(0.3518518519rem)}62.6666666667%{clip:rect(0.2rem, 99999px, 0.7rem, 0);transform:skew(13.2deg);transform:translateX(0.3888888889rem)}63.3333333333%{clip:rect(0.14rem, 99999px, 6.2rem, 0);transform:skew(0.8deg);transform:translateX(0.3888888889rem)}64%{clip:rect(0.16rem, 99999px, 1.8rem, 0);transform:skew(8.9deg);transform:translateX(0.462962963rem)}64.6666666667%{clip:rect(0.18rem, 99999px, 5.9rem, 0);transform:skew(4deg);transform:translateX(0.2777777778rem)}65.3333333333%{clip:rect(0.16rem, 99999px, 7.3rem, 0);transform:skew(8.5deg);transform:translateX(0.2777777778rem)}66%{clip:rect(0.02rem, 99999px, 8rem, 0);transform:skew(6.4deg);transform:translateX(0.2777777778rem)}66.6666666667%{clip:rect(0.08rem, 99999px, 6.8rem, 0);transform:skew(12.9deg);transform:translateX(0.2777777778rem)}67.3333333333%{clip:rect(0.18rem, 99999px, 9.7rem, 0);transform:skew(8.4deg);transform:translateX(0.0555555556rem)}68%{clip:rect(0.06rem, 99999px, 2.9rem, 0);transform:skew(6.6deg);transform:translateX(0.2777777778rem)}68.6666666667%{clip:rect(0.1rem, 99999px, 5.3rem, 0);transform:skew(0.3deg);transform:translateX(0.3888888889rem)}69.3333333333%{clip:rect(0.08rem, 99999px, 7.3rem, 0);transform:skew(0.8deg);transform:translateX(0.4814814815rem)}70%{clip:rect(0.18rem, 99999px, 0.3rem, 0);transform:skew(9.4deg);transform:translateX(0rem)}70.6666666667%{clip:rect(0.14rem, 99999px, 0.3rem, 0);transform:skew(5.6deg);transform:translateX(0.2777777778rem)}71.3333333333%{clip:rect(0.16rem, 99999px, 5.2rem, 0);transform:skew(6.5deg);transform:translateX(0.3518518519rem)}72%{clip:rect(0.02rem, 99999px, 0.1rem, 0);transform:skew(1.6deg);transform:translateX(-0.1666666667rem)}72.6666666667%{clip:rect(0.2rem, 99999px, 4.4rem, 0);transform:skew(14.3deg);transform:translateX(0.1666666667rem)}73.3333333333%{clip:rect(0.1rem, 99999px, 8.3rem, 0);transform:skew(12deg);transform:translateX(0.4444444444rem)}74%{clip:rect(0.08rem, 99999px, 3.4rem, 0);transform:skew(0.5deg);transform:translateX(0.3888888889rem)}74.6666666667%{clip:rect(0.2rem, 99999px, 9.3rem, 0);transform:skew(9.7deg);transform:translateX(0.0555555556rem)}75.3333333333%{clip:rect(0.1rem, 99999px, 3.1rem, 0);transform:skew(6.8deg);transform:translateX(0.2777777778rem)}76%{clip:rect(0.08rem, 99999px, 1.4rem, 0);transform:skew(1.4deg);transform:translateX(0.3888888889rem)}76.6666666667%{clip:rect(0.14rem, 99999px, 7.7rem, 0);transform:skew(14.7deg);transform:translateX(0.3888888889rem)}77.3333333333%{clip:rect(0.1rem, 99999px, 8rem, 0);transform:skew(4.9deg);transform:translateX(0.2777777778rem)}78%{clip:rect(0.08rem, 99999px, 3.7rem, 0);transform:skew(2.2deg);transform:translateX(0.3888888889rem)}78.6666666667%{clip:rect(0.06rem, 99999px, 9.2rem, 0);transform:skew(7.8deg);transform:translateX(0.3518518519rem)}79.3333333333%{clip:rect(0.02rem, 99999px, 9rem, 0);transform:skew(6.8deg);transform:translateX(0.2777777778rem)}80%{clip:rect(0.16rem, 99999px, 2.6rem, 0);transform:skew(10.2deg);transform:translateX(0.1666666667rem)}80.6666666667%{clip:rect(0.04rem, 99999px, 1.6rem, 0);transform:skew(0.1deg);transform:translateX(0.1666666667rem)}81.3333333333%{clip:rect(0.02rem, 99999px, 2.9rem, 0);transform:skew(1.7deg);transform:translateX(0.2777777778rem)}82%{clip:rect(0.1rem, 99999px, 2.2rem, 0);transform:skew(3deg);transform:translateX(0.3888888889rem)}82.6666666667%{clip:rect(0.14rem, 99999px, 9.4rem, 0);transform:skew(11.9deg);transform:translateX(0.3888888889rem)}83.3333333333%{clip:rect(0.06rem, 99999px, 8rem, 0);transform:skew(11.9deg);transform:translateX(0.3888888889rem)}84%{clip:rect(0.1rem, 99999px, 1.2rem, 0);transform:skew(4.9deg);transform:translateX(0.4259259259rem)}84.6666666667%{clip:rect(0.06rem, 99999px, 2.2rem, 0);transform:skew(0.9deg);transform:translateX(0.3888888889rem)}85.3333333333%{clip:rect(0.2rem, 99999px, 4.1rem, 0);transform:skew(4deg);transform:translateX(0.4444444444rem)}86%{clip:rect(0.18rem, 99999px, 10rem, 0);transform:skew(1.5deg);transform:translateX(0.3888888889rem)}86.6666666667%{clip:rect(0.12rem, 99999px, 5.3rem, 0);transform:skew(10.9deg);transform:translateX(-0.1666666667rem)}87.3333333333%{clip:rect(0.06rem, 99999px, 8.5rem, 0);transform:skew(1.8deg);transform:translateX(0.3888888889rem)}88%{clip:rect(0.1rem, 99999px, 9.9rem, 0);transform:skew(1.4deg);transform:translateX(0.2777777778rem)}88.6666666667%{clip:rect(0.02rem, 99999px, 0.9rem, 0);transform:skew(10.6deg);transform:translateX(0.1666666667rem)}89.3333333333%{clip:rect(0.16rem, 99999px, 4.8rem, 0);transform:skew(13.6deg);transform:translateX(0.1666666667rem)}90%{clip:rect(0.1rem, 99999px, 0.8rem, 0);transform:skew(9.5deg);transform:translateX(0.462962963rem)}90.6666666667%{clip:rect(0.06rem, 99999px, 4rem, 0);transform:skew(1.5deg);transform:translateX(0.1666666667rem)}91.3333333333%{clip:rect(0.06rem, 99999px, 5.3rem, 0);transform:skew(3.5deg);transform:translateX(0.2777777778rem)}92%{clip:rect(0.02rem, 99999px, 1.8rem, 0);transform:skew(6.7deg);transform:translateX(0.3888888889rem)}92.6666666667%{clip:rect(0.18rem, 99999px, 1.9rem, 0);transform:skew(14.5deg);transform:translateX(0.1666666667rem)}93.3333333333%{clip:rect(0.2rem, 99999px, 9.6rem, 0);transform:skew(9.5deg);transform:translateX(0.4259259259rem)}94%{clip:rect(0.16rem, 99999px, 8.6rem, 0);transform:skew(0.8deg);transform:translateX(0.3888888889rem)}94.6666666667%{clip:rect(0.18rem, 99999px, 0.2rem, 0);transform:skew(2.5deg);transform:translateX(0.3888888889rem)}95.3333333333%{clip:rect(0.2rem, 99999px, 9.8rem, 0);transform:skew(13deg);transform:translateX(0.0555555556rem)}96%{clip:rect(0.16rem, 99999px, 7.9rem, 0);transform:skew(3.4deg);transform:translateX(0.4814814815rem)}96.6666666667%{clip:rect(0.12rem, 99999px, 0.3rem, 0);transform:skew(2.4deg);transform:translateX(0.1666666667rem)}97.3333333333%{clip:rect(0.08rem, 99999px, 2.1rem, 0);transform:skew(8deg);transform:translateX(0.3888888889rem)}98%{clip:rect(0.16rem, 99999px, 2.1rem, 0);transform:skew(7deg);transform:translateX(0.4444444444rem)}98.6666666667%{clip:rect(0.08rem, 99999px, 5rem, 0);transform:skew(14.3deg);transform:translateX(0.2777777778rem)}99.3333333333%{clip:rect(0.1rem, 99999px, 9.4rem, 0);transform:skew(0.2deg);transform:translateX(0.2777777778rem)}}@keyframes svelte-1w4n5v7-glitch-skew{0%{transform:skew(-4deg)}10%{transform:skew(-1deg)}20%{transform:skew(1deg)}30%{transform:skew(0deg)}40%{transform:skew(1deg)}50%{transform:skew(0deg)}60%{transform:skew(1deg)}70%{transform:skew(-4deg)}80%{transform:skew(2deg)}90%{transform:skew(2deg)}}#bar.svelte-1w4n5v7 .logo.hover-effect-1.logo-behind-a.svelte-1w4n5v7{color:var(--accent-light);transform:translateX(-0.5rem);color:#ffc800 !important;text-shadow:-2px 0 #ffc800, 2px 2px #ffc800;clip:rect(44px, 450px, 56px, 0);animation:svelte-1w4n5v7-glitch-anim2 5s infinite linear alternate-reverse}#bar.svelte-1w4n5v7 .logo.hover-effect-1.logo-behind-b.svelte-1w4n5v7{color:rgb(165, 49, 49) !important;z-index:1;transform:translateX(0.2rem);text-shadow:-2px 0 #aa10f2;clip:rect(44px, 450px, 56px, 0);animation:svelte-1w4n5v7-glitch-anim 5s infinite linear alternate-reverse}#bar.svelte-1w4n5v7 .logo.logo-behind.svelte-1w4n5v7{width:0px;height:0px;overflow:visible;pointer-events:none}#bar.svelte-1w4n5v7 .logo.logo-behind.svelte-1w4n5v7:not(.hovered){display:none}#bar.svelte-1w4n5v7 #menus.svelte-1w4n5v7{margin-left:auto;display:flex}#bar.svelte-1w4n5v7 #menus #menu.svelte-1w4n5v7{height:10rem;display:flex;flex-direction:column;justify-content:space-between;margin-right:1rem}#bar.svelte-1w4n5v7 #menus #menu.svelte-1w4n5v7 .menu-item{font-weight:750;font-style:italic;width:fit-content}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQmFyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUF3QmdCLGtDQUFRLENBQ3hCLEtBQUksQ0FBSyxJQUFJLENBQ2IsVUFBUyxDQUFLLElBQUUsQ0FDaEIsYUFBZSxDQUFDLElBQUssQ0FDbkIsT0FBTSxNQUNOLFNBQUssTUFDTCxLQUFJLEtBQ04sQ0FDQSx3Q0FDQyxVQUFXLENBQUUsSUFDYixhQUFRLENBQ1IsQ0FDQSx3Q0FBVyxDQUtYLFNBQUksS0FBeUIsQ0FHN0IsV0FBSSxLQUFhLENBS2pCLE1BQUksWUFBYyxDQUVsQixlQUFJLEtBSUosb0JBQ0MsaUNBQWEsU0FDWixDQUFJLGtDQUlKLDhCQUNBLElBQUcsYUFBYSxDQUFDLHFGQUlqQiw0QkFBWSxJQUFTLENBQUMsNkNBRXZCLHVCQUFhLGFBRVosV0FBYyxPQUFVLE9BQUssRUFJN0IsTUFFRixTQUFhLENBQUUsVUFBSSxhQUNsQixDQUNGLElBQ0MsU0FBWSxXQUFLIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkJhci5zdmVsdGUiXX0= */");
+/**
+ * Creates a `Readable` store that allows reading by subscription.
+ *
+ * https://svelte.dev/docs/svelte-store#readable
+ * @template T
+ * @param {T} [value] initial value
+ * @param {import('./public.js').StartStopNotifier<T>} [start]
+ * @returns {import('./public.js').Readable<T>}
+ */
+function readable(value, start) {
+	return {
+		subscribe: writable(value, start).subscribe
+	};
 }
 
-function Bar_svelte_create_fragment(ctx) {
+/**
+ * Create a `Writable` store that allows both updating and reading by subscription.
+ *
+ * https://svelte.dev/docs/svelte-store#writable
+ * @template T
+ * @param {T} [value] initial value
+ * @param {import('./public.js').StartStopNotifier<T>} [start]
+ * @returns {import('./public.js').Writable<T>}
+ */
+function writable(value, start = utils_noop) {
+	/** @type {import('./public.js').Unsubscriber} */
+	let stop;
+	/** @type {Set<import('./private.js').SubscribeInvalidateTuple<T>>} */
+	const subscribers = new Set();
+	/** @param {T} new_value
+	 * @returns {void}
+	 */
+	function set(new_value) {
+		if (safe_not_equal(value, new_value)) {
+			value = new_value;
+			if (stop) {
+				// store is ready
+				const run_queue = !subscriber_queue.length;
+				for (const subscriber of subscribers) {
+					subscriber[1]();
+					subscriber_queue.push(subscriber, value);
+				}
+				if (run_queue) {
+					for (let i = 0; i < subscriber_queue.length; i += 2) {
+						subscriber_queue[i][0](subscriber_queue[i + 1]);
+					}
+					subscriber_queue.length = 0;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param {import('./public.js').Updater<T>} fn
+	 * @returns {void}
+	 */
+	function update(fn) {
+		set(fn(value));
+	}
+
+	/**
+	 * @param {import('./public.js').Subscriber<T>} run
+	 * @param {import('./private.js').Invalidator<T>} [invalidate]
+	 * @returns {import('./public.js').Unsubscriber}
+	 */
+	function subscribe(run, invalidate = utils_noop) {
+		/** @type {import('./private.js').SubscribeInvalidateTuple<T>} */
+		const subscriber = [run, invalidate];
+		subscribers.add(subscriber);
+		if (subscribers.size === 1) {
+			stop = start(set, update) || utils_noop;
+		}
+		run(value);
+		return () => {
+			subscribers.delete(subscriber);
+			if (subscribers.size === 0 && stop) {
+				stop();
+				stop = null;
+			}
+		};
+	}
+	return { set, update, subscribe };
+}
+
+/**
+ * Derived value store by synchronizing one or more readable stores and
+ * applying an aggregation function over its input values.
+ *
+ * https://svelte.dev/docs/svelte-store#derived
+ * @template {import('./private.js').Stores} S
+ * @template T
+ * @overload
+ * @param {S} stores - input stores
+ * @param {(values: import('./private.js').StoresValues<S>, set: (value: T) => void, update: (fn: import('./public.js').Updater<T>) => void) => import('./public.js').Unsubscriber | void} fn - function callback that aggregates the values
+ * @param {T} [initial_value] - initial value
+ * @returns {import('./public.js').Readable<T>}
+ */
+
+/**
+ * Derived value store by synchronizing one or more readable stores and
+ * applying an aggregation function over its input values.
+ *
+ * https://svelte.dev/docs/svelte-store#derived
+ * @template {import('./private.js').Stores} S
+ * @template T
+ * @overload
+ * @param {S} stores - input stores
+ * @param {(values: import('./private.js').StoresValues<S>) => T} fn - function callback that aggregates the values
+ * @param {T} [initial_value] - initial value
+ * @returns {import('./public.js').Readable<T>}
+ */
+
+/**
+ * @template {import('./private.js').Stores} S
+ * @template T
+ * @param {S} stores
+ * @param {Function} fn
+ * @param {T} [initial_value]
+ * @returns {import('./public.js').Readable<T>}
+ */
+function derived(stores, fn, initial_value) {
+	const single = !Array.isArray(stores);
+	/** @type {Array<import('./public.js').Readable<any>>} */
+	const stores_array = single ? [stores] : stores;
+	if (!stores_array.every(Boolean)) {
+		throw new Error('derived() expects stores as input, got a falsy value');
+	}
+	const auto = fn.length < 2;
+	return readable(initial_value, (set, update) => {
+		let started = false;
+		const values = [];
+		let pending = 0;
+		let cleanup = noop;
+		const sync = () => {
+			if (pending) {
+				return;
+			}
+			cleanup();
+			const result = fn(single ? values[0] : values, set, update);
+			if (auto) {
+				set(result);
+			} else {
+				cleanup = is_function(result) ? result : noop;
+			}
+		};
+		const unsubscribers = stores_array.map((store, i) =>
+			subscribe(
+				store,
+				(value) => {
+					values[i] = value;
+					pending &= ~(1 << i);
+					if (started) {
+						sync();
+					}
+				},
+				() => {
+					pending |= 1 << i;
+				}
+			)
+		);
+		started = true;
+		sync();
+		return function stop() {
+			run_all(unsubscribers);
+			cleanup();
+			// We need to set this to false because callbacks can still happen despite having unsubscribed:
+			// Callbacks might already be placed in the queue which doesn't know it should no longer
+			// invoke this derived store.
+			started = false;
+		};
+	});
+}
+
+/**
+ * Takes a store and returns a new one derived from the old one that is readable.
+ *
+ * https://svelte.dev/docs/svelte-store#readonly
+ * @template T
+ * @param {import('./public.js').Readable<T>} store  - store to make readonly
+ * @returns {import('./public.js').Readable<T>}
+ */
+function readonly(store) {
+	return {
+		subscribe: store.subscribe.bind(store)
+	};
+}
+
+
+
+;// CONCATENATED MODULE: ./src/store.ts
+
+let dark_mode = writable(false);
+
+;// CONCATENATED MODULE: ./src/components/utils/DarkModeToggle.svelte
+/* src\components\utils\DarkModeToggle.svelte generated by Svelte v4.2.0 */
+
+
+
+
+
+
+
+const DarkModeToggle_svelte_file = "src\\components\\utils\\DarkModeToggle.svelte";
+
+function DarkModeToggle_svelte_add_css(target) {
+	append_styles(target, "svelte-r4r3ii", "#toggle-container.svelte-r4r3ii{margin-top:auto;width:2rem;margin-right:auto;margin-left:1rem}#toggle-container.svelte-r4r3ii svg{cursor:pointer;aspect-ratio:1/1;width:2rem}#toggle-container.svelte-r4r3ii svg:active{filter:invert(1);background:var(--accent-light)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRGFya01vZGVUb2dnbGUuc3ZlbHRlIiwibWFwcGluZ3MiOiJBQW9Ca0IsK0JBQU0sQ0FDdEIsVUFBQyxNQUNELEtBQUMsQ0FBTSxJQUFDLENBQ1YsWUFBYyxDQUFFLElBQUksQ0FDcEIsV0FBYSxDQUFFLElBQ2YsQ0FDQSwrQkFBYSxLQUNiLE1BQUssUUFBUSxDQUNiLFlBQVEsS0FDUixLQUFJLEtBQ0osQ0FDQSwrQkFBUyxZQUNQLE1BQU0sV0FDTixVQUFNLG9CQUNSIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkRhcmtNb2RlVG9nZ2xlLnN2ZWx0ZSJdfQ== */");
+}
+
+// (68:1) {:else}
+function create_else_block(ctx) {
+	let style;
+
+	const block = {
+		c: function create() {
+			style = dom_element("style");
+			style.textContent = "*{\n\t\t\t--accent-light: white;\n\t\t\t--accent-dark: black;\n\t\t}";
+			add_location(style, DarkModeToggle_svelte_file, 80, 2, 1782);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, style, anchor);
+		},
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(style);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_else_block.name,
+		type: "else",
+		source: "(68:1) {:else}",
+		ctx
+	});
+
+	return block;
+}
+
+// (37:1) {#if is_dark_mode_toggled}
+function create_if_block(ctx) {
+	let style;
+
+	const block = {
+		c: function create() {
+			style = dom_element("style");
+			style.textContent = "*{\n\t\t\t--accent-light: black;\n\t\t\t--accent-dark: white;\n\t\t}\n\t\tpre {\n\t\t\tfilter: invert(1);\n\t\t}\n\t\tcode * {\n\t\t\tfont-weight: 800 !important;\n\t\t}\n\t\t.track{\n\t\t\tbackground: white !important;\n\t\t\tfilter: invert(1) !important;\n\t\t}\n\t\t.track *{\n\t\t\t/* color: */\n\t\t\t--accent-light: white;\n\t\t\t--accent-dark: black;\n\t\t}\n\t\t#toggle-container svg {\n\t\t\t\tbackground: var(--accent-light);\n\t\t\t\tfill:var(--accent-dark);\n\t\t\t\t/* filter: invert(1);\n\t\t\t\t&:active{\n\t\t\t\t\tfilter: invert(0) !important;\n\t\t\t\t} */\n\t\t\t}";
+			add_location(style, DarkModeToggle_svelte_file, 37, 0, 1264);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, style, anchor);
+		},
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(style);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block.name,
+		type: "if",
+		source: "(37:1) {#if is_dark_mode_toggled}",
+		ctx
+	});
+
+	return block;
+}
+
+function DarkModeToggle_svelte_create_fragment(ctx) {
+	let if_block_anchor;
+	let t;
+	let div;
+
+	function select_block_type(ctx, dirty) {
+		if (/*is_dark_mode_toggled*/ ctx[0]) return create_if_block;
+		return create_else_block;
+	}
+
+	let current_block_type = select_block_type(ctx, -1);
+	let if_block = current_block_type(ctx);
+
+	const block = {
+		c: function create() {
+			if_block.c();
+			if_block_anchor = empty();
+			t = space();
+			div = dom_element("div");
+			attr_dev(div, "id", "toggle-container");
+			attr_dev(div, "class", "svelte-r4r3ii");
+			add_location(div, DarkModeToggle_svelte_file, -1, 1889);
+		},
+		l: function claim(nodes) {
+			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+		},
+		m: function mount(target, anchor) {
+			if_block.m(document.head, null);
+			append_dev(document.head, if_block_anchor);
+			insert_dev(target, t, anchor);
+			insert_dev(target, div, anchor);
+			div.innerHTML = (brightness_6_FILL0_wght400_GRAD0_opsz48_default());
+			/*div_binding*/ ctx[2](div);
+		},
+		p: function update(ctx, [dirty]) {
+			if (current_block_type !== (current_block_type = select_block_type(ctx, dirty))) {
+				if_block.d(1);
+				if_block = current_block_type(ctx);
+
+				if (if_block) {
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(t);
+				detach_dev(div);
+			}
+
+			if_block.d(detaching);
+			detach_dev(if_block_anchor);
+			/*div_binding*/ ctx[2](null);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: DarkModeToggle_svelte_create_fragment.name,
+		type: "component",
+		source: "",
+		ctx
+	});
+
+	return block;
+}
+
+function DarkModeToggle_svelte_instance($$self, $$props, $$invalidate) {
+	let style_media;
+	let { $$slots: slots = {}, $$scope } = $$props;
+	validate_slots('DarkModeToggle', slots, []);
+	const systemSettingDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+	let is_dark_mode_toggled = localStorage.getItem("dark-mode") ? true : false;
+	dark_mode.set(is_dark_mode_toggled);
+	let container_element;
+	let light_dark_toggle_icon_element;
+
+	onMount(async () => {
+		light_dark_toggle_icon_element = container_element.querySelector("svg");
+
+		light_dark_toggle_icon_element.onclick = () => {
+			$$invalidate(0, is_dark_mode_toggled = !is_dark_mode_toggled);
+			dark_mode.set(is_dark_mode_toggled);
+			localStorage.setItem("dark-mode", is_dark_mode_toggled ? "true" : "");
+		};
+	});
+
+	onDestroy(() => {
+		
+	});
+
+	const writable_props = [];
+
+	Object.keys($$props).forEach(key => {
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<DarkModeToggle> was created with unknown prop '${key}'`);
+	});
+
+	function div_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			container_element = $$value;
+			$$invalidate(1, container_element);
+		});
+	}
+
+	$$self.$capture_state = () => ({
+		onMount: onMount,
+		onDestroy: onDestroy,
+		LightDarkToggleIcon: (brightness_6_FILL0_wght400_GRAD0_opsz48_default()),
+		dark_mode: dark_mode,
+		systemSettingDark,
+		is_dark_mode_toggled,
+		container_element,
+		light_dark_toggle_icon_element,
+		style_media
+	});
+
+	$$self.$inject_state = $$props => {
+		if ('is_dark_mode_toggled' in $$props) $$invalidate(0, is_dark_mode_toggled = $$props.is_dark_mode_toggled);
+		if ('container_element' in $$props) $$invalidate(1, container_element = $$props.container_element);
+		if ('light_dark_toggle_icon_element' in $$props) light_dark_toggle_icon_element = $$props.light_dark_toggle_icon_element;
+		if ('style_media' in $$props) style_media = $$props.style_media;
+	};
+
+	if ($$props && "$$inject" in $$props) {
+		$$self.$inject_state($$props.$$inject);
+	}
+
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*is_dark_mode_toggled*/ 1) {
+			$: style_media = is_dark_mode_toggled ? "" : `max-width:1px`;
+		}
+	};
+
+	return [is_dark_mode_toggled, container_element, div_binding];
+}
+
+class DarkModeToggle extends SvelteComponentDev {
+	constructor(options) {
+		super(options);
+		init(this, options, DarkModeToggle_svelte_instance, DarkModeToggle_svelte_create_fragment, safe_not_equal, {}, DarkModeToggle_svelte_add_css);
+
+		dispatch_dev("SvelteRegisterComponent", {
+			component: this,
+			tagName: "DarkModeToggle",
+			options,
+			id: DarkModeToggle_svelte_create_fragment.name
+		});
+	}
+}
+
+/* harmony default export */ const DarkModeToggle_svelte = (DarkModeToggle);
+;// CONCATENATED MODULE: ./src/components/utils/NavBar.svelte
+/* src\components\utils\NavBar.svelte generated by Svelte v4.2.0 */
+
+
+const { console: NavBar_svelte_console_1 } = globals;
+
+
+
+
+
+const NavBar_svelte_file = "src\\components\\utils\\NavBar.svelte";
+
+function NavBar_svelte_add_css(target) {
+	append_styles(target, "svelte-k83kuj", "#bar.svelte-k83kuj.svelte-k83kuj{width:100%;margin-top:1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;width:100%}#bar.svelte-k83kuj #bar-left.svelte-k83kuj{display:flex;flex-direction:column}#bar.svelte-k83kuj mark.svelte-k83kuj{background:var(--accent-dark)}#bar.svelte-k83kuj .logo.svelte-k83kuj{font-size:4rem;margin-left:1rem;height:fit-content;text-decoration:none}#bar.svelte-k83kuj .logo.logo-behind.svelte-k83kuj{position:absolute}#bar.svelte-k83kuj .logo.hovered.svelte-k83kuj{color:var(--accent-dark) !important}#bar.svelte-k83kuj .logo.hovered.hover-effect-0.svelte-k83kuj{animation:svelte-k83kuj-glitch-anim3 10s infinite linear alternate-reverse}@keyframes svelte-k83kuj-distort1{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0.5rem, 0rem)}25%{transform:translate(0.5rem, 1.5rem)}37.5%{transform:translate(0rem, 0.5rem)}50%{transform:translate(0.5rem, 0.5rem)}62.5%{transform:translate(0.5rem, 0rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0rem, 0.5rem)}100%{transform:translate(1.5rem, 0.5rem)}}@keyframes svelte-k83kuj-distort2{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0rem, 0.5rem)}25%{transform:translate(1.5rem, 0.5rem)}37.5%{transform:translate(1.5rem, 0rem)}50%{transform:translate(1.5rem, 0.5rem)}62.5%{transform:translate(0rem, 1.5rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0.5rem, 0rem)}100%{transform:translate(0.5rem, 0.5rem)}}@keyframes svelte-k83kuj-glitch-anim3{0%{clip:rect(3.9rem, 9999px, 2rem, 0);transform-origin:center}2%{clip:rect(1.5rem, 9999px, 5rem, 0);transform-origin:center}4%{clip:rect(1rem, 9999px, 3.5rem, 0);transform-origin:center}6%{clip:rect(2.9rem, 9999px, 3rem, 0);transform-origin:center}8%{clip:rect(3.2rem, 9999px, 4.5rem, 0);transform-origin:center}10%{clip:rect(3.7rem, 9999px, 0.5rem, 0);transform-origin:center}12%{clip:rect(3.8rem, 9999px, 3rem, 0);transform-origin:center}14%{clip:rect(0.2rem, 9999px, 1.5rem, 0);transform-origin:center}16%{clip:rect(3.7rem, 9999px, 2rem, 0);transform-origin:center}18%{clip:rect(1.1rem, 9999px, 2.5rem, 0);transform-origin:center}20%{clip:rect(0.7rem, 9999px, 4rem, 0);transform-origin:center}22%{clip:rect(0.7rem, 9999px, 3rem, 0);transform-origin:center}24%{clip:rect(3.9rem, 9999px, 3rem, 0);transform-origin:center}26%{clip:rect(0.4rem, 9999px, 2rem, 0);transform-origin:center}28%{clip:rect(2.4rem, 9999px, 2.5rem, 0);transform-origin:center}30%{clip:rect(3.3rem, 9999px, 4rem, 0);transform-origin:center}32%{clip:rect(4rem, 9999px, 4.5rem, 0);transform-origin:center}34%{clip:rect(1.4rem, 9999px, 3.5rem, 0);transform-origin:center}36%{clip:rect(3.8rem, 9999px, 0.5rem, 0);transform-origin:center}38%{clip:rect(2.9rem, 9999px, 1.5rem, 0);transform-origin:center}40%{clip:rect(2.9rem, 9999px, 3rem, 0);transform-origin:center}42%{clip:rect(2.3rem, 9999px, 2rem, 0);transform-origin:center}44%{clip:rect(2.7rem, 9999px, 2rem, 0);transform-origin:center}46%{clip:rect(1rem, 9999px, 2rem, 0);transform-origin:center}48%{clip:rect(3.4rem, 9999px, 5rem, 0);transform-origin:center}50%{clip:rect(3.9rem, 9999px, 5rem, 0);transform-origin:center}52%{clip:rect(2.1rem, 9999px, 4rem, 0);transform-origin:center}54%{clip:rect(2.6rem, 9999px, 1.5rem, 0);transform-origin:center}56%{clip:rect(3.7rem, 9999px, 2.5rem, 0);transform-origin:center}58%{clip:rect(0.4rem, 9999px, 1rem, 0);transform-origin:center}60%{clip:rect(2.3rem, 9999px, 0.5rem, 0);transform-origin:center}62%{clip:rect(0.2rem, 9999px, 2.5rem, 0);transform-origin:center}64%{clip:rect(3.7rem, 9999px, 3rem, 0);transform-origin:center}66%{clip:rect(2.3rem, 9999px, 2rem, 0);transform-origin:center}68%{clip:rect(1.6rem, 9999px, 2.5rem, 0);transform-origin:center}70%{clip:rect(1rem, 9999px, 4.5rem, 0);transform-origin:center}72%{clip:rect(1.1rem, 9999px, 4rem, 0);transform-origin:center}74%{clip:rect(0.2rem, 9999px, 2.5rem, 0);transform-origin:center}76%{clip:rect(1.3rem, 9999px, 4rem, 0);transform-origin:center}78%{clip:rect(0.2rem, 9999px, 4.5rem, 0);transform-origin:center}80%{clip:rect(1.2rem, 9999px, 3.5rem, 0);transform-origin:center}82%{clip:rect(0.5rem, 9999px, 3.5rem, 0);transform-origin:center}84%{clip:rect(2.1rem, 9999px, 2.5rem, 0);transform-origin:center}86%{clip:rect(2.5rem, 9999px, 4.5rem, 0);transform-origin:center}88%{clip:rect(2.1rem, 9999px, 3.5rem, 0);transform-origin:center}90%{clip:rect(0.9rem, 9999px, 3rem, 0);transform-origin:center}92%{clip:rect(3.7rem, 9999px, 1rem, 0);transform-origin:center}94%{clip:rect(1.9rem, 9999px, 4.5rem, 0);transform-origin:center}96%{clip:rect(2.2rem, 9999px, 5rem, 0);transform-origin:center}98%{clip:rect(1.4rem, 9999px, 3.5rem, 0);transform-origin:center}}@keyframes svelte-k83kuj-cooool{0%{color:red !important}2%{color:red !important}4%{color:red !important}6%{color:red !important}8%{color:red !important}10%{color:red !important}12%{color:red !important}14%{color:red !important}16%{color:red !important}18%{color:red !important}20%{color:red !important}22%{color:red !important}24%{color:red !important}26%{color:red !important}28%{color:red !important}30%{color:red !important}32%{color:red !important}34%{color:red !important}36%{color:red !important}38%{color:red !important}40%{color:red !important}42%{color:red !important}44%{color:red !important}46%{color:red !important}48%{color:red !important}50%{color:red !important}52%{color:red !important}54%{color:red !important}56%{color:red !important}58%{color:red !important}60%{color:red !important}62%{color:red !important}64%{color:red !important}66%{color:red !important}68%{color:red !important}70%{color:red !important}72%{color:red !important}74%{color:red !important}76%{color:red !important}78%{color:red !important}80%{color:red !important}82%{color:red !important}84%{color:red !important}86%{color:red !important}88%{color:red !important}90%{color:red !important}92%{color:red !important}94%{color:red !important}96%{color:red !important}98%{color:red !important}}#bar.svelte-k83kuj .logo.hovered.hover-effect-0.logo-behind-a.svelte-k83kuj{color:#ffc800 !important;animation:svelte-k83kuj-distort1 300ms linear infinite, svelte-k83kuj-glitch-anim3 5s infinite linear alternate-reverse, svelte-k83kuj-cooool 5s infinite linear alternate-reverse}#bar.svelte-k83kuj .logo.hovered.hover-effect-0.logo-behind-b.svelte-k83kuj{color:#aa10f2 !important;animation:svelte-k83kuj-distort2 300ms linear infinite, svelte-k83kuj-glitch-anim3 3s infinite linear alternate-reverse}#bar.svelte-k83kuj .logo.hover-effect-1.svelte-k83kuj{animation:svelte-k83kuj-glitch-skew 1s infinite linear alternate-reverse}@keyframes svelte-k83kuj-glitch-anim{0%{clip:rect(2.5rem, 9999px, 4rem, 0);transform:skew(5.8deg);z-index:3}2%{clip:rect(3.5rem, 9999px, 1rem, 0);transform:skew(5.3deg);z-index:2}4%{clip:rect(2.5rem, 9999px, 5rem, 0);transform:skew(9.3deg);z-index:1}6%{clip:rect(2.4rem, 9999px, 1rem, 0);transform:skew(4deg);z-index:4}8%{clip:rect(0.3rem, 9999px, 3rem, 0);transform:skew(5.1deg);z-index:3}10%{clip:rect(2.1rem, 9999px, 4.5rem, 0);transform:skew(1.8deg);z-index:4}12%{clip:rect(3.4rem, 9999px, 1.5rem, 0);transform:skew(7.3deg);z-index:4}14%{clip:rect(3.5rem, 9999px, 2rem, 0);transform:skew(8.5deg);z-index:2}16%{clip:rect(2.9rem, 9999px, 3.5rem, 0);transform:skew(5.3deg);z-index:4}18%{clip:rect(0.1rem, 9999px, 3.5rem, 0);transform:skew(0.9deg);z-index:4}20%{clip:rect(3.7rem, 9999px, 1rem, 0);transform:skew(4.6deg);z-index:3}22%{clip:rect(2.9rem, 9999px, 2rem, 0);transform:skew(3.1deg);z-index:3}24%{clip:rect(2.9rem, 9999px, 0.5rem, 0);transform:skew(7deg);z-index:4}26%{clip:rect(1.9rem, 9999px, 3rem, 0);transform:skew(1.6deg);z-index:4}28%{clip:rect(1.6rem, 9999px, 3.5rem, 0);transform:skew(5.3deg);z-index:2}30%{clip:rect(0.6rem, 9999px, 3rem, 0);transform:skew(1.2deg);z-index:3}32%{clip:rect(3.3rem, 9999px, 4rem, 0);transform:skew(5.2deg);z-index:3}34%{clip:rect(1.1rem, 9999px, 5rem, 0);transform:skew(9.1deg);z-index:2}36%{clip:rect(1.5rem, 9999px, 1.5rem, 0);transform:skew(1.7deg);z-index:1}38%{clip:rect(1.5rem, 9999px, 1rem, 0);transform:skew(8.9deg);z-index:4}40%{clip:rect(1rem, 9999px, 0.5rem, 0);transform:skew(5deg);z-index:3}42%{clip:rect(1.1rem, 9999px, 2.5rem, 0);transform:skew(9.5deg);z-index:1}44%{clip:rect(2.6rem, 9999px, 3.5rem, 0);transform:skew(0.1deg);z-index:4}46%{clip:rect(0.4rem, 9999px, 0.5rem, 0);transform:skew(7.3deg);z-index:4}48%{clip:rect(2.2rem, 9999px, 5rem, 0);transform:skew(7.4deg);z-index:1}50%{clip:rect(0.7rem, 9999px, 5rem, 0);transform:skew(3deg);z-index:2}52%{clip:rect(1.4rem, 9999px, 3.5rem, 0);transform:skew(1deg);z-index:2}54%{clip:rect(0.1rem, 9999px, 4.5rem, 0);transform:skew(2.1deg);z-index:3}56%{clip:rect(2.8rem, 9999px, 4rem, 0);transform:skew(3.8deg);z-index:2}58%{clip:rect(1.7rem, 9999px, 4.5rem, 0);transform:skew(2.9deg);z-index:2}60%{clip:rect(3.7rem, 9999px, 2.5rem, 0);transform:skew(2.9deg);z-index:1}62%{clip:rect(4rem, 9999px, 4rem, 0);transform:skew(9.1deg);z-index:2}64%{clip:rect(4rem, 9999px, 1rem, 0);transform:skew(4.6deg);z-index:2}66%{clip:rect(4rem, 9999px, 2rem, 0);transform:skew(5.8deg);z-index:3}68%{clip:rect(1.3rem, 9999px, 1.5rem, 0);transform:skew(9.2deg);z-index:1}70%{clip:rect(3.6rem, 9999px, 1.5rem, 0);transform:skew(4.7deg);z-index:1}72%{clip:rect(0.3rem, 9999px, 1rem, 0);transform:skew(4deg);z-index:1}74%{clip:rect(3.6rem, 9999px, 2.5rem, 0);transform:skew(5.2deg);z-index:3}76%{clip:rect(0.2rem, 9999px, 1rem, 0);transform:skew(10deg);z-index:1}78%{clip:rect(2.9rem, 9999px, 1.5rem, 0);transform:skew(5deg);z-index:4}80%{clip:rect(3rem, 9999px, 3.5rem, 0);transform:skew(5.9deg);z-index:2}82%{clip:rect(2.4rem, 9999px, 2rem, 0);transform:skew(8.9deg);z-index:2}84%{clip:rect(1.4rem, 9999px, 3.5rem, 0);transform:skew(8.6deg);z-index:1}86%{clip:rect(2.2rem, 9999px, 1rem, 0);transform:skew(3.6deg);z-index:2}88%{clip:rect(1rem, 9999px, 2.5rem, 0);transform:skew(3.3deg);z-index:2}90%{clip:rect(0.8rem, 9999px, 2.5rem, 0);transform:skew(7.6deg);z-index:3}92%{clip:rect(2.6rem, 9999px, 0.5rem, 0);transform:skew(5.3deg);z-index:1}94%{clip:rect(3.4rem, 9999px, 1.5rem, 0);transform:skew(5.6deg);z-index:2}96%{clip:rect(1.1rem, 9999px, 3rem, 0);transform:skew(8deg);z-index:3}98%{clip:rect(3.9rem, 9999px, 2.5rem, 0);transform:skew(1.6deg);z-index:2}}@keyframes svelte-k83kuj-glitch-anim2{0%{clip:rect(0.14rem, 99999px, 6.4rem, 0);transform:skew(0.4deg);transform:translateX(0.3888888889rem)}0.6666666667%{clip:rect(0.02rem, 99999px, 9.2rem, 0);transform:skew(11.3deg);transform:translateX(0.2037037037rem)}1.3333333333%{clip:rect(0.08rem, 99999px, 1.2rem, 0);transform:skew(10.1deg);transform:translateX(0.3888888889rem)}2%{clip:rect(0.04rem, 99999px, 9.3rem, 0);transform:skew(13deg);transform:translateX(0.4814814815rem)}2.6666666667%{clip:rect(0.06rem, 99999px, 4.6rem, 0);transform:skew(6.8deg);transform:translateX(0.4444444444rem)}3.3333333333%{clip:rect(0.04rem, 99999px, 1.2rem, 0);transform:skew(14.9deg);transform:translateX(0.3888888889rem)}4%{clip:rect(0.08rem, 99999px, 2.7rem, 0);transform:skew(13.5deg);transform:translateX(0.4444444444rem)}4.6666666667%{clip:rect(0.16rem, 99999px, 5.1rem, 0);transform:skew(5.4deg);transform:translateX(-0.1666666667rem)}5.3333333333%{clip:rect(0.08rem, 99999px, 6.1rem, 0);transform:skew(13.8deg);transform:translateX(0.462962963rem)}6%{clip:rect(0.18rem, 99999px, 2rem, 0);transform:skew(9.3deg);transform:translateX(0.3888888889rem)}6.6666666667%{clip:rect(0.06rem, 99999px, 9.3rem, 0);transform:skew(10.3deg);transform:translateX(0.4444444444rem)}7.3333333333%{clip:rect(0.02rem, 99999px, 3rem, 0);transform:skew(10.3deg);transform:translateX(0.3333333333rem)}8%{clip:rect(0.02rem, 99999px, 8.8rem, 0);transform:skew(9.8deg);transform:translateX(0.462962963rem)}8.6666666667%{clip:rect(0.06rem, 99999px, 7.4rem, 0);transform:skew(3.9deg);transform:translateX(0.1666666667rem)}9.3333333333%{clip:rect(0.02rem, 99999px, 1.4rem, 0);transform:skew(5.7deg);transform:translateX(0.1666666667rem)}10%{clip:rect(0.1rem, 99999px, 4.4rem, 0);transform:skew(3.6deg);transform:translateX(0.0555555556rem)}10.6666666667%{clip:rect(0.14rem, 99999px, 7.9rem, 0);transform:skew(12.1deg);transform:translateX(-0.1666666667rem)}11.3333333333%{clip:rect(0.1rem, 99999px, 3rem, 0);transform:skew(7.7deg);transform:translateX(0.2777777778rem)}12%{clip:rect(0.1rem, 99999px, 6.6rem, 0);transform:skew(10.9deg);transform:translateX(0.0555555556rem)}12.6666666667%{clip:rect(0.18rem, 99999px, 0.6rem, 0);transform:skew(9.3deg);transform:translateX(0.0555555556rem)}13.3333333333%{clip:rect(0.08rem, 99999px, 1.3rem, 0);transform:skew(9.3deg);transform:translateX(0.4259259259rem)}14%{clip:rect(0.06rem, 99999px, 6.2rem, 0);transform:skew(4.5deg);transform:translateX(0.3888888889rem)}14.6666666667%{clip:rect(0.2rem, 99999px, 0.1rem, 0);transform:skew(3deg);transform:translateX(0.3888888889rem)}15.3333333333%{clip:rect(0.04rem, 99999px, 0.6rem, 0);transform:skew(7.1deg);transform:translateX(0.4259259259rem)}16%{clip:rect(0.12rem, 99999px, 9.9rem, 0);transform:skew(0.1deg);transform:translateX(0.1666666667rem)}16.6666666667%{clip:rect(0.04rem, 99999px, 9.7rem, 0);transform:skew(9.9deg);transform:translateX(0.3888888889rem)}17.3333333333%{clip:rect(0.2rem, 99999px, 4.4rem, 0);transform:skew(12.3deg);transform:translateX(0.4259259259rem)}18%{clip:rect(0.2rem, 99999px, 7rem, 0);transform:skew(14.5deg);transform:translateX(0.3888888889rem)}18.6666666667%{clip:rect(0.1rem, 99999px, 5.3rem, 0);transform:skew(9.1deg);transform:translateX(0.4259259259rem)}19.3333333333%{clip:rect(0.14rem, 99999px, 6.8rem, 0);transform:skew(6.6deg);transform:translateX(0.3333333333rem)}20%{clip:rect(0.12rem, 99999px, 8rem, 0);transform:skew(0.4deg);transform:translateX(0.3518518519rem)}20.6666666667%{clip:rect(0.16rem, 99999px, 3.6rem, 0);transform:skew(12.8deg);transform:translateX(0.1666666667rem)}21.3333333333%{clip:rect(0.14rem, 99999px, 6.3rem, 0);transform:skew(10.7deg);transform:translateX(0.462962963rem)}22%{clip:rect(0.14rem, 99999px, 2.9rem, 0);transform:skew(5.1deg);transform:translateX(0.3518518519rem)}22.6666666667%{clip:rect(0.06rem, 99999px, 3.5rem, 0);transform:skew(9.1deg);transform:translateX(0.3888888889rem)}23.3333333333%{clip:rect(0.18rem, 99999px, 2.8rem, 0);transform:skew(8.1deg);transform:translateX(0.3518518519rem)}24%{clip:rect(0.02rem, 99999px, 9.6rem, 0);transform:skew(3.5deg);transform:translateX(0rem)}24.6666666667%{clip:rect(0.16rem, 99999px, 4.7rem, 0);transform:skew(13.2deg);transform:translateX(0.4259259259rem)}25.3333333333%{clip:rect(0.02rem, 99999px, 4.8rem, 0);transform:skew(2deg);transform:translateX(0.3333333333rem)}26%{clip:rect(0.02rem, 99999px, 7.8rem, 0);transform:skew(12.1deg);transform:translateX(0.4444444444rem)}26.6666666667%{clip:rect(0.2rem, 99999px, 0.1rem, 0);transform:skew(1.7deg);transform:translateX(0.4259259259rem)}27.3333333333%{clip:rect(0.04rem, 99999px, 6.8rem, 0);transform:skew(6.1deg);transform:translateX(0.4259259259rem)}28%{clip:rect(0.12rem, 99999px, 7rem, 0);transform:skew(14.5deg);transform:translateX(0.2777777778rem)}28.6666666667%{clip:rect(0.08rem, 99999px, 3.2rem, 0);transform:skew(5.6deg);transform:translateX(0.4259259259rem)}29.3333333333%{clip:rect(0.04rem, 99999px, 1.8rem, 0);transform:skew(3.4deg);transform:translateX(0.3888888889rem)}30%{clip:rect(0.16rem, 99999px, 1.3rem, 0);transform:skew(3.3deg);transform:translateX(0.1666666667rem)}30.6666666667%{clip:rect(0.04rem, 99999px, 6.4rem, 0);transform:skew(3.6deg);transform:translateX(0.3333333333rem)}31.3333333333%{clip:rect(0.12rem, 99999px, 9.4rem, 0);transform:skew(2.3deg);transform:translateX(0.2777777778rem)}32%{clip:rect(0.02rem, 99999px, 2.1rem, 0);transform:skew(0.9deg);transform:translateX(0.3518518519rem)}32.6666666667%{clip:rect(0.02rem, 99999px, 7.5rem, 0);transform:skew(1.5deg);transform:translateX(0.462962963rem)}33.3333333333%{clip:rect(0.04rem, 99999px, 7.2rem, 0);transform:skew(5.2deg);transform:translateX(0.3333333333rem)}34%{clip:rect(0.04rem, 99999px, 3.1rem, 0);transform:skew(0.1deg);transform:translateX(0.3888888889rem)}34.6666666667%{clip:rect(0.02rem, 99999px, 6.5rem, 0);transform:skew(3deg);transform:translateX(0.3888888889rem)}35.3333333333%{clip:rect(0.08rem, 99999px, 9.1rem, 0);transform:skew(12.4deg);transform:translateX(0.3888888889rem)}36%{clip:rect(0.2rem, 99999px, 9.9rem, 0);transform:skew(8.7deg);transform:translateX(0.3888888889rem)}36.6666666667%{clip:rect(0.1rem, 99999px, 9.6rem, 0);transform:skew(5.3deg);transform:translateX(0rem)}37.3333333333%{clip:rect(0.02rem, 99999px, 3.3rem, 0);transform:skew(12deg);transform:translateX(-0.1666666667rem)}38%{clip:rect(0.12rem, 99999px, 3.4rem, 0);transform:skew(2.7deg);transform:translateX(0.1666666667rem)}38.6666666667%{clip:rect(0.12rem, 99999px, 6.2rem, 0);transform:skew(14.9deg);transform:translateX(0.3518518519rem)}39.3333333333%{clip:rect(0.06rem, 99999px, 3.1rem, 0);transform:skew(5.4deg);transform:translateX(0.462962963rem)}40%{clip:rect(0.12rem, 99999px, 3.8rem, 0);transform:skew(8.7deg);transform:translateX(0.3333333333rem)}40.6666666667%{clip:rect(0.12rem, 99999px, 5.1rem, 0);transform:skew(13.9deg);transform:translateX(0rem)}41.3333333333%{clip:rect(0.06rem, 99999px, 6.8rem, 0);transform:skew(1.3deg);transform:translateX(0.462962963rem)}42%{clip:rect(0.04rem, 99999px, 0.8rem, 0);transform:skew(9.3deg);transform:translateX(0.2777777778rem)}42.6666666667%{clip:rect(0.04rem, 99999px, 7.2rem, 0);transform:skew(3.8deg);transform:translateX(-0.1666666667rem)}43.3333333333%{clip:rect(0.02rem, 99999px, 4.7rem, 0);transform:skew(1.8deg);transform:translateX(0.3518518519rem)}44%{clip:rect(0.06rem, 99999px, 6.8rem, 0);transform:skew(14.7deg);transform:translateX(0.3888888889rem)}44.6666666667%{clip:rect(0.14rem, 99999px, 1.2rem, 0);transform:skew(12deg);transform:translateX(0.2777777778rem)}45.3333333333%{clip:rect(0.16rem, 99999px, 2.8rem, 0);transform:skew(7.8deg);transform:translateX(0.3333333333rem)}46%{clip:rect(0.06rem, 99999px, 8.9rem, 0);transform:skew(13.6deg);transform:translateX(0.4259259259rem)}46.6666666667%{clip:rect(0.02rem, 99999px, 4.4rem, 0);transform:skew(9.2deg);transform:translateX(0.2777777778rem)}47.3333333333%{clip:rect(0.16rem, 99999px, 9.2rem, 0);transform:skew(3.7deg);transform:translateX(0.3888888889rem)}48%{clip:rect(0.14rem, 99999px, 8.5rem, 0);transform:skew(10.2deg);transform:translateX(0.3518518519rem)}48.6666666667%{clip:rect(0.18rem, 99999px, 2.2rem, 0);transform:skew(0.1deg);transform:translateX(0.3888888889rem)}49.3333333333%{clip:rect(0.1rem, 99999px, 3.8rem, 0);transform:skew(4.1deg);transform:translateX(0.462962963rem)}50%{clip:rect(0.08rem, 99999px, 3rem, 0);transform:skew(4deg);transform:translateX(0.3888888889rem)}50.6666666667%{clip:rect(0.08rem, 99999px, 9.7rem, 0);transform:skew(1.4deg);transform:translateX(0.4259259259rem)}51.3333333333%{clip:rect(0.12rem, 99999px, 2.5rem, 0);transform:skew(10.9deg);transform:translateX(0.4259259259rem)}52%{clip:rect(0.08rem, 99999px, 5.4rem, 0);transform:skew(4.4deg);transform:translateX(0.2777777778rem)}52.6666666667%{clip:rect(0.02rem, 99999px, 9.6rem, 0);transform:skew(2.3deg);transform:translateX(0.3888888889rem)}53.3333333333%{clip:rect(0.18rem, 99999px, 9.5rem, 0);transform:skew(12.4deg);transform:translateX(0.2777777778rem)}54%{clip:rect(0.1rem, 99999px, 7rem, 0);transform:skew(9.1deg);transform:translateX(0.3888888889rem)}54.6666666667%{clip:rect(0.1rem, 99999px, 6.1rem, 0);transform:skew(13.9deg);transform:translateX(0.1666666667rem)}55.3333333333%{clip:rect(0.16rem, 99999px, 6.4rem, 0);transform:skew(1.7deg);transform:translateX(0.2777777778rem)}56%{clip:rect(0.12rem, 99999px, 0.8rem, 0);transform:skew(8.7deg);transform:translateX(0.3518518519rem)}56.6666666667%{clip:rect(0.1rem, 99999px, 2.1rem, 0);transform:skew(2.9deg);transform:translateX(0.4259259259rem)}57.3333333333%{clip:rect(0.16rem, 99999px, 4.9rem, 0);transform:skew(13.9deg);transform:translateX(0.2037037037rem)}58%{clip:rect(0.04rem, 99999px, 9.4rem, 0);transform:skew(1.8deg);transform:translateX(0.4259259259rem)}58.6666666667%{clip:rect(0.14rem, 99999px, 6.4rem, 0);transform:skew(2.5deg);transform:translateX(0.3888888889rem)}59.3333333333%{clip:rect(0.06rem, 99999px, 7.9rem, 0);transform:skew(8deg);transform:translateX(0.3333333333rem)}60%{clip:rect(0.06rem, 99999px, 5.6rem, 0);transform:skew(1.7deg);transform:translateX(0.2777777778rem)}60.6666666667%{clip:rect(0.12rem, 99999px, 1.3rem, 0);transform:skew(12.4deg);transform:translateX(0.3888888889rem)}61.3333333333%{clip:rect(0.14rem, 99999px, 9.5rem, 0);transform:skew(1.3deg);transform:translateX(0.2777777778rem)}62%{clip:rect(0.06rem, 99999px, 4.6rem, 0);transform:skew(13.4deg);transform:translateX(0.4259259259rem)}62.6666666667%{clip:rect(0.04rem, 99999px, 4.4rem, 0);transform:skew(5.5deg);transform:translateX(0.462962963rem)}63.3333333333%{clip:rect(0.1rem, 99999px, 7.1rem, 0);transform:skew(14.7deg);transform:translateX(-0.5rem)}64%{clip:rect(0.04rem, 99999px, 3rem, 0);transform:skew(14.9deg);transform:translateX(0.3333333333rem)}64.6666666667%{clip:rect(0.2rem, 99999px, 2.3rem, 0);transform:skew(5.2deg);transform:translateX(0.3888888889rem)}65.3333333333%{clip:rect(0.08rem, 99999px, 5.9rem, 0);transform:skew(2.7deg);transform:translateX(0.1666666667rem)}66%{clip:rect(0.1rem, 99999px, 7.3rem, 0);transform:skew(0.1deg);transform:translateX(0.2777777778rem)}66.6666666667%{clip:rect(0.1rem, 99999px, 6.7rem, 0);transform:skew(6.2deg);transform:translateX(0.4259259259rem)}67.3333333333%{clip:rect(0.02rem, 99999px, 2.3rem, 0);transform:skew(12.2deg);transform:translateX(0.1666666667rem)}68%{clip:rect(0.04rem, 99999px, 4rem, 0);transform:skew(12.4deg);transform:translateX(0.3888888889rem)}68.6666666667%{clip:rect(0.1rem, 99999px, 6.8rem, 0);transform:skew(10.7deg);transform:translateX(-0.1666666667rem)}69.3333333333%{clip:rect(0.18rem, 99999px, 9.5rem, 0);transform:skew(6.9deg);transform:translateX(-0.1666666667rem)}70%{clip:rect(0.12rem, 99999px, 7.8rem, 0);transform:skew(13.8deg);transform:translateX(0.462962963rem)}70.6666666667%{clip:rect(0.16rem, 99999px, 4.4rem, 0);transform:skew(4.3deg);transform:translateX(0.2777777778rem)}71.3333333333%{clip:rect(0.1rem, 99999px, 2.9rem, 0);transform:skew(8deg);transform:translateX(0.3333333333rem)}72%{clip:rect(0.08rem, 99999px, 9.2rem, 0);transform:skew(5.7deg);transform:translateX(0.3888888889rem)}72.6666666667%{clip:rect(0.04rem, 99999px, 7.5rem, 0);transform:skew(4.2deg);transform:translateX(0.2777777778rem)}73.3333333333%{clip:rect(0.2rem, 99999px, 1.8rem, 0);transform:skew(8.2deg);transform:translateX(0.2777777778rem)}74%{clip:rect(0.06rem, 99999px, 1.1rem, 0);transform:skew(0.3deg);transform:translateX(0.1666666667rem)}74.6666666667%{clip:rect(0.04rem, 99999px, 5.2rem, 0);transform:skew(11.9deg);transform:translateX(0.4444444444rem)}75.3333333333%{clip:rect(0.18rem, 99999px, 2.9rem, 0);transform:skew(12.6deg);transform:translateX(0.3888888889rem)}76%{clip:rect(0.1rem, 99999px, 5.7rem, 0);transform:skew(0.1deg);transform:translateX(0.3888888889rem)}76.6666666667%{clip:rect(0.12rem, 99999px, 9.2rem, 0);transform:skew(0.1deg);transform:translateX(0.4259259259rem)}77.3333333333%{clip:rect(0.04rem, 99999px, 7.5rem, 0);transform:skew(4.8deg);transform:translateX(0.2777777778rem)}78%{clip:rect(0.02rem, 99999px, 3.6rem, 0);transform:skew(2.3deg);transform:translateX(0.3333333333rem)}78.6666666667%{clip:rect(0.04rem, 99999px, 7.9rem, 0);transform:skew(1.9deg);transform:translateX(0.2037037037rem)}79.3333333333%{clip:rect(0.2rem, 99999px, 5.8rem, 0);transform:skew(0.3deg);transform:translateX(0.3888888889rem)}80%{clip:rect(0.2rem, 99999px, 3.9rem, 0);transform:skew(13.6deg);transform:translateX(0.1666666667rem)}80.6666666667%{clip:rect(0.12rem, 99999px, 6.8rem, 0);transform:skew(0.9deg);transform:translateX(0.2777777778rem)}81.3333333333%{clip:rect(0.1rem, 99999px, 9.2rem, 0);transform:skew(8.6deg);transform:translateX(0.1666666667rem)}82%{clip:rect(0.08rem, 99999px, 3.2rem, 0);transform:skew(9.4deg);transform:translateX(0.3888888889rem)}82.6666666667%{clip:rect(0.08rem, 99999px, 6.5rem, 0);transform:skew(9.6deg);transform:translateX(0.4444444444rem)}83.3333333333%{clip:rect(0.16rem, 99999px, 8.7rem, 0);transform:skew(14.5deg);transform:translateX(0.3888888889rem)}84%{clip:rect(0.02rem, 99999px, 3.1rem, 0);transform:skew(0.4deg);transform:translateX(0.462962963rem)}84.6666666667%{clip:rect(0.2rem, 99999px, 6.1rem, 0);transform:skew(3.1deg);transform:translateX(0.3888888889rem)}85.3333333333%{clip:rect(0.14rem, 99999px, 0.7rem, 0);transform:skew(11deg);transform:translateX(0.2777777778rem)}86%{clip:rect(0.12rem, 99999px, 1.5rem, 0);transform:skew(11.6deg);transform:translateX(0.3518518519rem)}86.6666666667%{clip:rect(0.12rem, 99999px, 5.6rem, 0);transform:skew(8.9deg);transform:translateX(0.3333333333rem)}87.3333333333%{clip:rect(0.14rem, 99999px, 1.4rem, 0);transform:skew(7deg);transform:translateX(0.462962963rem)}88%{clip:rect(0.04rem, 99999px, 1rem, 0);transform:skew(0.3deg);transform:translateX(0.2777777778rem)}88.6666666667%{clip:rect(0.16rem, 99999px, 2.9rem, 0);transform:skew(8.9deg);transform:translateX(0.4259259259rem)}89.3333333333%{clip:rect(0.16rem, 99999px, 5.8rem, 0);transform:skew(9.7deg);transform:translateX(0.2777777778rem)}90%{clip:rect(0.04rem, 99999px, 0.3rem, 0);transform:skew(14.5deg);transform:translateX(0.2777777778rem)}90.6666666667%{clip:rect(0.08rem, 99999px, 8.7rem, 0);transform:skew(8.3deg);transform:translateX(0.1666666667rem)}91.3333333333%{clip:rect(0.2rem, 99999px, 4.9rem, 0);transform:skew(4.9deg);transform:translateX(0.1666666667rem)}92%{clip:rect(0.04rem, 99999px, 8.6rem, 0);transform:skew(9.3deg);transform:translateX(0.4444444444rem)}92.6666666667%{clip:rect(0.04rem, 99999px, 5rem, 0);transform:skew(13.2deg);transform:translateX(0.462962963rem)}93.3333333333%{clip:rect(0.2rem, 99999px, 8.8rem, 0);transform:skew(5.4deg);transform:translateX(-0.1666666667rem)}94%{clip:rect(0.14rem, 99999px, 0.9rem, 0);transform:skew(10deg);transform:translateX(0.3888888889rem)}94.6666666667%{clip:rect(0.12rem, 99999px, 4.9rem, 0);transform:skew(0.4deg);transform:translateX(0.462962963rem)}95.3333333333%{clip:rect(0.1rem, 99999px, 9.1rem, 0);transform:skew(13.2deg);transform:translateX(0.2777777778rem)}96%{clip:rect(0.02rem, 99999px, 7.5rem, 0);transform:skew(12.7deg);transform:translateX(0.4259259259rem)}96.6666666667%{clip:rect(0.2rem, 99999px, 3.6rem, 0);transform:skew(8.4deg);transform:translateX(0.3518518519rem)}97.3333333333%{clip:rect(0.14rem, 99999px, 8.5rem, 0);transform:skew(9.5deg);transform:translateX(0.462962963rem)}98%{clip:rect(0.2rem, 99999px, 0.6rem, 0);transform:skew(8.3deg);transform:translateX(0.3518518519rem)}98.6666666667%{clip:rect(0.1rem, 99999px, 2.8rem, 0);transform:skew(8.3deg);transform:translateX(0.1666666667rem)}99.3333333333%{clip:rect(0.04rem, 99999px, 6rem, 0);transform:skew(6deg);transform:translateX(-0.5rem)}}@keyframes svelte-k83kuj-glitch-skew{0%{transform:skew(3deg)}10%{transform:skew(-3deg)}20%{transform:skew(0deg)}30%{transform:skew(4deg)}40%{transform:skew(5deg)}50%{transform:skew(5deg)}60%{transform:skew(-2deg)}70%{transform:skew(-3deg)}80%{transform:skew(3deg)}90%{transform:skew(0deg)}}#bar.svelte-k83kuj .logo.hover-effect-1.logo-behind-a.svelte-k83kuj{color:var(--accent-light);transform:translateX(-0.5rem);color:#ffc800 !important;text-shadow:-2px 0 #ffc800, 2px 2px #ffc800;clip:rect(44px, 450px, 56px, 0);animation:svelte-k83kuj-glitch-anim2 5s infinite linear alternate-reverse}#bar.svelte-k83kuj .logo.hover-effect-1.logo-behind-b.svelte-k83kuj{color:rgb(165, 49, 49) !important;z-index:1;transform:translateX(0.2rem);text-shadow:-2px 0 #aa10f2;clip:rect(44px, 450px, 56px, 0);animation:svelte-k83kuj-glitch-anim 5s infinite linear alternate-reverse}#bar.svelte-k83kuj .logo.logo-behind.svelte-k83kuj{width:0px;height:0px;overflow:visible;pointer-events:none}#bar.svelte-k83kuj .logo.logo-behind.svelte-k83kuj:not(.hovered){display:none}#bar.svelte-k83kuj #bar-right.svelte-k83kuj{margin-left:auto;display:flex;margin-right:1rem;margin-top:1rem;position:relative}#bar.svelte-k83kuj #bar-right #menus.svelte-k83kuj{display:flex}#bar.svelte-k83kuj #bar-right #menus #menu.svelte-k83kuj{height:10rem;display:flex;flex-direction:column;justify-content:space-between;margin-right:1rem}#bar.svelte-k83kuj #bar-right #menus #menu.svelte-k83kuj .menu-item{font-weight:750;font-style:italic;width:fit-content}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTmF2QmFyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUE4Q2lCLGdDQUFPLENBQ3hCLEtBQUssQ0FBSSxLQUNULFVBQVksS0FBTSxDQUNsQixhQUFlLENBQUUsSUFBSSxDQUNyQixPQUFTLENBQUMsSUFBSyxDQUNmLFNBQVUsS0FBTyxDQUNqQixLQUFLLENBQUksSUFDVCxDQUNBLGtCQUFJLENBQUMsdUJBQVUsQ0FDZixPQUFTLE1BQ1AsY0FBTSxPQUNSLENBQ0Esa0JBQUUsQ0FBRyxrQkFBQyxDQUNOLDZCQUNBLENBQ0Esa0JBQUMsb0JBQU8sQ0FFUCxTQUFRLE1BQ1IsV0FBVyxLQUFNLENBRWpCLE1BQU8sWUFBYyxDQUlyQixlQUE2QixLQUU3QixDQUNBLGtCQUFJLGdDQUF5QixDQUM3QixRQUFJLFNBRUosQ0FFQSxrQkFBSSw0QkFBZSxDQUVuQixNQUFTLGtCQUFrQixvQ0FFekIscUNBQW1CLFVBQ25CLDJCQUFZLElBQVEsOENBRXBCLHNCQUFZLDZDQUdaLGtDQUVGLENBR0EsR0FBSSxDQUtBLFVBQVUsVUFBSSxlQUVsQixDQUlBLEtBQVEsQ0FDUCxvQkFBb0Isa0JBR3BCLFNBQUUsZ0NBR0QsVUFDSSxXQUFVLE1BQVMscUJBS3RCLFdBQWEsTUFBSSxlQUdsQixDQUNELFNBQUUsdUNBR0QsV0FBYyxPQUFVLE9BQUssRUFJL0IsQ0FFQSxXQUFVLHNCQUFTLENBQ2xCLEdBQ0YsbUNBQ0MiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiTmF2QmFyLnN2ZWx0ZSJdfQ== */");
+}
+
+// (1602:1) {:else}
+function NavBar_svelte_create_else_block(ctx) {
+	let style;
+
+	const block = {
+		c: function create() {
+			style = dom_element("style");
+			style.innerHTML = ``;
+			add_location(style, NavBar_svelte_file, -1, 36957);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, style, anchor);
+		},
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(style);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: NavBar_svelte_create_else_block.name,
+		type: "else",
+		source: "(1602:1) {:else}",
+		ctx
+	});
+
+	return block;
+}
+
+// (1592:1) {#if flex_wrapped}
+function create_if_block_2(ctx) {
+	let style;
+
+	const block = {
+		c: function create() {
+			style = dom_element("style");
+			style.textContent = "#bar-right{\n\twidth: 100%;\n}\n#toggle-container{\n\tmargin-left: 0px;\n\tmargin-right: auto;\n}";
+			add_location(style, NavBar_svelte_file, -1, 36840);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, style, anchor);
+		},
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(style);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_2.name,
+		type: "if",
+		source: "(1592:1) {#if flex_wrapped}",
+		ctx
+	});
+
+	return block;
+}
+
+// (1624:2) {#if !flex_wrapped}
+function create_if_block_1(ctx) {
+	let darkmodetoggle;
+	let current;
+	darkmodetoggle = new DarkModeToggle_svelte({ $$inline: true });
+
+	const block = {
+		c: function create() {
+			create_component(darkmodetoggle.$$.fragment);
+		},
+		m: function mount(target, anchor) {
+			mount_component(darkmodetoggle, target, anchor);
+			current = true;
+		},
+		i: function intro(local) {
+			if (current) return;
+			transitions_transition_in(darkmodetoggle.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transitions_transition_out(darkmodetoggle.$$.fragment, local);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			destroy_component(darkmodetoggle, detaching);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: create_if_block_1.name,
+		type: "if",
+		source: "(1624:2) {#if !flex_wrapped}",
+		ctx
+	});
+
+	return block;
+}
+
+// (1629:2) {#if flex_wrapped}
+function NavBar_svelte_create_if_block(ctx) {
+	let darkmodetoggle;
+	let current;
+	darkmodetoggle = new DarkModeToggle_svelte({ $$inline: true });
+
+	const block = {
+		c: function create() {
+			create_component(darkmodetoggle.$$.fragment);
+		},
+		m: function mount(target, anchor) {
+			mount_component(darkmodetoggle, target, anchor);
+			current = true;
+		},
+		i: function intro(local) {
+			if (current) return;
+			transitions_transition_in(darkmodetoggle.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transitions_transition_out(darkmodetoggle.$$.fragment, local);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			destroy_component(darkmodetoggle, detaching);
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: NavBar_svelte_create_if_block.name,
+		type: "if",
+		source: "(1629:2) {#if flex_wrapped}",
+		ctx
+	});
+
+	return block;
+}
+
+function NavBar_svelte_create_fragment(ctx) {
+	let if_block0_anchor;
+	let t0;
 	let nav;
+	let div1;
+	let div0;
 	let a0;
 	let mark;
 	let a0_class_value;
-	let t1;
-	let a1;
 	let t2;
-	let a1_class_value;
+	let a1;
 	let t3;
-	let a2;
+	let a1_class_value;
 	let t4;
-	let a2_class_value;
+	let a2;
 	let t5;
-	let div2;
-	let div0;
+	let a2_class_value;
 	let t6;
-	let div1;
-	let link0;
 	let t7;
-	let link1;
+	let div5;
 	let t8;
-	let link2;
+	let div4;
+	let div2;
 	let t9;
-	let link3;
+	let div3;
+	let link0;
 	let t10;
-	let link4;
+	let link1;
 	let t11;
+	let link2;
+	let t12;
+	let link3;
+	let t13;
+	let link4;
+	let t14;
 	let link5;
 	let current;
-	const default_slot_template = /*#slots*/ ctx[3].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[2], null);
+
+	function select_block_type(ctx, dirty) {
+		if (/*flex_wrapped*/ ctx[5]) return create_if_block_2;
+		return NavBar_svelte_create_else_block;
+	}
+
+	let current_block_type = select_block_type(ctx, -1);
+	let if_block0 = current_block_type(ctx);
+	let if_block1 = !/*flex_wrapped*/ ctx[5] && create_if_block_1(ctx);
+	let if_block2 = /*flex_wrapped*/ ctx[5] && NavBar_svelte_create_if_block(ctx);
+	const default_slot_template = /*#slots*/ ctx[8].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[7], null);
 
 	link0 = new Link_svelte({
 			props: { link: "/art", text: "/art" },
@@ -8000,117 +9231,201 @@ function Bar_svelte_create_fragment(ctx) {
 
 	const block = {
 		c: function create() {
+			if_block0.c();
+			if_block0_anchor = empty();
+			t0 = space();
 			nav = dom_element("nav");
+			div1 = dom_element("div");
+			div0 = dom_element("div");
 			a0 = dom_element("a");
 			mark = dom_element("mark");
 			mark.textContent = "wrighter";
-			t1 = space();
+			t2 = space();
 			a1 = dom_element("a");
-			t2 = dom_text("wrighter");
-			t3 = space();
+			t3 = dom_text("wrighter");
+			t4 = space();
 			a2 = dom_element("a");
-			t4 = dom_text("wrighter");
-			t5 = space();
-			div2 = dom_element("div");
-			div0 = dom_element("div");
-			if (default_slot) default_slot.c();
+			t5 = dom_text("wrighter");
 			t6 = space();
-			div1 = dom_element("div");
-			create_component(link0.$$.fragment);
+			if (if_block1) if_block1.c();
 			t7 = space();
-			create_component(link1.$$.fragment);
+			div5 = dom_element("div");
+			if (if_block2) if_block2.c();
 			t8 = space();
-			create_component(link2.$$.fragment);
+			div4 = dom_element("div");
+			div2 = dom_element("div");
+			if (default_slot) default_slot.c();
 			t9 = space();
-			create_component(link3.$$.fragment);
+			div3 = dom_element("div");
+			create_component(link0.$$.fragment);
 			t10 = space();
-			create_component(link4.$$.fragment);
+			create_component(link1.$$.fragment);
 			t11 = space();
+			create_component(link2.$$.fragment);
+			t12 = space();
+			create_component(link3.$$.fragment);
+			t13 = space();
+			create_component(link4.$$.fragment);
+			t14 = space();
 			create_component(link5.$$.fragment);
-			attr_dev(mark, "class", "svelte-1w4n5v7");
-			add_location(mark, Bar_svelte_file, -1, 36042);
+			attr_dev(mark, "class", "svelte-k83kuj");
+			add_location(mark, NavBar_svelte_file, -1, 37190);
 			attr_dev(a0, "href", "/");
-			attr_dev(a0, "class", a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[1] + " svelte-1w4n5v7");
-			add_location(a0, Bar_svelte_file, -1, 35972);
+			attr_dev(a0, "class", a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-k83kuj");
+			add_location(a0, NavBar_svelte_file, -1, 37118);
 			attr_dev(a1, "href", "/");
-			attr_dev(a1, "class", a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[1] + " svelte-1w4n5v7");
-			add_location(a1, Bar_svelte_file, -1, 36077);
+			attr_dev(a1, "class", a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-k83kuj");
+			add_location(a1, NavBar_svelte_file, -1, 37233);
 			attr_dev(a2, "href", "/");
-			attr_dev(a2, "class", a2_class_value = "logo " + /*hovered_class*/ ctx[1] + " svelte-1w4n5v7");
-			add_location(a2, Bar_svelte_file, -1, 36163);
-			attr_dev(div0, "id", "menu");
-			attr_dev(div0, "class", "svelte-1w4n5v7");
-			add_location(div0, Bar_svelte_file, -1, 36267);
-			attr_dev(div1, "id", "menu");
-			attr_dev(div1, "class", "svelte-1w4n5v7");
-			add_location(div1, Bar_svelte_file, -1, 36559);
-			attr_dev(div2, "id", "menus");
-			attr_dev(div2, "class", "svelte-1w4n5v7");
-			add_location(div2, Bar_svelte_file, -1, 36248);
+			attr_dev(a2, "class", a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-k83kuj");
+			add_location(a2, NavBar_svelte_file, -1, 37325);
+			attr_dev(div0, "id", "logo-container");
+			add_location(div0, NavBar_svelte_file, -1, 37089);
+			attr_dev(div1, "id", "bar-left");
+			attr_dev(div1, "class", "svelte-k83kuj");
+			add_location(div1, NavBar_svelte_file, -1, 37042);
+			attr_dev(div2, "id", "menu");
+			attr_dev(div2, "class", "svelte-k83kuj");
+			add_location(div2, NavBar_svelte_file, -1, 37627);
+			attr_dev(div3, "id", "menu");
+			attr_dev(div3, "class", "svelte-k83kuj");
+			add_location(div3, NavBar_svelte_file, -1, 37928);
+			attr_dev(div4, "id", "menus");
+			attr_dev(div4, "class", "svelte-k83kuj");
+			add_location(div4, NavBar_svelte_file, -1, 37581);
+			attr_dev(div5, "id", "bar-right");
+			attr_dev(div5, "class", "svelte-k83kuj");
+			add_location(div5, NavBar_svelte_file, -1, 37482);
 			attr_dev(nav, "id", "bar");
-			attr_dev(nav, "class", "svelte-1w4n5v7");
-			add_location(nav, Bar_svelte_file, -1, 35956);
+			attr_dev(nav, "class", "svelte-k83kuj");
+			add_location(nav, NavBar_svelte_file, -1, 36999);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
 		},
 		m: function mount(target, anchor) {
+			if_block0.m(document.head, null);
+			append_dev(document.head, if_block0_anchor);
+			insert_dev(target, t0, anchor);
 			insert_dev(target, nav, anchor);
-			append_dev(nav, a0);
+			append_dev(nav, div1);
+			append_dev(div1, div0);
+			append_dev(div0, a0);
 			append_dev(a0, mark);
-			append_dev(nav, t1);
-			append_dev(nav, a1);
-			append_dev(a1, t2);
-			append_dev(nav, t3);
-			append_dev(nav, a2);
-			append_dev(a2, t4);
-			/*a2_binding*/ ctx[4](a2);
-			append_dev(nav, t5);
-			append_dev(nav, div2);
-			append_dev(div2, div0);
+			append_dev(div0, t2);
+			append_dev(div0, a1);
+			append_dev(a1, t3);
+			append_dev(div0, t4);
+			append_dev(div0, a2);
+			append_dev(a2, t5);
+			/*a2_binding*/ ctx[9](a2);
+			append_dev(div1, t6);
+			if (if_block1) if_block1.m(div1, null);
+			/*div1_binding*/ ctx[10](div1);
+			append_dev(nav, t7);
+			append_dev(nav, div5);
+			if (if_block2) if_block2.m(div5, null);
+			append_dev(div5, t8);
+			append_dev(div5, div4);
+			append_dev(div4, div2);
 
 			if (default_slot) {
-				default_slot.m(div0, null);
+				default_slot.m(div2, null);
 			}
 
-			append_dev(div2, t6);
-			append_dev(div2, div1);
-			mount_component(link0, div1, null);
-			append_dev(div1, t7);
-			mount_component(link1, div1, null);
-			append_dev(div1, t8);
-			mount_component(link2, div1, null);
-			append_dev(div1, t9);
-			mount_component(link3, div1, null);
-			append_dev(div1, t10);
-			mount_component(link4, div1, null);
-			append_dev(div1, t11);
-			mount_component(link5, div1, null);
+			append_dev(div4, t9);
+			append_dev(div4, div3);
+			mount_component(link0, div3, null);
+			append_dev(div3, t10);
+			mount_component(link1, div3, null);
+			append_dev(div3, t11);
+			mount_component(link2, div3, null);
+			append_dev(div3, t12);
+			mount_component(link3, div3, null);
+			append_dev(div3, t13);
+			mount_component(link4, div3, null);
+			append_dev(div3, t14);
+			mount_component(link5, div3, null);
+			/*div4_binding*/ ctx[11](div4);
+			/*div5_binding*/ ctx[12](div5);
+			/*nav_binding*/ ctx[13](nav);
 			current = true;
 		},
 		p: function update(ctx, [dirty]) {
-			if (!current || dirty & /*hovered_class*/ 2 && a0_class_value !== (a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[1] + " svelte-1w4n5v7")) {
+			if (current_block_type !== (current_block_type = select_block_type(ctx, dirty))) {
+				if_block0.d(1);
+				if_block0 = current_block_type(ctx);
+
+				if (if_block0) {
+					if_block0.c();
+					if_block0.m(if_block0_anchor.parentNode, if_block0_anchor);
+				}
+			}
+
+			if (!current || dirty & /*hovered_class*/ 64 && a0_class_value !== (a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-k83kuj")) {
 				attr_dev(a0, "class", a0_class_value);
 			}
 
-			if (!current || dirty & /*hovered_class*/ 2 && a1_class_value !== (a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[1] + " svelte-1w4n5v7")) {
+			if (!current || dirty & /*hovered_class*/ 64 && a1_class_value !== (a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-k83kuj")) {
 				attr_dev(a1, "class", a1_class_value);
 			}
 
-			if (!current || dirty & /*hovered_class*/ 2 && a2_class_value !== (a2_class_value = "logo " + /*hovered_class*/ ctx[1] + " svelte-1w4n5v7")) {
+			if (!current || dirty & /*hovered_class*/ 64 && a2_class_value !== (a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-k83kuj")) {
 				attr_dev(a2, "class", a2_class_value);
 			}
 
+			if (!/*flex_wrapped*/ ctx[5]) {
+				if (if_block1) {
+					if (dirty & /*flex_wrapped*/ 32) {
+						transitions_transition_in(if_block1, 1);
+					}
+				} else {
+					if_block1 = create_if_block_1(ctx);
+					if_block1.c();
+					transitions_transition_in(if_block1, 1);
+					if_block1.m(div1, null);
+				}
+			} else if (if_block1) {
+				transitions_group_outros();
+
+				transitions_transition_out(if_block1, 1, 1, () => {
+					if_block1 = null;
+				});
+
+				transitions_check_outros();
+			}
+
+			if (/*flex_wrapped*/ ctx[5]) {
+				if (if_block2) {
+					if (dirty & /*flex_wrapped*/ 32) {
+						transitions_transition_in(if_block2, 1);
+					}
+				} else {
+					if_block2 = NavBar_svelte_create_if_block(ctx);
+					if_block2.c();
+					transitions_transition_in(if_block2, 1);
+					if_block2.m(div5, t8);
+				}
+			} else if (if_block2) {
+				transitions_group_outros();
+
+				transitions_transition_out(if_block2, 1, 1, () => {
+					if_block2 = null;
+				});
+
+				transitions_check_outros();
+			}
+
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 4)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 128)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[2],
+						/*$$scope*/ ctx[7],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[2])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[2], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[7])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[7], dirty, null),
 						null
 					);
 				}
@@ -8118,6 +9433,8 @@ function Bar_svelte_create_fragment(ctx) {
 		},
 		i: function intro(local) {
 			if (current) return;
+			transitions_transition_in(if_block1);
+			transitions_transition_in(if_block2);
 			transitions_transition_in(default_slot, local);
 			transitions_transition_in(link0.$$.fragment, local);
 			transitions_transition_in(link1.$$.fragment, local);
@@ -8128,6 +9445,8 @@ function Bar_svelte_create_fragment(ctx) {
 			current = true;
 		},
 		o: function outro(local) {
+			transitions_transition_out(if_block1);
+			transitions_transition_out(if_block2);
 			transitions_transition_out(default_slot, local);
 			transitions_transition_out(link0.$$.fragment, local);
 			transitions_transition_out(link1.$$.fragment, local);
@@ -8139,10 +9458,16 @@ function Bar_svelte_create_fragment(ctx) {
 		},
 		d: function destroy(detaching) {
 			if (detaching) {
+				detach_dev(t0);
 				detach_dev(nav);
 			}
 
-			/*a2_binding*/ ctx[4](null);
+			if_block0.d(detaching);
+			detach_dev(if_block0_anchor);
+			/*a2_binding*/ ctx[9](null);
+			if (if_block1) if_block1.d();
+			/*div1_binding*/ ctx[10](null);
+			if (if_block2) if_block2.d();
 			if (default_slot) default_slot.d(detaching);
 			destroy_component(link0);
 			destroy_component(link1);
@@ -8150,12 +9475,15 @@ function Bar_svelte_create_fragment(ctx) {
 			destroy_component(link3);
 			destroy_component(link4);
 			destroy_component(link5);
+			/*div4_binding*/ ctx[11](null);
+			/*div5_binding*/ ctx[12](null);
+			/*nav_binding*/ ctx[13](null);
 		}
 	};
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: Bar_svelte_create_fragment.name,
+		id: NavBar_svelte_create_fragment.name,
 		type: "component",
 		source: "",
 		ctx
@@ -8164,29 +9492,53 @@ function Bar_svelte_create_fragment(ctx) {
 	return block;
 }
 
-function Bar_svelte_instance($$self, $$props, $$invalidate) {
+function NavBar_svelte_instance($$self, $$props, $$invalidate) {
 	let { $$slots: slots = {}, $$scope } = $$props;
-	validate_slots('Bar', slots, ['default']);
+	validate_slots('NavBar', slots, ['default']);
 	let logo_element;
+	let right_element;
+	let left_element;
+	let parent_element;
+	let menus_element;
+	let flex_wrapped = false;
+
+	function check_flex_wrapped() {
+		if (parent_element.clientWidth < menus_element.clientWidth + left_element.clientWidth) {
+			$$invalidate(5, flex_wrapped = true);
+			console.log("PRINT");
+			console.log(parent_element.clientWidth);
+			console.log(right_element.clientWidth);
+			console.log(left_element.clientWidth);
+		} else {
+			$$invalidate(5, flex_wrapped = false);
+		}
+	}
+
 	let hovered_class = "";
 	let effect_idx = 1;
 	let last_t_during_fx_change = new Date();
 
 	onMount(async () => {
+		check_flex_wrapped();
+
+		window.addEventListener('resize', () => {
+			check_flex_wrapped();
+		});
+
 		logo_element.addEventListener('mouseenter', () => {
 			let new_date = new Date();
 			let seconds = Math.abs(last_t_during_fx_change.getTime() - new_date.getTime()) / 1000;
-			$$invalidate(1, hovered_class = "hovered");
+			$$invalidate(6, hovered_class = "hovered");
 
 			if (seconds > 0.5) {
-				$$invalidate(1, hovered_class += " hover-effect-" + effect_idx);
+				$$invalidate(6, hovered_class += " hover-effect-" + effect_idx);
 			}
 
 			console.log("hovered");
 		});
 
 		logo_element.addEventListener('mouseleave', () => {
-			$$invalidate(1, hovered_class = "");
+			$$invalidate(6, hovered_class = "");
 			effect_idx = (effect_idx + 1) % 2;
 		});
 	});
@@ -8198,7 +9550,7 @@ function Bar_svelte_instance($$self, $$props, $$invalidate) {
 	const writable_props = [];
 
 	Object.keys($$props).forEach(key => {
-		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') Bar_svelte_console_1.warn(`<Bar> was created with unknown prop '${key}'`);
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') NavBar_svelte_console_1.warn(`<NavBar> was created with unknown prop '${key}'`);
 	});
 
 	function a2_binding($$value) {
@@ -8208,15 +9560,50 @@ function Bar_svelte_instance($$self, $$props, $$invalidate) {
 		});
 	}
 
+	function div1_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			left_element = $$value;
+			$$invalidate(2, left_element);
+		});
+	}
+
+	function div4_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			menus_element = $$value;
+			$$invalidate(4, menus_element);
+		});
+	}
+
+	function div5_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			right_element = $$value;
+			$$invalidate(1, right_element);
+		});
+	}
+
+	function nav_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			parent_element = $$value;
+			$$invalidate(3, parent_element);
+		});
+	}
+
 	$$self.$$set = $$props => {
-		if ('$$scope' in $$props) $$invalidate(2, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(7, $$scope = $$props.$$scope);
 	};
 
 	$$self.$capture_state = () => ({
 		onMount: onMount,
 		onDestroy: onDestroy,
 		Link: Link_svelte,
+		DarkModeToggle: DarkModeToggle_svelte,
 		logo_element,
+		right_element,
+		left_element,
+		parent_element,
+		menus_element,
+		flex_wrapped,
+		check_flex_wrapped,
 		hovered_class,
 		effect_idx,
 		last_t_during_fx_change
@@ -8224,7 +9611,12 @@ function Bar_svelte_instance($$self, $$props, $$invalidate) {
 
 	$$self.$inject_state = $$props => {
 		if ('logo_element' in $$props) $$invalidate(0, logo_element = $$props.logo_element);
-		if ('hovered_class' in $$props) $$invalidate(1, hovered_class = $$props.hovered_class);
+		if ('right_element' in $$props) $$invalidate(1, right_element = $$props.right_element);
+		if ('left_element' in $$props) $$invalidate(2, left_element = $$props.left_element);
+		if ('parent_element' in $$props) $$invalidate(3, parent_element = $$props.parent_element);
+		if ('menus_element' in $$props) $$invalidate(4, menus_element = $$props.menus_element);
+		if ('flex_wrapped' in $$props) $$invalidate(5, flex_wrapped = $$props.flex_wrapped);
+		if ('hovered_class' in $$props) $$invalidate(6, hovered_class = $$props.hovered_class);
 		if ('effect_idx' in $$props) effect_idx = $$props.effect_idx;
 		if ('last_t_during_fx_change' in $$props) last_t_during_fx_change = $$props.last_t_during_fx_change;
 	};
@@ -8233,170 +9625,81 @@ function Bar_svelte_instance($$self, $$props, $$invalidate) {
 		$$self.$inject_state($$props.$$inject);
 	}
 
-	return [logo_element, hovered_class, $$scope, slots, a2_binding];
+	return [
+		logo_element,
+		right_element,
+		left_element,
+		parent_element,
+		menus_element,
+		flex_wrapped,
+		hovered_class,
+		$$scope,
+		slots,
+		a2_binding,
+		div1_binding,
+		div4_binding,
+		div5_binding,
+		nav_binding
+	];
 }
 
-class Bar extends SvelteComponentDev {
+class NavBar extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init(this, options, Bar_svelte_instance, Bar_svelte_create_fragment, safe_not_equal, {}, Bar_svelte_add_css);
+		init(this, options, NavBar_svelte_instance, NavBar_svelte_create_fragment, safe_not_equal, {}, NavBar_svelte_add_css);
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
-			tagName: "Bar",
+			tagName: "NavBar",
 			options,
-			id: Bar_svelte_create_fragment.name
+			id: NavBar_svelte_create_fragment.name
 		});
 	}
 }
 
-/* harmony default export */ const Bar_svelte = (Bar);
-// EXTERNAL MODULE: ./public/brightness_6_FILL0_wght400_GRAD0_opsz48.svg
-var brightness_6_FILL0_wght400_GRAD0_opsz48 = __webpack_require__(567);
-var brightness_6_FILL0_wght400_GRAD0_opsz48_default = /*#__PURE__*/__webpack_require__.n(brightness_6_FILL0_wght400_GRAD0_opsz48);
-;// CONCATENATED MODULE: ./src/components/Footer.svelte
-/* src\components\Footer.svelte generated by Svelte v4.2.0 */
+/* harmony default export */ const NavBar_svelte = (NavBar);
+;// CONCATENATED MODULE: ./src/components/utils/Footer.svelte
+/* src\components\utils\Footer.svelte generated by Svelte v4.2.0 */
 
 
 
 
-
-
-
-const Footer_svelte_file = "src\\components\\Footer.svelte";
+const Footer_svelte_file = "src\\components\\utils\\Footer.svelte";
 
 function Footer_svelte_add_css(target) {
-	append_styles(target, "svelte-10dh2qp", "#bar.svelte-10dh2qp.svelte-10dh2qp{width:100%;margin-top:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;padding-top:2rem;padding-bottom:2rem}#bar.svelte-10dh2qp svg{cursor:pointer;aspect-ratio:1/1;width:2rem;margin-right:auto}#bar.svelte-10dh2qp svg:active{filter:invert(1);background:var(--accent-light)}#bar.svelte-10dh2qp .svelte-10dh2qp{font-weight:600}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRm9vdGVyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFpQkcsbUNBQ0QsS0FBQyxDQUFNLElBQUUsQ0FDWCxVQUFZLENBQUUsSUFBQyxDQUNmLE9BQUssQ0FBTSxJQUFDLENBQ1osU0FBVyxDQUFDLElBQUssQ0FDZixlQUFDLFVBQ0QsV0FBTyxNQUNQLGNBQU0sS0FDUixDQUNBLG1CQUFJLEtBQ0osTUFBSyxRQUFZLENBQ2pCLFlBQVksQ0FBSSxDQUFDLENBQUMsRUFDaEIsS0FBQyxNQUNILGlCQUNBLENBQ0EsbUJBQUcsQ0FBTSxXQUNQLE1BQUksV0FDSixVQUFNLG1CQUFvQixDQUM1QixDQUNBLG1CQUFFLGdCQUFLLENBQ0wsV0FBSyxJQUNQIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkZvb3Rlci5zdmVsdGUiXX0= */");
-}
-
-// (64:1) {:else}
-function create_else_block(ctx) {
-	let style;
-
-	const block = {
-		c: function create() {
-			style = dom_element("style");
-			style.textContent = "*{\n\t\t\t--accent-light: white;\n\t\t\t--accent-dark: black;\n\t\t}";
-			attr_dev(style, "class", "svelte-10dh2qp");
-			add_location(style, Footer_svelte_file, -1, 1522);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, style, anchor);
-		},
-		d: function destroy(detaching) {
-			if (detaching) {
-				detach_dev(style);
-			}
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_else_block.name,
-		type: "else",
-		source: "(64:1) {:else}",
-		ctx
-	});
-
-	return block;
-}
-
-// (42:1) {#if is_dark_mode_toggled}
-function create_if_block(ctx) {
-	let style;
-
-	const block = {
-		c: function create() {
-			style = dom_element("style");
-			style.textContent = "*{\n\t\t\t--accent-light: black;\n\t\t\t--accent-dark: white;\n\t\t}\n\t\tpre {\n\t\t\tfilter: invert(1);\n\t\t}\n\t\tcode * {\n\t\t\tfont-weight: 800 !important;\n\t\t}\n\t\t.track{\n\t\t\tbackground: white !important;\n\t\t\tfilter: invert(1) !important;\n\t\t}\n\t\t.track *{\n\t\t\t/* color: */\n\t\t\t--accent-light: white;\n\t\t\t--accent-dark: black;\n\t\t}";
-			attr_dev(style, "class", "svelte-10dh2qp");
-			add_location(style, Footer_svelte_file, 43, 1, 1190);
-		},
-		m: function mount(target, anchor) {
-			insert_dev(target, style, anchor);
-		},
-		d: function destroy(detaching) {
-			if (detaching) {
-				detach_dev(style);
-			}
-		}
-	};
-
-	dispatch_dev("SvelteRegisterBlock", {
-		block,
-		id: create_if_block.name,
-		type: "if",
-		source: "(42:1) {#if is_dark_mode_toggled}",
-		ctx
-	});
-
-	return block;
+	append_styles(target, "svelte-12quas", "#bar.svelte-12quas.svelte-12quas{width:100%;margin-top:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;padding-top:2rem;padding-bottom:2rem}#bar.svelte-12quas #name.svelte-12quas{margin-right:2rem}#bar.svelte-12quas .svelte-12quas{font-weight:600}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRm9vdGVyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFHTyxpQ0FDTCxNQUFPLEtBQ1QsZ0JBQ0MsT0FBTyxLQUFNLENBSWIsU0FBVSxDQUFHLElBQUUsQ0FDZCxlQUFPLFVBQ1QsaUJBQ0MsY0FBWSxDQUFLIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkZvb3Rlci5zdmVsdGUiXX0= */");
 }
 
 function Footer_svelte_create_fragment(ctx) {
 	let footer;
-	let t0;
-	let html_tag;
-	let t1;
 	let div;
-
-	function select_block_type(ctx, dirty) {
-		if (/*is_dark_mode_toggled*/ ctx[0]) return create_if_block;
-		return create_else_block;
-	}
-
-	let current_block_type = select_block_type(ctx, -1);
-	let if_block = current_block_type(ctx);
 
 	const block = {
 		c: function create() {
 			footer = dom_element("footer");
-			if_block.c();
-			t0 = space();
-			html_tag = new HtmlTag(false);
-			t1 = space();
 			div = dom_element("div");
 			div.textContent = "Petar Guglev © 2023";
-			html_tag.a = t1;
 			attr_dev(div, "id", "name");
-			attr_dev(div, "class", "svelte-10dh2qp");
-			add_location(div, Footer_svelte_file, -1, 1640);
+			attr_dev(div, "class", "svelte-12quas");
+			add_location(div, Footer_svelte_file, -1, 355);
 			attr_dev(footer, "id", "bar");
-			attr_dev(footer, "class", "svelte-10dh2qp");
-			add_location(footer, Footer_svelte_file, 40, 0, 1119);
+			attr_dev(footer, "class", "svelte-12quas");
+			add_location(footer, Footer_svelte_file, -1, 336);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, footer, anchor);
-			if_block.m(footer, null);
-			append_dev(footer, t0);
-			html_tag.m((brightness_6_FILL0_wght400_GRAD0_opsz48_default()), footer);
-			append_dev(footer, t1);
 			append_dev(footer, div);
-			/*footer_binding*/ ctx[2](footer);
 		},
-		p: function update(ctx, [dirty]) {
-			if (current_block_type !== (current_block_type = select_block_type(ctx, dirty))) {
-				if_block.d(1);
-				if_block = current_block_type(ctx);
-
-				if (if_block) {
-					if_block.c();
-					if_block.m(footer, t0);
-				}
-			}
-		},
+		p: utils_noop,
 		i: utils_noop,
 		o: utils_noop,
 		d: function destroy(detaching) {
 			if (detaching) {
 				detach_dev(footer);
 			}
-
-			if_block.d();
-			/*footer_binding*/ ctx[2](null);
 		}
 	};
 
@@ -8412,21 +9715,8 @@ function Footer_svelte_create_fragment(ctx) {
 }
 
 function Footer_svelte_instance($$self, $$props, $$invalidate) {
-	let style_media;
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('Footer', slots, []);
-	let is_dark_mode_toggled = localStorage.getItem("dark-mode") ?? false;
-	let bar_element;
-	let light_dark_toggle_icon_element;
-
-	onMount(async () => {
-		light_dark_toggle_icon_element = bar_element.querySelector("svg");
-
-		light_dark_toggle_icon_element.onclick = () => {
-			$$invalidate(0, is_dark_mode_toggled = !is_dark_mode_toggled);
-			localStorage.setItem("dark-mode", is_dark_mode_toggled ? "true" : "");
-		};
-	});
 
 	onDestroy(() => {
 		
@@ -8438,42 +9728,8 @@ function Footer_svelte_instance($$self, $$props, $$invalidate) {
 		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Footer> was created with unknown prop '${key}'`);
 	});
 
-	function footer_binding($$value) {
-		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-			bar_element = $$value;
-			$$invalidate(1, bar_element);
-		});
-	}
-
-	$$self.$capture_state = () => ({
-		onMount: onMount,
-		onDestroy: onDestroy,
-		Link: Link_svelte,
-		LightDarkToggleIcon: (brightness_6_FILL0_wght400_GRAD0_opsz48_default()),
-		is_dark_mode_toggled,
-		bar_element,
-		light_dark_toggle_icon_element,
-		style_media
-	});
-
-	$$self.$inject_state = $$props => {
-		if ('is_dark_mode_toggled' in $$props) $$invalidate(0, is_dark_mode_toggled = $$props.is_dark_mode_toggled);
-		if ('bar_element' in $$props) $$invalidate(1, bar_element = $$props.bar_element);
-		if ('light_dark_toggle_icon_element' in $$props) light_dark_toggle_icon_element = $$props.light_dark_toggle_icon_element;
-		if ('style_media' in $$props) style_media = $$props.style_media;
-	};
-
-	if ($$props && "$$inject" in $$props) {
-		$$self.$inject_state($$props.$$inject);
-	}
-
-	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*is_dark_mode_toggled*/ 1) {
-			$: style_media = is_dark_mode_toggled ? "" : `max-width:1px`;
-		}
-	};
-
-	return [is_dark_mode_toggled, bar_element, footer_binding];
+	$$self.$capture_state = () => ({ onDestroy: onDestroy });
+	return [];
 }
 
 class Footer extends SvelteComponentDev {
@@ -8504,7 +9760,7 @@ const { Object: Object_1 } = globals;
 const favdemosPage_svelte_file = "src\\components\\favdemosPage.svelte";
 
 function favdemosPage_svelte_add_css(target) {
-	append_styles(target, "svelte-1njzqxq", ".year.svelte-1njzqxq.svelte-1njzqxq{font-weight:bolder;font-size:2rem;margin-bottom:0.1rem;margin-top:0.9rem}.demo.svelte-1njzqxq.svelte-1njzqxq{width:fit-content;display:flex}.demo.svelte-1njzqxq .svelte-1njzqxq{font-size:1rem}.demo.svelte-1njzqxq .name.svelte-1njzqxq{font-weight:bold}main.svelte-1njzqxq.svelte-1njzqxq{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmF2ZGVtb3NQYWdlLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFxSUcsK0NBQ0ssaUJBQ0wsQ0FBSSxJQUFLLGNBQ1Qsa0JBR0EsaURBTUEsb0JBQ0csQ0FBRSx5Q0FFTCxVQUNBLCtDQUVJLFlBQ0osK0NBSUEsSUFBSSxVQUNKLGlCQUNLLFlBQ0wsWUFBUyxRQUNULG9CQUdBLGlCQUNLIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbImZhdmRlbW9zUGFnZS5zdmVsdGUiXX0= */");
+	append_styles(target, "svelte-1njzqxq", ".year.svelte-1njzqxq.svelte-1njzqxq{font-weight:bolder;font-size:2rem;margin-bottom:0.1rem;margin-top:0.9rem}.demo.svelte-1njzqxq.svelte-1njzqxq{width:fit-content;display:flex}.demo.svelte-1njzqxq .svelte-1njzqxq{font-size:1rem}.demo.svelte-1njzqxq .name.svelte-1njzqxq{font-weight:bold}main.svelte-1njzqxq.svelte-1njzqxq{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmF2ZGVtb3NQYWdlLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFpSUcsK0NBR0EsaUJBQ0ssbUJBQ0QsQ0FBSyxpQkFDVCxpREFNQSxvQkFDRyxDQUFFLHlCQUVMLDBCQUNLLENBRUwseUJBSUQscUJBQU0sWUFDRCwrQ0FJSixJQUFJLFVBQ0osaUJBQ0ssWUFDTCxZQUFTLFFBQ1Qsb0JBQ0ssaUJBQ0wsQ0FBSSxJQUFLIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbImZhdmRlbW9zUGFnZS5zdmVsdGUiXX0= */");
 }
 
 function get_each_context(ctx, list, i) {
@@ -8539,11 +9795,11 @@ function create_each_block_1(ctx) {
 			div = dom_element("div");
 			div.textContent = `${/*demo*/ ctx[12].name}   —   ${/*demo*/ ctx[12].group}`;
 			attr_dev(div, "class", "name svelte-1njzqxq");
-			add_location(div, favdemosPage_svelte_file, -1, 7763);
+			add_location(div, favdemosPage_svelte_file, 193, 1, 7778);
 			attr_dev(a, "href", a_href_value = /*demo*/ ctx[12].link);
 			attr_dev(a, "target", "”_blank”");
 			attr_dev(a, "class", "demo svelte-1njzqxq");
-			add_location(a, favdemosPage_svelte_file, -1, 7637);
+			add_location(a, favdemosPage_svelte_file, 192, 0, 7652);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -8606,7 +9862,7 @@ function create_each_block(ctx) {
 
 			each_1_anchor = empty();
 			attr_dev(div, "class", "year svelte-1njzqxq");
-			add_location(div, favdemosPage_svelte_file, -1, 7564);
+			add_location(div, favdemosPage_svelte_file, -1, 7579);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -8674,10 +9930,11 @@ function favdemosPage_svelte_create_fragment(ctx) {
 	let t1;
 	let t2;
 	let img;
+	let img_style_value;
 	let t3;
 	let footer;
 	let current;
-	bar = new Bar_svelte({ $$inline: true });
+	bar = new NavBar_svelte({ $$inline: true });
 	let each_value = ensure_array_like_dev(Object.keys(/*list*/ ctx[3]).reverse());
 	let each_blocks = [];
 
@@ -8704,16 +9961,22 @@ function favdemosPage_svelte_create_fragment(ctx) {
 			img = dom_element("img");
 			t3 = space();
 			create_component(footer.$$.fragment);
-			add_location(div, favdemosPage_svelte_file, 185, 1, 7500);
+			add_location(div, favdemosPage_svelte_file, -1, 7515);
 			attr_dev(img, "class", "hover-image");
-			set_style(img, "background", "var(--accent-dark)");
-			set_style(img, "display", "none");
-			set_style(img, "position", "fixed");
-			set_style(img, "pointer-events", "none");
-			set_style(img, "position", "fixed");
-			add_location(img, favdemosPage_svelte_file, -1, 8048);
+
+			attr_dev(img, "style", img_style_value = `
+			background:var(--accent-dark);
+			display:none;
+			position: fixed;
+			pointer-events: none;
+			position:fixed;
+			min-width: 1rem;
+			min-height: 1rem;
+		`);
+
+			add_location(img, favdemosPage_svelte_file, -1, 8063);
 			attr_dev(main, "class", "svelte-1njzqxq");
-			add_location(main, favdemosPage_svelte_file, 183, 0, 7483);
+			add_location(main, favdemosPage_svelte_file, 179, 1, 7498);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -8945,7 +10208,7 @@ function favdemosPage_svelte_instance($$self, $$props, $$invalidate) {
 	$$self.$capture_state = () => ({
 		onMount: onMount,
 		onDestroy: onDestroy,
-		Bar: Bar_svelte,
+		Bar: NavBar_svelte,
 		Footer: Footer_svelte,
 		hover_image_element,
 		showImage,
@@ -9012,34 +10275,34 @@ const { Object: musicPage_svelte_Object_1 } = globals;
 const musicPage_svelte_file = "src\\components\\musicPage.svelte";
 
 function musicPage_svelte_add_css(target) {
-	append_styles(target, "svelte-16er8oa", ".player.svelte-16er8oa.svelte-16er8oa::part(play){stroke:black !important}.player.svelte-16er8oa.svelte-16er8oa::part(button){fill:black !important}.player.svelte-16er8oa.svelte-16er8oa::part(duration){display:none;font-family:\"Petrona\" !important}.player.svelte-16er8oa.svelte-16er8oa::part(currenttime){display:none;font-weight:400}.player.svelte-16er8oa.svelte-16er8oa::part(input){overflow:hidden}.player.svelte-16er8oa.svelte-16er8oa::part(path2){stroke:black !important}.title.svelte-16er8oa.svelte-16er8oa{font-weight:bolder;font-size:2rem;margin-left:1.5rem;margin-bottom:0.6rem;margin-top:0.9rem}.tracks.svelte-16er8oa.svelte-16er8oa{display:flex;flex-wrap:wrap;justify-content:space-around}.tracks.svelte-16er8oa .track.svelte-16er8oa{display:flex;width:fit-content;flex-direction:column;align-items:end;margin-bottom:0.5rem}.tracks.svelte-16er8oa .track .track-bottom-bar.svelte-16er8oa{height:2rem;justify-content:space-between;width:100%;display:flex}.tracks.svelte-16er8oa .track .track-bottom-bar .track-name.svelte-16er8oa{font-weight:600;margin-left:1rem;width:10rem}.tracks.svelte-16er8oa .track .track-bottom-bar .track-date.svelte-16er8oa{margin-right:0.4rem}main.svelte-16er8oa *{color:var(--accent-dark);font-family:\"Petrona\";font-weight:400}main.svelte-16er8oa *::selection{background:var(--accent-dark);color:var(--accent-light)}main.svelte-16er8oa.svelte-16er8oa{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVzaWNQYWdlLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUF1Qm1CLHFDQUFJLGFBQ3ZCLE1BQU8sTUFBSyxXQUNaLENBRUEscUNBQU8sT0FBTyxNQUFNLENBQUMsQ0FDckIsS0FBUSxLQUFJLFdBQ1osQ0FFQSxxQ0FBTyxPQUFDLFFBQVcsQ0FBSyxDQUN4QixPQUFTLEtBQUksQ0FDYixXQUFZLFVBQVksQ0FBQyxVQUN6QixDQUVBLHFDQUFPLE9BQUssYUFDWixPQUFPLENBQUksS0FDWCxXQUFVLElBQ1YsQ0FFQSxxQ0FBRSxPQUFTLE9BQ1QsUUFBSyxPQUNQLENBRUEsbURBQ0MsTUFBTyxNQUFNLENBQUUsVUFFZixDQUtBLG9DQUFPLENBR1AsV0FBUyxpQkFHUixDQUFTLGdCQUNSLE9BQVUsY0FDVCxRQUNILGlCQUdBLHNDQUVDLFFBQ0EsZUFDQyxDQUFLLElBQUksZ0JBQ0osQ0FBSywwREFJWixPQUFNLE1BR04sS0FBTyxZQUFVLENBRWpCLGNBQWEsQ0FBSSxNQUFFLENBQ2pCLGdCQUVGLGFBQWUsT0FDaEIsQ0FDQSwrREFDQyxNQUFNLEtBQU0iLCJuYW1lcyI6W10sInNvdXJjZXMiOlsibXVzaWNQYWdlLnN2ZWx0ZSJdfQ== */");
+	append_styles(target, "svelte-l9r4ji", ".player.svelte-l9r4ji.svelte-l9r4ji::part(play){stroke:black !important}.player.svelte-l9r4ji.svelte-l9r4ji::part(button){fill:black !important}.player.svelte-l9r4ji.svelte-l9r4ji::part(duration){display:none;font-family:\"Petrona\" !important}.player.svelte-l9r4ji.svelte-l9r4ji::part(currenttime){display:none;font-weight:400}.player.svelte-l9r4ji.svelte-l9r4ji::part(input){overflow:hidden}.player.svelte-l9r4ji.svelte-l9r4ji::part(path2){stroke:black !important}.title-container.svelte-l9r4ji.svelte-l9r4ji{margin-left:2rem;width:fit-content;cursor:pointer;display:flex;align-items:center}.title-container.svelte-l9r4ji svg.svelte-l9r4ji{transition:transform 0.1s ease}.title-container.svelte-l9r4ji.svelte-l9r4ji:active{filter:invert(1);background:var(--accent-light)}.title-container.svelte-l9r4ji .title.svelte-l9r4ji{font-weight:bolder;font-size:2rem;margin-bottom:2rem;margin-top:2rem}.tracks.svelte-l9r4ji.svelte-l9r4ji{display:flex;flex-wrap:wrap;justify-content:space-around}.tracks.svelte-l9r4ji .track.svelte-l9r4ji{display:flex;width:fit-content;flex-direction:column;align-items:end;margin-bottom:0.5rem}.tracks.svelte-l9r4ji .track .track-bottom-bar.svelte-l9r4ji{height:2rem;justify-content:space-between;width:100%;display:flex}.tracks.svelte-l9r4ji .track .track-bottom-bar .track-name.svelte-l9r4ji{font-weight:600;margin-left:1rem;width:10rem}.tracks.svelte-l9r4ji .track .track-bottom-bar .track-date.svelte-l9r4ji{margin-right:0.4rem}main.svelte-l9r4ji *{color:var(--accent-dark);font-family:\"Petrona\";font-weight:400}main.svelte-l9r4ji *::selection{background:var(--accent-dark);color:var(--accent-light)}main.svelte-l9r4ji.svelte-l9r4ji{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibXVzaWNQYWdlLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUE2QmtCLG1DQUFLLE9BQU0sTUFDN0IsTUFBTyxDQUFHLEtBQUssV0FDZixDQUVBLG1DQUFPLE9BQUssTUFBUSxDQUFFLENBQ3RCLEtBQU8sS0FBTSxDQUFDLFVBQ2QsQ0FFQSxtQ0FBTyxPQUFLLFFBQUssQ0FBTyxDQUN4QixPQUFPLENBQUksS0FDWCxXQUFZLFVBQVksQ0FBQyxVQUN6QixDQUVBLG1DQUFPLE9BQUssV0FBYSxFQUN6QixPQUFRLE1BQ1IsV0FBYSxJQUNiLENBRUEsbUNBQUssT0FBSyxPQUNSLFFBQU0sT0FDUixDQUVBLG1DQUFPLGNBQ1AsdUJBQ0EsQ0FFQSw0Q0FBaUIsQ0FFaEIsV0FBUSxLQUFTLENBRWpCLEtBQU8sWUFBUyxDQUdoQixNQUFPLFFBQU0sQ0FHYixPQUFTLGlCQUdDLHNDQUVQLG1CQUNILDhCQUdBLDZDQUNLLGNBQ0osQ0FBSyxvQkFDTCxLQUFZLGNBQTJCLGdDQUVqQyxxQkFBUSxZQUVkLHVCQUVELGFBQU0sS0FBYSxDQUNuQixVQUFNLEtBR04sb0NBR0ssUUFDQSxLQUFJLFVBQ1AscUJBQ0csY0FFTCxxQkFBRSxzQkFFRixPQUFTLENBQUMsSUFBSyxDQUNkLE1BQU8sWUFDVCxzQkFDQyxXQUFZLElBQUsiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsibXVzaWNQYWdlLnN2ZWx0ZSJdfQ== */");
 }
 
 function musicPage_svelte_get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[4] = list[i];
-	child_ctx[6] = i;
+	child_ctx[6] = list[i];
+	child_ctx[8] = i;
 	return child_ctx;
 }
 
 function musicPage_svelte_get_each_context_1(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[7] = list[i];
-	child_ctx[9] = i;
+	child_ctx[9] = list[i];
+	child_ctx[11] = i;
 	return child_ctx;
 }
 
 function get_each_context_2(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[10] = list[i];
-	child_ctx[9] = i;
+	child_ctx[12] = list[i];
+	child_ctx[11] = i;
 	return child_ctx;
 }
 
-// (132:2) {#each Object.keys(audio_folders) as audio_folder, i}
+// (151:2) {#each Object.keys(audio_folders) as audio_folder, i}
 function create_each_block_2(ctx) {
 	let a;
-	let t0_value = /*audio_folder*/ ctx[10] + "";
+	let t0_value = /*audio_folder*/ ctx[12] + "";
 	let t0;
 	let t1;
 	let a_href_value;
@@ -9047,7 +10310,7 @@ function create_each_block_2(ctx) {
 	let dispose;
 
 	function click_handler() {
-		return /*click_handler*/ ctx[2](/*audio_folder*/ ctx[10]);
+		return /*click_handler*/ ctx[3](/*audio_folder*/ ctx[12]);
 	}
 
 	const block = {
@@ -9055,9 +10318,9 @@ function create_each_block_2(ctx) {
 			a = dom_element("a");
 			t0 = dom_text(t0_value);
 			t1 = space();
-			attr_dev(a, "href", a_href_value = `#${/*audio_folder*/ ctx[10]}`);
+			attr_dev(a, "href", a_href_value = `#${/*audio_folder*/ ctx[12]}`);
 			attr_dev(a, "class", "menu-item");
-			add_location(a, musicPage_svelte_file, -1, 2313);
+			add_location(a, musicPage_svelte_file, -1, 2749);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -9086,17 +10349,17 @@ function create_each_block_2(ctx) {
 		block,
 		id: create_each_block_2.name,
 		type: "each",
-		source: "(132:2) {#each Object.keys(audio_folders) as audio_folder, i}",
+		source: "(151:2) {#each Object.keys(audio_folders) as audio_folder, i}",
 		ctx
 	});
 
 	return block;
 }
 
-// (131:1) <Bar>
-function create_default_slot(ctx) {
+// (150:1) <Bar>
+function musicPage_svelte_create_default_slot(ctx) {
 	let each_1_anchor;
-	let each_value_2 = ensure_array_like_dev(Object.keys(/*audio_folders*/ ctx[0]));
+	let each_value_2 = ensure_array_like_dev(Object.keys(/*audio_folders*/ ctx[1]));
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value_2.length; i += 1) {
@@ -9121,8 +10384,8 @@ function create_default_slot(ctx) {
 			insert_dev(target, each_1_anchor, anchor);
 		},
 		p: function update(ctx, dirty) {
-			if (dirty & /*Object, audio_folders, scroll_to_view*/ 1) {
-				each_value_2 = ensure_array_like_dev(Object.keys(/*audio_folders*/ ctx[0]));
+			if (dirty & /*Object, audio_folders, scroll_to_view*/ 2) {
+				each_value_2 = ensure_array_like_dev(Object.keys(/*audio_folders*/ ctx[1]));
 				let i;
 
 				for (i = 0; i < each_value_2.length; i += 1) {
@@ -9155,16 +10418,16 @@ function create_default_slot(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_default_slot.name,
+		id: musicPage_svelte_create_default_slot.name,
 		type: "slot",
-		source: "(131:1) <Bar>",
+		source: "(150:1) <Bar>",
 		ctx
 	});
 
 	return block;
 }
 
-// (147:3) {#each audio_folders[audio_folder_key]["sorted"] as audio_file, i}
+// (175:3) {#each audio_folders[audio_folder_key]["sorted"] as audio_file, i}
 function musicPage_svelte_create_each_block_1(ctx) {
 	let div3;
 	let wave_audio_path_player;
@@ -9182,25 +10445,25 @@ function musicPage_svelte_create_each_block_1(ctx) {
 			t0 = space();
 			div2 = dom_element("div");
 			div0 = dom_element("div");
-			div0.textContent = `${/*audio_file*/ ctx[7].name}`;
+			div0.textContent = `${/*audio_file*/ ctx[9].name}`;
 			t2 = space();
 			div1 = dom_element("div");
-			div1.textContent = `${/*audio_file*/ ctx[7].creation_date}`;
-			if (!src_url_equal(wave_audio_path_player.src, wave_audio_path_player_src_value = `${window.LFS_PREPEND}${/*audio_file*/ ctx[7].src}`)) set_custom_element_data(wave_audio_path_player, "src", wave_audio_path_player_src_value);
-			set_custom_element_data(wave_audio_path_player, "class", "player svelte-16er8oa");
+			div1.textContent = `${/*audio_file*/ ctx[9].creation_date}`;
+			if (!src_url_equal(wave_audio_path_player.src, wave_audio_path_player_src_value = `${window.LFS_PREPEND}${/*audio_file*/ ctx[9].src}`)) set_custom_element_data(wave_audio_path_player, "src", wave_audio_path_player_src_value);
+			set_custom_element_data(wave_audio_path_player, "class", "player svelte-l9r4ji");
 			set_custom_element_data(wave_audio_path_player, "wave-width", "200");
 			set_custom_element_data(wave_audio_path_player, "wave-height", "80");
 			set_custom_element_data(wave_audio_path_player, "color", "black");
 			set_custom_element_data(wave_audio_path_player, "wave-slider", "black");
-			add_location(wave_audio_path_player, musicPage_svelte_file, -1, 2814);
-			attr_dev(div0, "class", "track-name svelte-16er8oa");
-			add_location(div0, musicPage_svelte_file, -1, 3157);
-			attr_dev(div1, "class", "track-date svelte-16er8oa");
-			add_location(div1, musicPage_svelte_file, -1, 3228);
-			attr_dev(div2, "class", "track-bottom-bar svelte-16er8oa");
-			add_location(div2, musicPage_svelte_file, -1, 3119);
-			attr_dev(div3, "class", "track svelte-16er8oa");
-			add_location(div3, musicPage_svelte_file, -1, 2788);
+			add_location(wave_audio_path_player, musicPage_svelte_file, -1, 3709);
+			attr_dev(div0, "class", "track-name svelte-l9r4ji");
+			add_location(div0, musicPage_svelte_file, -1, 4052);
+			attr_dev(div1, "class", "track-date svelte-l9r4ji");
+			add_location(div1, musicPage_svelte_file, -1, 4123);
+			attr_dev(div2, "class", "track-bottom-bar svelte-l9r4ji");
+			add_location(div2, musicPage_svelte_file, -1, 4014);
+			attr_dev(div3, "class", "track svelte-l9r4ji");
+			add_location(div3, musicPage_svelte_file, -1, 3683);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div3, anchor);
@@ -9223,22 +10486,35 @@ function musicPage_svelte_create_each_block_1(ctx) {
 		block,
 		id: musicPage_svelte_create_each_block_1.name,
 		type: "each",
-		source: "(147:3) {#each audio_folders[audio_folder_key][\\\"sorted\\\"] as audio_file, i}",
+		source: "(175:3) {#each audio_folders[audio_folder_key][\\\"sorted\\\"] as audio_file, i}",
 		ctx
 	});
 
 	return block;
 }
 
-// (141:1) {#each Object.keys(audio_folders) as audio_folder_key, k}
+// (160:1) {#each Object.keys(audio_folders) as audio_folder_key, k}
 function musicPage_svelte_create_each_block(ctx) {
+	let div1;
 	let div0;
-	let t0_value = /*audio_folder_key*/ ctx[4] + "";
+	let t0_value = /*audio_folder_key*/ ctx[6] + "";
 	let t0;
 	let div0_id_value;
 	let t1;
-	let div1;
-	let each_value_1 = ensure_array_like_dev(/*audio_folders*/ ctx[0][/*audio_folder_key*/ ctx[4]]["sorted"]);
+	let svg;
+	let path;
+	let svg_style_value;
+	let t2;
+	let div2;
+	let div2_style_value;
+	let mounted;
+	let dispose;
+
+	function click_handler_1() {
+		return /*click_handler_1*/ ctx[4](/*k*/ ctx[8]);
+	}
+
+	let each_value_1 = ensure_array_like_dev(/*audio_folders*/ ctx[1][/*audio_folder_key*/ ctx[6]]["sorted"]);
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
@@ -9247,36 +10523,77 @@ function musicPage_svelte_create_each_block(ctx) {
 
 	const block = {
 		c: function create() {
+			div1 = dom_element("div");
 			div0 = dom_element("div");
 			t0 = dom_text(t0_value);
 			t1 = space();
-			div1 = dom_element("div");
+			svg = svg_element("svg");
+			path = svg_element("path");
+			t2 = space();
+			div2 = dom_element("div");
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			attr_dev(div0, "class", "title svelte-16er8oa");
-			attr_dev(div0, "id", div0_id_value = /*audio_folder_key*/ ctx[4]);
-			add_location(div0, musicPage_svelte_file, -1, 2536);
-			attr_dev(div1, "class", "tracks svelte-16er8oa");
-			add_location(div1, musicPage_svelte_file, -1, 2611);
+			attr_dev(div0, "class", "title svelte-l9r4ji");
+			attr_dev(div0, "id", div0_id_value = /*audio_folder_key*/ ctx[6]);
+			add_location(div0, musicPage_svelte_file, -1, 3136);
+			attr_dev(path, "d", "M480-360 280-559h400L480-360Z");
+			add_location(path, musicPage_svelte_file, -1, 3385);
+			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
+			attr_dev(svg, "height", "48");
+			attr_dev(svg, "viewBox", "0 -960 960 960");
+			attr_dev(svg, "width", "48");
+
+			attr_dev(svg, "style", svg_style_value = /*audio_folders_toggled*/ ctx[0][/*k*/ ctx[8]]
+			? ""
+			: "transform: scaleY(-1);");
+
+			attr_dev(svg, "class", "svelte-l9r4ji");
+			add_location(svg, musicPage_svelte_file, -1, 3214);
+			attr_dev(div1, "class", "title-container svelte-l9r4ji");
+			add_location(div1, musicPage_svelte_file, -1, 3033);
+			attr_dev(div2, "class", "tracks svelte-l9r4ji");
+
+			attr_dev(div2, "style", div2_style_value = /*audio_folders_toggled*/ ctx[0][/*k*/ ctx[8]]
+			? ``
+			: `display: none;`);
+
+			add_location(div2, musicPage_svelte_file, -1, 3449);
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, div0, anchor);
-			append_dev(div0, t0);
-			insert_dev(target, t1, anchor);
 			insert_dev(target, div1, anchor);
+			append_dev(div1, div0);
+			append_dev(div0, t0);
+			append_dev(div1, t1);
+			append_dev(div1, svg);
+			append_dev(svg, path);
+			insert_dev(target, t2, anchor);
+			insert_dev(target, div2, anchor);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				if (each_blocks[i]) {
-					each_blocks[i].m(div1, null);
+					each_blocks[i].m(div2, null);
 				}
 			}
+
+			if (!mounted) {
+				dispose = listen_dev(div1, "click", click_handler_1, false, false, false, false);
+				mounted = true;
+			}
 		},
-		p: function update(ctx, dirty) {
-			if (dirty & /*audio_folders, Object, window*/ 1) {
-				each_value_1 = ensure_array_like_dev(/*audio_folders*/ ctx[0][/*audio_folder_key*/ ctx[4]]["sorted"]);
+		p: function update(new_ctx, dirty) {
+			ctx = new_ctx;
+
+			if (dirty & /*audio_folders_toggled*/ 1 && svg_style_value !== (svg_style_value = /*audio_folders_toggled*/ ctx[0][/*k*/ ctx[8]]
+			? ""
+			: "transform: scaleY(-1);")) {
+				attr_dev(svg, "style", svg_style_value);
+			}
+
+			if (dirty & /*audio_folders, Object, window*/ 2) {
+				each_value_1 = ensure_array_like_dev(/*audio_folders*/ ctx[1][/*audio_folder_key*/ ctx[6]]["sorted"]);
 				let i;
 
 				for (i = 0; i < each_value_1.length; i += 1) {
@@ -9287,7 +10604,7 @@ function musicPage_svelte_create_each_block(ctx) {
 					} else {
 						each_blocks[i] = musicPage_svelte_create_each_block_1(child_ctx);
 						each_blocks[i].c();
-						each_blocks[i].m(div1, null);
+						each_blocks[i].m(div2, null);
 					}
 				}
 
@@ -9297,15 +10614,23 @@ function musicPage_svelte_create_each_block(ctx) {
 
 				each_blocks.length = each_value_1.length;
 			}
+
+			if (dirty & /*audio_folders_toggled*/ 1 && div2_style_value !== (div2_style_value = /*audio_folders_toggled*/ ctx[0][/*k*/ ctx[8]]
+			? ``
+			: `display: none;`)) {
+				attr_dev(div2, "style", div2_style_value);
+			}
 		},
 		d: function destroy(detaching) {
 			if (detaching) {
-				detach_dev(div0);
-				detach_dev(t1);
 				detach_dev(div1);
+				detach_dev(t2);
+				detach_dev(div2);
 			}
 
 			destroy_each(each_blocks, detaching);
+			mounted = false;
+			dispose();
 		}
 	};
 
@@ -9313,7 +10638,7 @@ function musicPage_svelte_create_each_block(ctx) {
 		block,
 		id: musicPage_svelte_create_each_block.name,
 		type: "each",
-		source: "(141:1) {#each Object.keys(audio_folders) as audio_folder_key, k}",
+		source: "(160:1) {#each Object.keys(audio_folders) as audio_folder_key, k}",
 		ctx
 	});
 
@@ -9328,15 +10653,15 @@ function musicPage_svelte_create_fragment(ctx) {
 	let footer;
 	let current;
 
-	bar = new Bar_svelte({
+	bar = new NavBar_svelte({
 			props: {
-				$$slots: { default: [create_default_slot] },
+				$$slots: { default: [musicPage_svelte_create_default_slot] },
 				$$scope: { ctx }
 			},
 			$$inline: true
 		});
 
-	let each_value = ensure_array_like_dev(Object.keys(/*audio_folders*/ ctx[0]));
+	let each_value = ensure_array_like_dev(Object.keys(/*audio_folders*/ ctx[1]));
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value.length; i += 1) {
@@ -9357,8 +10682,8 @@ function musicPage_svelte_create_fragment(ctx) {
 
 			t1 = space();
 			create_component(footer.$$.fragment);
-			attr_dev(main, "class", "svelte-16er8oa");
-			add_location(main, musicPage_svelte_file, -1, 2240);
+			attr_dev(main, "class", "svelte-l9r4ji");
+			add_location(main, musicPage_svelte_file, -1, 2676);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -9381,14 +10706,14 @@ function musicPage_svelte_create_fragment(ctx) {
 		p: function update(ctx, [dirty]) {
 			const bar_changes = {};
 
-			if (dirty & /*$$scope*/ 4096) {
+			if (dirty & /*$$scope*/ 16384) {
 				bar_changes.$$scope = { dirty, ctx };
 			}
 
 			bar.$set(bar_changes);
 
-			if (dirty & /*audio_folders, Object, window*/ 1) {
-				each_value = ensure_array_like_dev(Object.keys(/*audio_folders*/ ctx[0]));
+			if (dirty & /*audio_folders_toggled, audio_folders, Object, window*/ 3) {
+				each_value = ensure_array_like_dev(Object.keys(/*audio_folders*/ ctx[1]));
 				let i;
 
 				for (i = 0; i < each_value.length; i += 1) {
@@ -9462,10 +10787,16 @@ function musicPage_svelte_instance($$self, $$props, $$invalidate) {
 	}
 
 	const audio_folders = {"public":{"favicon-32.png":{"src":"favicon-32.png"},"favicon-128.png":{"src":"favicon-128.png"},"dummy.png":{"src":"dummy.png"},"images":{"1690102042507_1[1].png":{"src":"images\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12"},"paintings":{"unknown.png":{"src":"images\\paintings\\unknown.png","width":386,"height":381,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},"adsg.png":{"src":"images\\paintings\\adsg.png","width":826,"height":877,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"adsg.png"},"868.png":{"src":"images\\paintings\\868.png","width":1918,"height":3074,"src_thumb":"images\\paintings\\_thumb_868.jpg","is_video":false,"creation_date":"2022-5-5","name":"868.png"},"1690102042507_1[1].png":{"src":"images\\paintings\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\paintings\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12","name":"1690102042507_1[1].png"},"1690037672960_1 (1).png":{"src":"images\\paintings\\1690037672960_1 (1).png","width":1804,"height":1785,"src_thumb":"images\\paintings\\_thumb_1690037672960_1 (1).jpg","is_video":false,"creation_date":"2023-8-13","name":"1690037672960_1 (1).png"},"1689957895824_2 (1).png":{"src":"images\\paintings\\1689957895824_2 (1).png","width":1437,"height":1701,"src_thumb":"images\\paintings\\_thumb_1689957895824_2 (1).jpg","is_video":false,"creation_date":"2023-8-14","name":"1689957895824_2 (1).png"},"1137-a.png":{"src":"images\\paintings\\1137-a.png","width":1920,"height":1880,"src_thumb":"images\\paintings\\_thumb_1137-a.jpg","is_video":false,"creation_date":"2023-8-15","name":"1137-a.png"},"1135-c.png":{"src":"images\\paintings\\1135-c.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1135-c.jpg","is_video":false,"creation_date":"2023-8-15","name":"1135-c.png"},"1132-a.png":{"src":"images\\paintings\\1132-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1132-a.jpg","is_video":false,"creation_date":"2023-1-24","name":"1132-a.png"},"1131-a.png":{"src":"images\\paintings\\1131-a.png","width":1920,"height":2880,"src_thumb":"images\\paintings\\_thumb_1131-a.jpg","is_video":false,"creation_date":"2023-1-23","name":"1131-a.png"},"1130-b.png":{"src":"images\\paintings\\1130-b.png","width":1920,"height":2680,"src_thumb":"images\\paintings\\_thumb_1130-b.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-b.png"},"1130-a.png":{"src":"images\\paintings\\1130-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1130-a.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-a.png"},"1129-pat-a.png":{"src":"images\\paintings\\1129-pat-a.png","width":2020,"height":1280,"src_thumb":"images\\paintings\\_thumb_1129-pat-a.jpg","is_video":false,"creation_date":"2023-1-21","name":"1129-pat-a.png"},"1123-e.png":{"src":"images\\paintings\\1123-e.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1123-e.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-e.png"},"1123-c.png":{"src":"images\\paintings\\1123-c.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1123-c.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-c.png"},"1119.png":{"src":"images\\paintings\\1119.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1119.jpg","is_video":false,"creation_date":"2023-1-11","name":"1119.png"},"1117-2.png":{"src":"images\\paintings\\1117-2.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1117-2.jpg","is_video":false,"creation_date":"2023-1-9","name":"1117-2.png"},"1112.png":{"src":"images\\paintings\\1112.png","width":1170,"height":1860,"src_thumb":"images\\paintings\\_thumb_1112.jpg","is_video":false,"creation_date":"2023-1-4","name":"1112.png"},"1055.png":{"src":"images\\paintings\\1055.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1055.jpg","is_video":false,"creation_date":"2022-11-8","name":"1055.png"},"1041.png":{"src":"images\\paintings\\1041.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1041.jpg","is_video":false,"creation_date":"2022-10-25","name":"1041.png"},"1135-b (1).jpg":{"src":"images\\paintings\\1135-b (1).jpg","width":1920,"height":2780,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"1135-b (1).jpg"},"sorted":[{"src":"images\\paintings\\1137-a.png","width":1920,"height":1880,"src_thumb":"images\\paintings\\_thumb_1137-a.jpg","is_video":false,"creation_date":"2023-8-15","name":"1137-a.png"},{"src":"images\\paintings\\1135-c.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1135-c.jpg","is_video":false,"creation_date":"2023-8-15","name":"1135-c.png"},{"src":"images\\paintings\\1135-b (1).jpg","width":1920,"height":2780,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"1135-b (1).jpg"},{"src":"images\\paintings\\1689957895824_2 (1).png","width":1437,"height":1701,"src_thumb":"images\\paintings\\_thumb_1689957895824_2 (1).jpg","is_video":false,"creation_date":"2023-8-14","name":"1689957895824_2 (1).png"},{"src":"images\\paintings\\1690037672960_1 (1).png","width":1804,"height":1785,"src_thumb":"images\\paintings\\_thumb_1690037672960_1 (1).jpg","is_video":false,"creation_date":"2023-8-13","name":"1690037672960_1 (1).png"},{"src":"images\\paintings\\adsg.png","width":826,"height":877,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"adsg.png"},{"src":"images\\paintings\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\paintings\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12","name":"1690102042507_1[1].png"},{"src":"images\\paintings\\1132-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1132-a.jpg","is_video":false,"creation_date":"2023-1-24","name":"1132-a.png"},{"src":"images\\paintings\\1131-a.png","width":1920,"height":2880,"src_thumb":"images\\paintings\\_thumb_1131-a.jpg","is_video":false,"creation_date":"2023-1-23","name":"1131-a.png"},{"src":"images\\paintings\\1130-b.png","width":1920,"height":2680,"src_thumb":"images\\paintings\\_thumb_1130-b.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-b.png"},{"src":"images\\paintings\\1130-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1130-a.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-a.png"},{"src":"images\\paintings\\1129-pat-a.png","width":2020,"height":1280,"src_thumb":"images\\paintings\\_thumb_1129-pat-a.jpg","is_video":false,"creation_date":"2023-1-21","name":"1129-pat-a.png"},{"src":"images\\paintings\\1123-e.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1123-e.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-e.png"},{"src":"images\\paintings\\1123-c.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1123-c.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-c.png"},{"src":"images\\paintings\\1119.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1119.jpg","is_video":false,"creation_date":"2023-1-11","name":"1119.png"},{"src":"images\\paintings\\1117-2.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1117-2.jpg","is_video":false,"creation_date":"2023-1-9","name":"1117-2.png"},{"src":"images\\paintings\\1112.png","width":1170,"height":1860,"src_thumb":"images\\paintings\\_thumb_1112.jpg","is_video":false,"creation_date":"2023-1-4","name":"1112.png"},{"src":"images\\paintings\\1055.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1055.jpg","is_video":false,"creation_date":"2022-11-8","name":"1055.png"},{"src":"images\\paintings\\1041.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1041.jpg","is_video":false,"creation_date":"2022-10-25","name":"1041.png"},{"src":"images\\paintings\\868.png","width":1918,"height":3074,"src_thumb":"images\\paintings\\_thumb_868.jpg","is_video":false,"creation_date":"2022-5-5","name":"868.png"},{"src":"images\\paintings\\unknown.png","width":386,"height":381,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"}]},"graphic_design":{"995_out.png":{"src":"images\\graphic_design\\995_out.png","width":4416,"height":6092,"src_thumb":"images\\graphic_design\\_thumb_995_out.jpg","is_video":false,"creation_date":"2022-9-9","name":"995_out.png"},"940.png":{"src":"images\\graphic_design\\940.png","width":2495,"height":3230,"src_thumb":"images\\graphic_design\\_thumb_940.jpg","is_video":false,"creation_date":"2022-7-16","name":"940.png"},"934 out.png":{"src":"images\\graphic_design\\934 out.png","width":5000,"height":3168,"src_thumb":"images\\graphic_design\\_thumb_934 out.jpg","is_video":false,"creation_date":"2022-7-10","name":"934 out.png"},"919.png":{"src":"images\\graphic_design\\919.png","width":2334,"height":3500,"src_thumb":"images\\graphic_design\\_thumb_919.jpg","is_video":false,"creation_date":"2022-6-25","name":"919.png"},"713-output.png":{"src":"images\\graphic_design\\713-output.png","width":1920,"height":1080,"src_thumb":"images\\graphic_design\\_thumb_713-output.jpg","is_video":false,"creation_date":"2021-12-1","name":"713-output.png"},"593.png":{"src":"images\\graphic_design\\593.png","width":4000,"height":4788,"src_thumb":"images\\graphic_design\\_thumb_593.jpg","is_video":false,"creation_date":"2021-8-3","name":"593.png"},"592-out.png":{"src":"images\\graphic_design\\592-out.png","width":2256,"height":3300,"src_thumb":"images\\graphic_design\\_thumb_592-out.jpg","is_video":false,"creation_date":"2021-8-2","name":"592-out.png"},"591.png":{"src":"images\\graphic_design\\591.png","width":2160,"height":3840,"src_thumb":"images\\graphic_design\\_thumb_591.jpg","is_video":false,"creation_date":"2021-8-1","name":"591.png"},"583-оут.png":{"src":"images\\graphic_design\\583-оут.png","width":1500,"height":1500,"src_thumb":"images\\graphic_design\\_thumb_583-оут.jpg","is_video":false,"creation_date":"2021-7-24","name":"583-оут.png"},"555.png":{"src":"images\\graphic_design\\555.png","width":2319,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_555.jpg","is_video":false,"creation_date":"2021-6-26","name":"555.png"},"499.png":{"src":"images\\graphic_design\\499.png","width":3370,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_499.jpg","is_video":false,"creation_date":"2021-5-1","name":"499.png"},"493.png":{"src":"images\\graphic_design\\493.png","width":596,"height":657,"src_thumb":"","is_video":false,"creation_date":"2021-4-26","name":"493.png"},"1x935_out.png":{"src":"images\\graphic_design\\1x935_out.png","width":3402,"height":5222,"src_thumb":"images\\graphic_design\\_thumb_1x935_out.jpg","is_video":false,"creation_date":"2022-7-11","name":"1x935_out.png"},"1x933.png":{"src":"images\\graphic_design\\1x933.png","width":5000,"height":3182,"src_thumb":"images\\graphic_design\\_thumb_1x933.jpg","is_video":false,"creation_date":"2022-7-9","name":"1x933.png"},"1x929.png":{"src":"images\\graphic_design\\1x929.png","width":5802,"height":8000,"src_thumb":"images\\graphic_design\\_thumb_1x929.jpg","is_video":false,"creation_date":"2022-7-6","name":"1x929.png"},"1x925 (1).png":{"src":"images\\graphic_design\\1x925 (1).png","width":2115,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_1x925 (1).jpg","is_video":false,"creation_date":"2022-7-2","name":"1x925 (1).png"},"1155-out.png":{"src":"images\\graphic_design\\1155-out.png","width":3840,"height":4710,"src_thumb":"images\\graphic_design\\_thumb_1155-out.jpg","is_video":false,"creation_date":"2023-2-16","name":"1155-out.png"},"1093.png":{"src":"images\\graphic_design\\1093.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1093.jpg","is_video":false,"creation_date":"2022-12-16","name":"1093.png"},"1090.png":{"src":"images\\graphic_design\\1090.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1090.jpg","is_video":false,"creation_date":"2022-12-13","name":"1090.png"},"1089.png":{"src":"images\\graphic_design\\1089.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1089.jpg","is_video":false,"creation_date":"2022-12-12","name":"1089.png"},"1087_out.png":{"src":"images\\graphic_design\\1087_out.png","width":1887,"height":1880,"src_thumb":"images\\graphic_design\\_thumb_1087_out.jpg","is_video":false,"creation_date":"2022-12-10","name":"1087_out.png"},"1052_out.png":{"src":"images\\graphic_design\\1052_out.png","width":4320,"height":4320,"src_thumb":"images\\graphic_design\\_thumb_1052_out.jpg","is_video":false,"creation_date":"2022-11-5","name":"1052_out.png"},"1048_out.png":{"src":"images\\graphic_design\\1048_out.png","width":4290,"height":5400,"src_thumb":"images\\graphic_design\\_thumb_1048_out.jpg","is_video":false,"creation_date":"2022-11-1","name":"1048_out.png"},"1030_in.png":{"src":"images\\graphic_design\\1030_in.png","width":2540,"height":3525,"src_thumb":"images\\graphic_design\\_thumb_1030_in.jpg","is_video":false,"creation_date":"2022-10-14","name":"1030_in.png"},"1013_out.png":{"src":"images\\graphic_design\\1013_out.png","width":4096,"height":4092,"src_thumb":"images\\graphic_design\\_thumb_1013_out.jpg","is_video":false,"creation_date":"2022-9-27","name":"1013_out.png"},"1008_out.png":{"src":"images\\graphic_design\\1008_out.png","width":4000,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_1008_out.jpg","is_video":false,"creation_date":"2022-9-22","name":"1008_out.png"},"1007_out.png":{"src":"images\\graphic_design\\1007_out.png","width":3840,"height":3872,"src_thumb":"images\\graphic_design\\_thumb_1007_out.jpg","is_video":false,"creation_date":"2022-9-21","name":"1007_out.png"},"1006.png":{"src":"images\\graphic_design\\1006.png","width":3084,"height":4316,"src_thumb":"images\\graphic_design\\_thumb_1006.jpg","is_video":false,"creation_date":"2022-9-20","name":"1006.png"},"1005_out.png":{"src":"images\\graphic_design\\1005_out.png","width":2870,"height":4104,"src_thumb":"images\\graphic_design\\_thumb_1005_out.jpg","is_video":false,"creation_date":"2022-9-19","name":"1005_out.png"},"1004_out.png":{"src":"images\\graphic_design\\1004_out.png","width":2964,"height":4268,"src_thumb":"images\\graphic_design\\_thumb_1004_out.jpg","is_video":false,"creation_date":"2022-9-18","name":"1004_out.png"},"1002.png":{"src":"images\\graphic_design\\1002.png","width":3258,"height":4435,"src_thumb":"images\\graphic_design\\_thumb_1002.jpg","is_video":false,"creation_date":"2022-9-17","name":"1002.png"},"1001-b.png":{"src":"images\\graphic_design\\1001-b.png","width":4224,"height":4290,"src_thumb":"images\\graphic_design\\_thumb_1001-b.jpg","is_video":false,"creation_date":"2022-9-15","name":"1001-b.png"},"sorted":[{"src":"images\\graphic_design\\1155-out.png","width":3840,"height":4710,"src_thumb":"images\\graphic_design\\_thumb_1155-out.jpg","is_video":false,"creation_date":"2023-2-16","name":"1155-out.png"},{"src":"images\\graphic_design\\1093.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1093.jpg","is_video":false,"creation_date":"2022-12-16","name":"1093.png"},{"src":"images\\graphic_design\\1090.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1090.jpg","is_video":false,"creation_date":"2022-12-13","name":"1090.png"},{"src":"images\\graphic_design\\1089.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1089.jpg","is_video":false,"creation_date":"2022-12-12","name":"1089.png"},{"src":"images\\graphic_design\\1087_out.png","width":1887,"height":1880,"src_thumb":"images\\graphic_design\\_thumb_1087_out.jpg","is_video":false,"creation_date":"2022-12-10","name":"1087_out.png"},{"src":"images\\graphic_design\\1052_out.png","width":4320,"height":4320,"src_thumb":"images\\graphic_design\\_thumb_1052_out.jpg","is_video":false,"creation_date":"2022-11-5","name":"1052_out.png"},{"src":"images\\graphic_design\\1048_out.png","width":4290,"height":5400,"src_thumb":"images\\graphic_design\\_thumb_1048_out.jpg","is_video":false,"creation_date":"2022-11-1","name":"1048_out.png"},{"src":"images\\graphic_design\\1030_in.png","width":2540,"height":3525,"src_thumb":"images\\graphic_design\\_thumb_1030_in.jpg","is_video":false,"creation_date":"2022-10-14","name":"1030_in.png"},{"src":"images\\graphic_design\\1013_out.png","width":4096,"height":4092,"src_thumb":"images\\graphic_design\\_thumb_1013_out.jpg","is_video":false,"creation_date":"2022-9-27","name":"1013_out.png"},{"src":"images\\graphic_design\\1008_out.png","width":4000,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_1008_out.jpg","is_video":false,"creation_date":"2022-9-22","name":"1008_out.png"},{"src":"images\\graphic_design\\1007_out.png","width":3840,"height":3872,"src_thumb":"images\\graphic_design\\_thumb_1007_out.jpg","is_video":false,"creation_date":"2022-9-21","name":"1007_out.png"},{"src":"images\\graphic_design\\1006.png","width":3084,"height":4316,"src_thumb":"images\\graphic_design\\_thumb_1006.jpg","is_video":false,"creation_date":"2022-9-20","name":"1006.png"},{"src":"images\\graphic_design\\1005_out.png","width":2870,"height":4104,"src_thumb":"images\\graphic_design\\_thumb_1005_out.jpg","is_video":false,"creation_date":"2022-9-19","name":"1005_out.png"},{"src":"images\\graphic_design\\1004_out.png","width":2964,"height":4268,"src_thumb":"images\\graphic_design\\_thumb_1004_out.jpg","is_video":false,"creation_date":"2022-9-18","name":"1004_out.png"},{"src":"images\\graphic_design\\1002.png","width":3258,"height":4435,"src_thumb":"images\\graphic_design\\_thumb_1002.jpg","is_video":false,"creation_date":"2022-9-17","name":"1002.png"},{"src":"images\\graphic_design\\1001-b.png","width":4224,"height":4290,"src_thumb":"images\\graphic_design\\_thumb_1001-b.jpg","is_video":false,"creation_date":"2022-9-15","name":"1001-b.png"},{"src":"images\\graphic_design\\995_out.png","width":4416,"height":6092,"src_thumb":"images\\graphic_design\\_thumb_995_out.jpg","is_video":false,"creation_date":"2022-9-9","name":"995_out.png"},{"src":"images\\graphic_design\\940.png","width":2495,"height":3230,"src_thumb":"images\\graphic_design\\_thumb_940.jpg","is_video":false,"creation_date":"2022-7-16","name":"940.png"},{"src":"images\\graphic_design\\1x935_out.png","width":3402,"height":5222,"src_thumb":"images\\graphic_design\\_thumb_1x935_out.jpg","is_video":false,"creation_date":"2022-7-11","name":"1x935_out.png"},{"src":"images\\graphic_design\\934 out.png","width":5000,"height":3168,"src_thumb":"images\\graphic_design\\_thumb_934 out.jpg","is_video":false,"creation_date":"2022-7-10","name":"934 out.png"},{"src":"images\\graphic_design\\1x933.png","width":5000,"height":3182,"src_thumb":"images\\graphic_design\\_thumb_1x933.jpg","is_video":false,"creation_date":"2022-7-9","name":"1x933.png"},{"src":"images\\graphic_design\\1x929.png","width":5802,"height":8000,"src_thumb":"images\\graphic_design\\_thumb_1x929.jpg","is_video":false,"creation_date":"2022-7-6","name":"1x929.png"},{"src":"images\\graphic_design\\1x925 (1).png","width":2115,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_1x925 (1).jpg","is_video":false,"creation_date":"2022-7-2","name":"1x925 (1).png"},{"src":"images\\graphic_design\\919.png","width":2334,"height":3500,"src_thumb":"images\\graphic_design\\_thumb_919.jpg","is_video":false,"creation_date":"2022-6-25","name":"919.png"},{"src":"images\\graphic_design\\713-output.png","width":1920,"height":1080,"src_thumb":"images\\graphic_design\\_thumb_713-output.jpg","is_video":false,"creation_date":"2021-12-1","name":"713-output.png"},{"src":"images\\graphic_design\\593.png","width":4000,"height":4788,"src_thumb":"images\\graphic_design\\_thumb_593.jpg","is_video":false,"creation_date":"2021-8-3","name":"593.png"},{"src":"images\\graphic_design\\592-out.png","width":2256,"height":3300,"src_thumb":"images\\graphic_design\\_thumb_592-out.jpg","is_video":false,"creation_date":"2021-8-2","name":"592-out.png"},{"src":"images\\graphic_design\\591.png","width":2160,"height":3840,"src_thumb":"images\\graphic_design\\_thumb_591.jpg","is_video":false,"creation_date":"2021-8-1","name":"591.png"},{"src":"images\\graphic_design\\583-оут.png","width":1500,"height":1500,"src_thumb":"images\\graphic_design\\_thumb_583-оут.jpg","is_video":false,"creation_date":"2021-7-24","name":"583-оут.png"},{"src":"images\\graphic_design\\555.png","width":2319,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_555.jpg","is_video":false,"creation_date":"2021-6-26","name":"555.png"},{"src":"images\\graphic_design\\499.png","width":3370,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_499.jpg","is_video":false,"creation_date":"2021-5-1","name":"499.png"},{"src":"images\\graphic_design\\493.png","width":596,"height":657,"src_thumb":"","is_video":false,"creation_date":"2021-4-26","name":"493.png"}]},"generative_static":{"unknown.png":{"src":"images\\generative_static\\unknown.png","width":1254,"height":701,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},"unknown (9).png":{"src":"images\\generative_static\\unknown (9).png","width":578,"height":577,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (9).png"},"unknown (8).png":{"src":"images\\generative_static\\unknown (8).png","width":792,"height":807,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (8).png"},"unknown (7).png":{"src":"images\\generative_static\\unknown (7).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (7).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (7).png"},"unknown (6).png":{"src":"images\\generative_static\\unknown (6).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (6).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (6).png"},"unknown (5).png":{"src":"images\\generative_static\\unknown (5).png","width":2004,"height":901,"src_thumb":"images\\generative_static\\_thumb_unknown (5).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (5).png"},"unknown (4).png":{"src":"images\\generative_static\\unknown (4).png","width":1189,"height":729,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (4).png"},"unknown (3).png":{"src":"images\\generative_static\\unknown (3).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (3).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (3).png"},"unknown (2).png":{"src":"images\\generative_static\\unknown (2).png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (2).png"},"unknown (11).png":{"src":"images\\generative_static\\unknown (11).png","width":1270,"height":710,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (11).png"},"unknown (10).png":{"src":"images\\generative_static\\unknown (10).png","width":2000,"height":2000,"src_thumb":"images\\generative_static\\_thumb_unknown (10).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (10).png"},"unknown (1).png":{"src":"images\\generative_static\\unknown (1).png","width":800,"height":450,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (1).png"},"spectracer.png":{"src":"images\\generative_static\\spectracer.png","width":518,"height":493,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer.png"},"spectracer (5).png":{"src":"images\\generative_static\\spectracer (5).png","width":877,"height":490,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (5).png"},"spectracer (4).png":{"src":"images\\generative_static\\spectracer (4).png","width":558,"height":309,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (4).png"},"spectracer (3).png":{"src":"images\\generative_static\\spectracer (3).png","width":574,"height":449,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (3).png"},"spectracer (2).png":{"src":"images\\generative_static\\spectracer (2).png","width":795,"height":443,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (2).png"},"spectracer (1).png":{"src":"images\\generative_static\\spectracer (1).png","width":793,"height":442,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (1).png"},"S138LuQAAAABJRU5ErkJggg.png":{"src":"images\\generative_static\\S138LuQAAAABJRU5ErkJggg.png","width":1920,"height":1023,"src_thumb":"images\\generative_static\\_thumb_S138LuQAAAABJRU5ErkJggg.jpg","is_video":false,"creation_date":"2021-3-31","name":"S138LuQAAAABJRU5ErkJggg.png"},"P0y3BNk6U271AAAAAElFTkSuQmCC.png":{"src":"images\\generative_static\\P0y3BNk6U271AAAAAElFTkSuQmCC.png","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"P0y3BNk6U271AAAAAElFTkSuQmCC.png"},"image (29).png":{"src":"images\\generative_static\\image (29).png","width":890,"height":497,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (29).png"},"image (27).png":{"src":"images\\generative_static\\image (27).png","width":729,"height":404,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (27).png"},"image (26).png":{"src":"images\\generative_static\\image (26).png","width":1180,"height":660,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (26).png"},"image (25).png":{"src":"images\\generative_static\\image (25).png","width":1210,"height":673,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (25).png"},"idklol-out.png":{"src":"images\\generative_static\\idklol-out.png","width":2854,"height":2804,"src_thumb":"images\\generative_static\\_thumb_idklol-out.jpg","is_video":false,"creation_date":"2022-1-24","name":"idklol-out.png"},"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png":{"src":"images\\generative_static\\Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png","width":1920,"height":1080,"src_thumb":"images\\generative_static\\_thumb_Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.jpg","is_video":false,"creation_date":"2021-3-31","name":"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png"},"Ha2Ch0D.png":{"src":"images\\generative_static\\Ha2Ch0D.png","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"Ha2Ch0D.png"},"flowers.png":{"src":"images\\generative_static\\flowers.png","width":1055,"height":682,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"flowers.png"},"FJ5S5FKWQAMjtjO.png":{"src":"images\\generative_static\\FJ5S5FKWQAMjtjO.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_FJ5S5FKWQAMjtjO.jpg","is_video":false,"creation_date":"2023-8-15","name":"FJ5S5FKWQAMjtjO.png"},"FbPBBI7XkAIz10q.png":{"src":"images\\generative_static\\FbPBBI7XkAIz10q.png","width":680,"height":435,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"FbPBBI7XkAIz10q.png"},"F3mGHzuXwAAqOTA.png":{"src":"images\\generative_static\\F3mGHzuXwAAqOTA.png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-17","name":"F3mGHzuXwAAqOTA.png"},"767.png":{"src":"images\\generative_static\\767.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_767.jpg","is_video":false,"creation_date":"2022-1-24","name":"767.png"},"765.png":{"src":"images\\generative_static\\765.png","width":1400,"height":1860,"src_thumb":"images\\generative_static\\_thumb_765.jpg","is_video":false,"creation_date":"2023-8-15","name":"765.png"},"757-out.png":{"src":"images\\generative_static\\757-out.png","width":3000,"height":3000,"src_thumb":"images\\generative_static\\_thumb_757-out.jpg","is_video":false,"creation_date":"2022-1-14","name":"757-out.png"},"717.png":{"src":"images\\generative_static\\717.png","width":2488,"height":1440,"src_thumb":"images\\generative_static\\_thumb_717.jpg","is_video":false,"creation_date":"2021-12-5","name":"717.png"},"54.png":{"src":"images\\generative_static\\54.png","width":881,"height":496,"src_thumb":"","is_video":false,"creation_date":"2020-2-25","name":"54.png"},"172-a-toned.png":{"src":"images\\generative_static\\172-a-toned.png","width":893,"height":1374,"src_thumb":"","is_video":false,"creation_date":"2020-6-9","name":"172-a-toned.png"},"FR56Q9mWQAA7U4X.jpg":{"src":"images\\generative_static\\FR56Q9mWQAA7U4X.jpg","width":1000,"height":1834,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FR56Q9mWQAA7U4X.jpg"},"FbPBBI7XkAIz10q.jpg":{"src":"images\\generative_static\\FbPBBI7XkAIz10q.jpg","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbPBBI7XkAIz10q.jpg"},"FbBtUi9XoAEHFrV.jpg":{"src":"images\\generative_static\\FbBtUi9XoAEHFrV.jpg","width":1200,"height":675,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbBtUi9XoAEHFrV.jpg"},"3tycWV.jpg":{"src":"images\\generative_static\\3tycWV.jpg","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-8-25","name":"3tycWV.jpg"},"1XTPsDi.mp4":{"src":"images\\generative_static\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},"sorted":[{"src":"images\\generative_static\\F3mGHzuXwAAqOTA.png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-17","name":"F3mGHzuXwAAqOTA.png"},{"src":"images\\generative_static\\unknown (9).png","width":578,"height":577,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (9).png"},{"src":"images\\generative_static\\unknown (8).png","width":792,"height":807,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (8).png"},{"src":"images\\generative_static\\unknown (7).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (7).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (7).png"},{"src":"images\\generative_static\\unknown (6).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (6).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (6).png"},{"src":"images\\generative_static\\unknown (5).png","width":2004,"height":901,"src_thumb":"images\\generative_static\\_thumb_unknown (5).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (5).png"},{"src":"images\\generative_static\\unknown (4).png","width":1189,"height":729,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (4).png"},{"src":"images\\generative_static\\unknown (3).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (3).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (3).png"},{"src":"images\\generative_static\\unknown (2).png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (2).png"},{"src":"images\\generative_static\\unknown (11).png","width":1270,"height":710,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (11).png"},{"src":"images\\generative_static\\unknown (10).png","width":2000,"height":2000,"src_thumb":"images\\generative_static\\_thumb_unknown (10).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (10).png"},{"src":"images\\generative_static\\unknown (1).png","width":800,"height":450,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (1).png"},{"src":"images\\generative_static\\spectracer.png","width":518,"height":493,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer.png"},{"src":"images\\generative_static\\spectracer (5).png","width":877,"height":490,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (5).png"},{"src":"images\\generative_static\\spectracer (4).png","width":558,"height":309,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (4).png"},{"src":"images\\generative_static\\spectracer (3).png","width":574,"height":449,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (3).png"},{"src":"images\\generative_static\\spectracer (2).png","width":795,"height":443,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (2).png"},{"src":"images\\generative_static\\spectracer (1).png","width":793,"height":442,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (1).png"},{"src":"images\\generative_static\\image (29).png","width":890,"height":497,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (29).png"},{"src":"images\\generative_static\\image (27).png","width":729,"height":404,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (27).png"},{"src":"images\\generative_static\\image (26).png","width":1180,"height":660,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (26).png"},{"src":"images\\generative_static\\image (25).png","width":1210,"height":673,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (25).png"},{"src":"images\\generative_static\\FJ5S5FKWQAMjtjO.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_FJ5S5FKWQAMjtjO.jpg","is_video":false,"creation_date":"2023-8-15","name":"FJ5S5FKWQAMjtjO.png"},{"src":"images\\generative_static\\765.png","width":1400,"height":1860,"src_thumb":"images\\generative_static\\_thumb_765.jpg","is_video":false,"creation_date":"2023-8-15","name":"765.png"},{"src":"images\\generative_static\\FR56Q9mWQAA7U4X.jpg","width":1000,"height":1834,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FR56Q9mWQAA7U4X.jpg"},{"src":"images\\generative_static\\FbPBBI7XkAIz10q.jpg","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbPBBI7XkAIz10q.jpg"},{"src":"images\\generative_static\\FbBtUi9XoAEHFrV.jpg","width":1200,"height":675,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbBtUi9XoAEHFrV.jpg"},{"src":"images\\generative_static\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},{"src":"images\\generative_static\\FbPBBI7XkAIz10q.png","width":680,"height":435,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"FbPBBI7XkAIz10q.png"},{"src":"images\\generative_static\\idklol-out.png","width":2854,"height":2804,"src_thumb":"images\\generative_static\\_thumb_idklol-out.jpg","is_video":false,"creation_date":"2022-1-24","name":"idklol-out.png"},{"src":"images\\generative_static\\767.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_767.jpg","is_video":false,"creation_date":"2022-1-24","name":"767.png"},{"src":"images\\generative_static\\757-out.png","width":3000,"height":3000,"src_thumb":"images\\generative_static\\_thumb_757-out.jpg","is_video":false,"creation_date":"2022-1-14","name":"757-out.png"},{"src":"images\\generative_static\\717.png","width":2488,"height":1440,"src_thumb":"images\\generative_static\\_thumb_717.jpg","is_video":false,"creation_date":"2021-12-5","name":"717.png"},{"src":"images\\generative_static\\3tycWV.jpg","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-8-25","name":"3tycWV.jpg"},{"src":"images\\generative_static\\unknown.png","width":1254,"height":701,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},{"src":"images\\generative_static\\S138LuQAAAABJRU5ErkJggg.png","width":1920,"height":1023,"src_thumb":"images\\generative_static\\_thumb_S138LuQAAAABJRU5ErkJggg.jpg","is_video":false,"creation_date":"2021-3-31","name":"S138LuQAAAABJRU5ErkJggg.png"},{"src":"images\\generative_static\\P0y3BNk6U271AAAAAElFTkSuQmCC.png","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"P0y3BNk6U271AAAAAElFTkSuQmCC.png"},{"src":"images\\generative_static\\Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png","width":1920,"height":1080,"src_thumb":"images\\generative_static\\_thumb_Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.jpg","is_video":false,"creation_date":"2021-3-31","name":"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png"},{"src":"images\\generative_static\\Ha2Ch0D.png","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"Ha2Ch0D.png"},{"src":"images\\generative_static\\flowers.png","width":1055,"height":682,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"flowers.png"},{"src":"images\\generative_static\\172-a-toned.png","width":893,"height":1374,"src_thumb":"","is_video":false,"creation_date":"2020-6-9","name":"172-a-toned.png"},{"src":"images\\generative_static\\54.png","width":881,"height":496,"src_thumb":"","is_video":false,"creation_date":"2020-2-25","name":"54.png"}]},"noise_tex.webp":{"src":"images\\noise_tex.webp","width":720,"height":720,"src_thumb":"","is_video":false,"creation_date":"2023-8-9"},"generative_mograph":{"capture - 2021-02-23T161035.355.webm":{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.webm","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-2-23","name":"capture - 2021-02-23T161035.355.webm"},"capture (59).webm":{"src":"images\\generative_mograph\\capture (59).webm","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2020-11-17","name":"capture (59).webm"},"WQC0rBl.mp4":{"src":"images\\generative_mograph\\WQC0rBl.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"WQC0rBl.mp4"},"pOiFoUR.mp4":{"src":"images\\generative_mograph\\pOiFoUR.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"pOiFoUR.mp4"},"OUT (3).mp4":{"src":"images\\generative_mograph\\OUT (3).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (3).mp4"},"OUT (2).mp4":{"src":"images\\generative_mograph\\OUT (2).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (2).mp4"},"OUT (1).mp4":{"src":"images\\generative_mograph\\OUT (1).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (1).mp4"},"chrome_xOHw6iea45.mp4":{"src":"images\\generative_mograph\\chrome_xOHw6iea45.mp4","width":798,"height":442,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_xOHw6iea45.mp4"},"chrome_UDlKJV4jdZ.mp4":{"src":"images\\generative_mograph\\chrome_UDlKJV4jdZ.mp4","width":784,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_UDlKJV4jdZ.mp4"},"chrome_RazqupSsRS.mp4":{"src":"images\\generative_mograph\\chrome_RazqupSsRS.mp4","width":794,"height":440,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_RazqupSsRS.mp4"},"chrome_ibz88JN1To.mp4":{"src":"images\\generative_mograph\\chrome_ibz88JN1To.mp4","width":792,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_ibz88JN1To.mp4"},"chrome_foG6RANRoM.mp4":{"src":"images\\generative_mograph\\chrome_foG6RANRoM.mp4","width":874,"height":488,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_foG6RANRoM.mp4"},"capture - 2021-04-01T215056.436.mp4":{"src":"images\\generative_mograph\\capture - 2021-04-01T215056.436.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-04-01T215056.436.mp4"},"capture - 2021-02-24T174055.362.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-24T174055.362.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-24T174055.362.mp4"},"capture - 2021-02-23T161035.355.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T161035.355.mp4"},"capture - 2021-02-23T135750.665.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-23T135750.665.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T135750.665.mp4"},"capture - 2021-02-22T191650.873.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-22T191650.873.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-22T191650.873.mp4"},"capture - 2021-02-15T183608.531.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-15T183608.531.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-15T183608.531.mp4"},"capture - 2021-02-06T155448.767.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-06T155448.767.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-06T155448.767.mp4"},"capture - 2021-02-04T235908.915.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-04T235908.915.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-04T235908.915.mp4"},"capture - 2021-01-25T215853.813.mp4":{"src":"images\\generative_mograph\\capture - 2021-01-25T215853.813.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-01-25T215853.813.mp4"},"capture (71).mp4":{"src":"images\\generative_mograph\\capture (71).mp4","width":800,"height":450,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (71).mp4"},"capture (61).mp4":{"src":"images\\generative_mograph\\capture (61).mp4","width":1100,"height":900,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (61).mp4"},"capture (60).mp4":{"src":"images\\generative_mograph\\capture (60).mp4","width":1100,"height":700,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (60).mp4"},"capture (51).mp4":{"src":"images\\generative_mograph\\capture (51).mp4","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (51).mp4"},"1XTPsDi.mp4":{"src":"images\\generative_mograph\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},"166.mp4":{"src":"images\\generative_mograph\\166.mp4","width":640,"height":400,"src_thumb":"","is_video":true,"creation_date":"2021-8-25","name":"166.mp4"},"soDroUS.gif":{"src":"images\\generative_mograph\\soDroUS.gif","width":500,"height":500,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"soDroUS.gif"},"129.gif":{"src":"images\\generative_mograph\\129.gif","width":400,"height":400,"src_thumb":"","is_video":false,"creation_date":"2020-4-26","name":"129.gif"},"126.gif":{"src":"images\\generative_mograph\\126.gif","width":256,"height":256,"src_thumb":"","is_video":false,"creation_date":"2020-4-23","name":"126.gif"},"123.gif":{"src":"images\\generative_mograph\\123.gif","width":512,"height":512,"src_thumb":"","is_video":false,"creation_date":"2020-4-20","name":"123.gif"},"sorted":[{"src":"images\\generative_mograph\\WQC0rBl.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"WQC0rBl.mp4"},{"src":"images\\generative_mograph\\pOiFoUR.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"pOiFoUR.mp4"},{"src":"images\\generative_mograph\\OUT (3).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (3).mp4"},{"src":"images\\generative_mograph\\OUT (2).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (2).mp4"},{"src":"images\\generative_mograph\\OUT (1).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (1).mp4"},{"src":"images\\generative_mograph\\chrome_xOHw6iea45.mp4","width":798,"height":442,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_xOHw6iea45.mp4"},{"src":"images\\generative_mograph\\chrome_UDlKJV4jdZ.mp4","width":784,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_UDlKJV4jdZ.mp4"},{"src":"images\\generative_mograph\\chrome_RazqupSsRS.mp4","width":794,"height":440,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_RazqupSsRS.mp4"},{"src":"images\\generative_mograph\\chrome_ibz88JN1To.mp4","width":792,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_ibz88JN1To.mp4"},{"src":"images\\generative_mograph\\chrome_foG6RANRoM.mp4","width":874,"height":488,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_foG6RANRoM.mp4"},{"src":"images\\generative_mograph\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},{"src":"images\\generative_mograph\\166.mp4","width":640,"height":400,"src_thumb":"","is_video":true,"creation_date":"2021-8-25","name":"166.mp4"},{"src":"images\\generative_mograph\\capture - 2021-04-01T215056.436.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-04-01T215056.436.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-24T174055.362.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-24T174055.362.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T161035.355.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-23T135750.665.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T135750.665.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-22T191650.873.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-22T191650.873.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-15T183608.531.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-15T183608.531.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-06T155448.767.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-06T155448.767.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-04T235908.915.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-04T235908.915.mp4"},{"src":"images\\generative_mograph\\capture - 2021-01-25T215853.813.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-01-25T215853.813.mp4"},{"src":"images\\generative_mograph\\capture (71).mp4","width":800,"height":450,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (71).mp4"},{"src":"images\\generative_mograph\\capture (61).mp4","width":1100,"height":900,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (61).mp4"},{"src":"images\\generative_mograph\\capture (60).mp4","width":1100,"height":700,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (60).mp4"},{"src":"images\\generative_mograph\\capture (51).mp4","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (51).mp4"},{"src":"images\\generative_mograph\\soDroUS.gif","width":500,"height":500,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"soDroUS.gif"},{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.webm","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-2-23","name":"capture - 2021-02-23T161035.355.webm"},{"src":"images\\generative_mograph\\capture (59).webm","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2020-11-17","name":"capture (59).webm"},{"src":"images\\generative_mograph\\129.gif","width":400,"height":400,"src_thumb":"","is_video":false,"creation_date":"2020-4-26","name":"129.gif"},{"src":"images\\generative_mograph\\126.gif","width":256,"height":256,"src_thumb":"","is_video":false,"creation_date":"2020-4-23","name":"126.gif"},{"src":"images\\generative_mograph\\123.gif","width":512,"height":512,"src_thumb":"","is_video":false,"creation_date":"2020-4-20","name":"123.gif"}]}},"blog":{"preview_pathtracing.png":{"src":"blog\\preview_pathtracing.png"},"vorpol_dawn_by_technochroma.jpg":{"src":"blog\\vorpol_dawn_by_technochroma.jpg"},"lyc-sketch.gif":{"src":"blog\\lyc-sketch.gif"}},"audio":{"moody":{"wip4e.mp3":{"src":"audio\\moody\\wip4e.mp3","creation_date":"2021-7-14","name":"wip4e.mp3"},"926.mp3":{"src":"audio\\moody\\926.mp3","creation_date":"2022-7-2","name":"926.mp3"},"691.mp3":{"src":"audio\\moody\\691.mp3","creation_date":"2021-11-9","name":"691.mp3"},"590.mp3":{"src":"audio\\moody\\590.mp3","creation_date":"2021-7-31","name":"590.mp3"},"574-radiator .mp3":{"src":"audio\\moody\\574-radiator .mp3","creation_date":"2021-7-14","name":"574-radiator .mp3"},"570 - mark thing wip.mp3":{"src":"audio\\moody\\570 - mark thing wip.mp3","creation_date":"2021-7-11","name":"570 - mark thing wip.mp3"},"524.mp3":{"src":"audio\\moody\\524.mp3","creation_date":"2021-5-26","name":"524.mp3"},"460.mp3":{"src":"audio\\moody\\460.mp3","creation_date":"2021-3-24","name":"460.mp3"},"256.mp3":{"src":"audio\\moody\\256.mp3","creation_date":"2020-9-1","name":"256.mp3"},"255-v2 - Copy.mp3":{"src":"audio\\moody\\255-v2 - Copy.mp3","creation_date":"2020-8-31","name":"255-v2 - Copy.mp3"},"1244 ok 2023-08-07 1915.mp3":{"src":"audio\\moody\\1244 ok 2023-08-07 1915.mp3","creation_date":"2023-8-7","name":"1244 ok 2023-08-07 1915.mp3"},"1188 2023-08-07 1946.mp3":{"src":"audio\\moody\\1188 2023-08-07 1946.mp3","creation_date":"2023-8-7","name":"1188 2023-08-07 1946.mp3"},"sorted":[{"src":"audio\\moody\\1244 ok 2023-08-07 1915.mp3","creation_date":"2023-8-7","name":"1244 ok 2023-08-07 1915.mp3"},{"src":"audio\\moody\\1188 2023-08-07 1946.mp3","creation_date":"2023-8-7","name":"1188 2023-08-07 1946.mp3"},{"src":"audio\\moody\\926.mp3","creation_date":"2022-7-2","name":"926.mp3"},{"src":"audio\\moody\\691.mp3","creation_date":"2021-11-9","name":"691.mp3"},{"src":"audio\\moody\\590.mp3","creation_date":"2021-7-31","name":"590.mp3"},{"src":"audio\\moody\\wip4e.mp3","creation_date":"2021-7-14","name":"wip4e.mp3"},{"src":"audio\\moody\\574-radiator .mp3","creation_date":"2021-7-14","name":"574-radiator .mp3"},{"src":"audio\\moody\\570 - mark thing wip.mp3","creation_date":"2021-7-11","name":"570 - mark thing wip.mp3"},{"src":"audio\\moody\\524.mp3","creation_date":"2021-5-26","name":"524.mp3"},{"src":"audio\\moody\\460.mp3","creation_date":"2021-3-24","name":"460.mp3"},{"src":"audio\\moody\\256.mp3","creation_date":"2020-9-1","name":"256.mp3"},{"src":"audio\\moody\\255-v2 - Copy.mp3","creation_date":"2020-8-31","name":"255-v2 - Copy.mp3"}]},"melodic":{"jajaja.mp3":{"src":"audio\\melodic\\jajaja.mp3","creation_date":"2020-6-8","name":"jajaja.mp3"},"932.mp3":{"src":"audio\\melodic\\932.mp3","creation_date":"2022-7-8","name":"932.mp3"},"927.mp3":{"src":"audio\\melodic\\927.mp3","creation_date":"2022-7-3","name":"927.mp3"},"797-b.mp3":{"src":"audio\\melodic\\797-b.mp3","creation_date":"2022-4-16","name":"797-b.mp3"},"730.mp3":{"src":"audio\\melodic\\730.mp3","creation_date":"2021-12-18","name":"730.mp3"},"692.mp3":{"src":"audio\\melodic\\692.mp3","creation_date":"2021-11-10","name":"692.mp3"},"690_unnoised.mp3":{"src":"audio\\melodic\\690_unnoised.mp3","creation_date":"2021-11-8","name":"690_unnoised.mp3"},"662.mp3":{"src":"audio\\melodic\\662.mp3","creation_date":"2021-10-12","name":"662.mp3"},"626.mp3":{"src":"audio\\melodic\\626.mp3","creation_date":"2021-9-5","name":"626.mp3"},"576-fuji-rmx.mp3":{"src":"audio\\melodic\\576-fuji-rmx.mp3","creation_date":"2021-7-17","name":"576-fuji-rmx.mp3"},"575-2k.mp3":{"src":"audio\\melodic\\575-2k.mp3","creation_date":"2021-7-15","name":"575-2k.mp3"},"527.mp3":{"src":"audio\\melodic\\527.mp3","creation_date":"2021-5-29","name":"527.mp3"},"481.mp3":{"src":"audio\\melodic\\481.mp3","creation_date":"2021-4-13","name":"481.mp3"},"465.mp3":{"src":"audio\\melodic\\465.mp3","creation_date":"2021-3-30","name":"465.mp3"},"236.mp3":{"src":"audio\\melodic\\236.mp3","creation_date":"2020-8-12","name":"236.mp3"},"222.mp3":{"src":"audio\\melodic\\222.mp3","creation_date":"2020-7-29","name":"222.mp3"},"219.mp3":{"src":"audio\\melodic\\219.mp3","creation_date":"2020-7-26","name":"219.mp3"},"138.mp3":{"src":"audio\\melodic\\138.mp3","creation_date":"2020-5-5","name":"138.mp3"},"1243.mp3":{"src":"audio\\melodic\\1243.mp3","creation_date":"2023-8-7","name":"1243.mp3"},"1140.mp3":{"src":"audio\\melodic\\1140.mp3","creation_date":"2023-2-1","name":"1140.mp3"},"1121.mp3":{"src":"audio\\melodic\\1121.mp3","creation_date":"2023-1-13","name":"1121.mp3"},"1071.mp3":{"src":"audio\\melodic\\1071.mp3","creation_date":"2022-11-27","name":"1071.mp3"},"1069.mp3":{"src":"audio\\melodic\\1069.mp3","creation_date":"2022-11-22","name":"1069.mp3"},"1034.mp3":{"src":"audio\\melodic\\1034.mp3","creation_date":"2022-10-18","name":"1034.mp3"},"1025.mp3":{"src":"audio\\melodic\\1025.mp3","creation_date":"2022-10-9","name":"1025.mp3"},"1021.mp3":{"src":"audio\\melodic\\1021.mp3","creation_date":"2022-10-5","name":"1021.mp3"},"sorted":[{"src":"audio\\melodic\\1243.mp3","creation_date":"2023-8-7","name":"1243.mp3"},{"src":"audio\\melodic\\1140.mp3","creation_date":"2023-2-1","name":"1140.mp3"},{"src":"audio\\melodic\\1121.mp3","creation_date":"2023-1-13","name":"1121.mp3"},{"src":"audio\\melodic\\1071.mp3","creation_date":"2022-11-27","name":"1071.mp3"},{"src":"audio\\melodic\\1069.mp3","creation_date":"2022-11-22","name":"1069.mp3"},{"src":"audio\\melodic\\1034.mp3","creation_date":"2022-10-18","name":"1034.mp3"},{"src":"audio\\melodic\\1025.mp3","creation_date":"2022-10-9","name":"1025.mp3"},{"src":"audio\\melodic\\1021.mp3","creation_date":"2022-10-5","name":"1021.mp3"},{"src":"audio\\melodic\\932.mp3","creation_date":"2022-7-8","name":"932.mp3"},{"src":"audio\\melodic\\927.mp3","creation_date":"2022-7-3","name":"927.mp3"},{"src":"audio\\melodic\\797-b.mp3","creation_date":"2022-4-16","name":"797-b.mp3"},{"src":"audio\\melodic\\730.mp3","creation_date":"2021-12-18","name":"730.mp3"},{"src":"audio\\melodic\\692.mp3","creation_date":"2021-11-10","name":"692.mp3"},{"src":"audio\\melodic\\690_unnoised.mp3","creation_date":"2021-11-8","name":"690_unnoised.mp3"},{"src":"audio\\melodic\\662.mp3","creation_date":"2021-10-12","name":"662.mp3"},{"src":"audio\\melodic\\626.mp3","creation_date":"2021-9-5","name":"626.mp3"},{"src":"audio\\melodic\\576-fuji-rmx.mp3","creation_date":"2021-7-17","name":"576-fuji-rmx.mp3"},{"src":"audio\\melodic\\575-2k.mp3","creation_date":"2021-7-15","name":"575-2k.mp3"},{"src":"audio\\melodic\\527.mp3","creation_date":"2021-5-29","name":"527.mp3"},{"src":"audio\\melodic\\481.mp3","creation_date":"2021-4-13","name":"481.mp3"},{"src":"audio\\melodic\\465.mp3","creation_date":"2021-3-30","name":"465.mp3"},{"src":"audio\\melodic\\236.mp3","creation_date":"2020-8-12","name":"236.mp3"},{"src":"audio\\melodic\\222.mp3","creation_date":"2020-7-29","name":"222.mp3"},{"src":"audio\\melodic\\219.mp3","creation_date":"2020-7-26","name":"219.mp3"},{"src":"audio\\melodic\\jajaja.mp3","creation_date":"2020-6-8","name":"jajaja.mp3"},{"src":"audio\\melodic\\138.mp3","creation_date":"2020-5-5","name":"138.mp3"}]},"chill":{"hmmm.mp3":{"src":"audio\\chill\\hmmm.mp3","creation_date":"2020-5-16","name":"hmmm.mp3"},"330.mp3":{"src":"audio\\chill\\330.mp3","creation_date":"2020-11-18","name":"330.mp3"},"319.mp3":{"src":"audio\\chill\\319.mp3","creation_date":"2020-11-4","name":"319.mp3"},"257-2.mp3":{"src":"audio\\chill\\257-2.mp3","creation_date":"2020-9-2","name":"257-2.mp3"},"244.mp3":{"src":"audio\\chill\\244.mp3","creation_date":"2020-8-20","name":"244.mp3"},"1180 2023-03-13 vcv.mp3":{"src":"audio\\chill\\1180 2023-03-13 vcv.mp3","creation_date":"2023-3-13","name":"1180 2023-03-13 vcv.mp3"},"1116-toomb-ludum-dare.mp3":{"src":"audio\\chill\\1116-toomb-ludum-dare.mp3","creation_date":"2023-1-8","name":"1116-toomb-ludum-dare.mp3"},"1099-toomb4.mp3":{"src":"audio\\chill\\1099-toomb4.mp3","creation_date":"2022-12-22","name":"1099-toomb4.mp3"},"1098-toomb3 (1).mp3":{"src":"audio\\chill\\1098-toomb3 (1).mp3","creation_date":"2022-12-21","name":"1098-toomb3 (1).mp3"},"1096-toomb2.mp3":{"src":"audio\\chill\\1096-toomb2.mp3","creation_date":"2022-12-19","name":"1096-toomb2.mp3"},"1095-toomb.mp3":{"src":"audio\\chill\\1095-toomb.mp3","creation_date":"2022-12-18","name":"1095-toomb.mp3"},"1014.mp3":{"src":"audio\\chill\\1014.mp3","creation_date":"2022-9-28","name":"1014.mp3"},"sorted":[{"src":"audio\\chill\\1180 2023-03-13 vcv.mp3","creation_date":"2023-3-13","name":"1180 2023-03-13 vcv.mp3"},{"src":"audio\\chill\\1116-toomb-ludum-dare.mp3","creation_date":"2023-1-8","name":"1116-toomb-ludum-dare.mp3"},{"src":"audio\\chill\\1099-toomb4.mp3","creation_date":"2022-12-22","name":"1099-toomb4.mp3"},{"src":"audio\\chill\\1098-toomb3 (1).mp3","creation_date":"2022-12-21","name":"1098-toomb3 (1).mp3"},{"src":"audio\\chill\\1096-toomb2.mp3","creation_date":"2022-12-19","name":"1096-toomb2.mp3"},{"src":"audio\\chill\\1095-toomb.mp3","creation_date":"2022-12-18","name":"1095-toomb.mp3"},{"src":"audio\\chill\\1014.mp3","creation_date":"2022-9-28","name":"1014.mp3"},{"src":"audio\\chill\\330.mp3","creation_date":"2020-11-18","name":"330.mp3"},{"src":"audio\\chill\\319.mp3","creation_date":"2020-11-4","name":"319.mp3"},{"src":"audio\\chill\\257-2.mp3","creation_date":"2020-9-2","name":"257-2.mp3"},{"src":"audio\\chill\\244.mp3","creation_date":"2020-8-20","name":"244.mp3"},{"src":"audio\\chill\\hmmm.mp3","creation_date":"2020-5-16","name":"hmmm.mp3"}]},"bass":{"836.mp3":{"src":"audio\\bass\\836.mp3","creation_date":"2022-4-3","name":"836.mp3"},"801.mp3":{"src":"audio\\bass\\801.mp3","creation_date":"2022-2-27","name":"801.mp3"},"642 other.mp3":{"src":"audio\\bass\\642 other.mp3","creation_date":"2021-9-22","name":"642 other.mp3"},"589.mp3":{"src":"audio\\bass\\589.mp3","creation_date":"2021-7-30","name":"589.mp3"},"560-v2.mp3":{"src":"audio\\bass\\560-v2.mp3","creation_date":"2021-7-1","name":"560-v2.mp3"},"515.mp3":{"src":"audio\\bass\\515.mp3","creation_date":"2021-5-17","name":"515.mp3"},"316.mp3":{"src":"audio\\bass\\316.mp3","creation_date":"2020-11-1","name":"316.mp3"},"309 not te4no.mp3":{"src":"audio\\bass\\309 not te4no.mp3","creation_date":"2020-10-24","name":"309 not te4no.mp3"},"254.mp3":{"src":"audio\\bass\\254.mp3","creation_date":"2020-8-30","name":"254.mp3"},"1187 2023-03-20 2255.mp3":{"src":"audio\\bass\\1187 2023-03-20 2255.mp3","creation_date":"2023-3-20","name":"1187 2023-03-20 2255.mp3"},"1162.mp3":{"src":"audio\\bass\\1162.mp3","creation_date":"2023-2-23","name":"1162.mp3"},"sorted":[{"src":"audio\\bass\\1187 2023-03-20 2255.mp3","creation_date":"2023-3-20","name":"1187 2023-03-20 2255.mp3"},{"src":"audio\\bass\\1162.mp3","creation_date":"2023-2-23","name":"1162.mp3"},{"src":"audio\\bass\\836.mp3","creation_date":"2022-4-3","name":"836.mp3"},{"src":"audio\\bass\\801.mp3","creation_date":"2022-2-27","name":"801.mp3"},{"src":"audio\\bass\\642 other.mp3","creation_date":"2021-9-22","name":"642 other.mp3"},{"src":"audio\\bass\\589.mp3","creation_date":"2021-7-30","name":"589.mp3"},{"src":"audio\\bass\\560-v2.mp3","creation_date":"2021-7-1","name":"560-v2.mp3"},{"src":"audio\\bass\\515.mp3","creation_date":"2021-5-17","name":"515.mp3"},{"src":"audio\\bass\\316.mp3","creation_date":"2020-11-1","name":"316.mp3"},{"src":"audio\\bass\\309 not te4no.mp3","creation_date":"2020-10-24","name":"309 not te4no.mp3"},{"src":"audio\\bass\\254.mp3","creation_date":"2020-8-30","name":"254.mp3"}]}}}}["public"]["audio"];
+	const audio_folders_toggled = [];
 	let { url = "/favdemos" } = $$props;
 
 	onMount(async () => {
-		
+		let i = 0;
+
+		for (let folder of Object.keys(audio_folders)) {
+			audio_folders_toggled.push(false);
+			i++;
+		}
 	});
 
 	onDestroy(() => {
@@ -9482,36 +10813,41 @@ function musicPage_svelte_instance($$self, $$props, $$invalidate) {
 		scroll_to_view(`#${audio_folder}`);
 	};
 
+	const click_handler_1 = k => {
+		$$invalidate(0, audio_folders_toggled[k] = !audio_folders_toggled[k], audio_folders_toggled);
+	};
+
 	$$self.$$set = $$props => {
-		if ('url' in $$props) $$invalidate(1, url = $$props.url);
+		if ('url' in $$props) $$invalidate(2, url = $$props.url);
 	};
 
 	$$self.$capture_state = () => ({
 		onMount: onMount,
 		onDestroy: onDestroy,
-		Bar: Bar_svelte,
+		Bar: NavBar_svelte,
 		Footer: Footer_svelte,
 		scroll_to_view,
 		Demo,
 		audio_folders,
+		audio_folders_toggled,
 		url
 	});
 
 	$$self.$inject_state = $$props => {
-		if ('url' in $$props) $$invalidate(1, url = $$props.url);
+		if ('url' in $$props) $$invalidate(2, url = $$props.url);
 	};
 
 	if ($$props && "$$inject" in $$props) {
 		$$self.$inject_state($$props.$$inject);
 	}
 
-	return [audio_folders, url, click_handler];
+	return [audio_folders_toggled, audio_folders, url, click_handler, click_handler_1];
 }
 
 class MusicPage extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init(this, options, musicPage_svelte_instance, musicPage_svelte_create_fragment, safe_not_equal, { url: 1 }, musicPage_svelte_add_css);
+		init(this, options, musicPage_svelte_instance, musicPage_svelte_create_fragment, safe_not_equal, { url: 2 }, musicPage_svelte_add_css);
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -9531,12 +10867,12 @@ class MusicPage extends SvelteComponentDev {
 }
 
 /* harmony default export */ const musicPage_svelte = (MusicPage);
-;// CONCATENATED MODULE: ./src/components/lib/Img.svelte
-/* src\components\lib\Img.svelte generated by Svelte v4.2.0 */
+;// CONCATENATED MODULE: ./src/components/utils/lib/Img.svelte
+/* src\components\utils\lib\Img.svelte generated by Svelte v4.2.0 */
 
 
 
-const Img_svelte_file = "src\\components\\lib\\Img.svelte";
+const Img_svelte_file = "src\\components\\utils\\lib\\Img.svelte";
 
 function Img_svelte_create_fragment(ctx) {
 	let img;
@@ -9611,7 +10947,7 @@ class Img extends SvelteComponentDev {
 }
 
 /* harmony default export */ const Img_svelte = (Img);
-;// CONCATENATED MODULE: ./src/components/lib/dijkstra.js
+;// CONCATENATED MODULE: ./src/components/utils/lib/dijkstra.js
 /******************************************************************************
  * Created 2008-08-19.
  *
@@ -9867,7 +11203,7 @@ BinaryHeap.prototype = {
   }
 };
 
-;// CONCATENATED MODULE: ./src/components/lib/layout.js
+;// CONCATENATED MODULE: ./src/components/utils/lib/layout.js
 
 
 function round(n) {
@@ -9982,8 +11318,8 @@ function calcSeekLimit(containerWidth, targetRowHeight) {
   }
 }
 
-;// CONCATENATED MODULE: ./src/components/Gallery.svelte
-/* src\components\Gallery.svelte generated by Svelte v4.2.0 */
+;// CONCATENATED MODULE: ./src/components/utils/Gallery.svelte
+/* src\components\utils\Gallery.svelte generated by Svelte v4.2.0 */
 
 
 const { console: Gallery_svelte_console_1 } = globals;
@@ -9991,8 +11327,7 @@ const { console: Gallery_svelte_console_1 } = globals;
 
 
 
-
-const Gallery_svelte_file = "src\\components\\Gallery.svelte";
+const Gallery_svelte_file = "src\\components\\utils\\Gallery.svelte";
 
 function Gallery_svelte_add_css(target) {
 	append_styles(target, "svelte-1rbj9nr", ".masonry.svelte-1rbj9nr{max-width:100%}.container.svelte-1rbj9nr{display:flex;flex-wrap:wrap}.image.svelte-1rbj9nr{position:relative;height:100%}.image.svelte-1rbj9nr>*{width:100%;height:100%}.hidden.svelte-1rbj9nr{visibility:hidden}.stashed.svelte-1rbj9nr{display:none}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiR2FsbGVyeS5zdmVsdGUiLCJtYXBwaW5ncyI6IkFBc0VDLHVCQUFLLENBQ0gsU0FBUSxLQUNYLDJCQUdHLFFBQVUsS0FDVCxTQUFTLEtBQ2IsdUJBR0csUUFBTSxVQUNMLE9BQVEsSUFDWix5QkFHRyxLQUFNLENBQUUsSUFBQyxDQUNSLE1BQU0sQ0FBQyxJQUNYLHdCQUdHLFVBQU8sT0FDVixDQUNFLHdCQUNDLE9BQVEsS0FDWCIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJHYWxsZXJ5LnN2ZWx0ZSJdfQ== */");
@@ -10073,7 +11408,7 @@ function Gallery_svelte_create_else_block(ctx) {
 				isLastRow: /*isLastRow*/ ctx[23]
 			}));
 
-			add_location(div, Gallery_svelte_file, 135, 8, 3291);
+			add_location(div, Gallery_svelte_file, 136, 8, 3254);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -10152,7 +11487,7 @@ function Gallery_svelte_create_else_block(ctx) {
 	return block;
 }
 
-// (81:6) {#if image['is_video']}
+// (80:6) {#if image['is_video']}
 function Gallery_svelte_create_if_block(ctx) {
 	let div;
 	let t;
@@ -10179,7 +11514,7 @@ function Gallery_svelte_create_if_block(ctx) {
 				isLastRow: /*isLastRow*/ ctx[23]
 			}));
 
-			add_location(div, Gallery_svelte_file, 104, 8, 2167);
+			add_location(div, Gallery_svelte_file, 104, 8, 2108);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -10252,7 +11587,7 @@ function Gallery_svelte_create_if_block(ctx) {
 		block,
 		id: Gallery_svelte_create_if_block.name,
 		type: "if",
-		source: "(81:6) {#if image['is_video']}",
+		source: "(80:6) {#if image['is_video']}",
 		ctx
 	});
 
@@ -10277,7 +11612,7 @@ function fallback_block_1(ctx) {
 
 			attr_dev(img, "width", img_width_value = /*image*/ ctx[25].width);
 			attr_dev(img, "height", img_height_value = /*image*/ ctx[25].height);
-			add_location(img, Gallery_svelte_file, 141, 14, 3519);
+			add_location(img, Gallery_svelte_file, 142, 14, 3482);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, img, anchor);
@@ -10315,7 +11650,7 @@ function fallback_block_1(ctx) {
 	return block;
 }
 
-// (88:34)                
+// (87:34)                
 function fallback_block(ctx) {
 	let video;
 	let video_data_src_value;
@@ -10341,9 +11676,10 @@ function fallback_block(ctx) {
 			: /*image*/ ctx[25].src);
 
 			video.loop = true;
+			video.muted = true;
 			attr_dev(video, "width", video_width_value = /*image*/ ctx[25].width);
 			attr_dev(video, "height", video_height_value = /*image*/ ctx[25].height);
-			add_location(video, Gallery_svelte_file, 122, 14, 2858);
+			add_location(video, Gallery_svelte_file, 122, 14, 2799);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, video, anchor);
@@ -10392,14 +11728,14 @@ function fallback_block(ctx) {
 		block,
 		id: fallback_block.name,
 		type: "fallback",
-		source: "(88:34)                ",
+		source: "(87:34)                ",
 		ctx
 	});
 
 	return block;
 }
 
-// (79:4) {#each scaledImages as { index, ratio, scaledHeight, scaledWidth, isLastInRow, isLastRow, scaledWidthPc, ...image }
+// (78:4) {#each scaledImages as { index, ratio, scaledHeight, scaledWidth, isLastInRow, isLastRow, scaledWidthPc, ...image }
 function Gallery_svelte_create_each_block(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -10475,7 +11811,7 @@ function Gallery_svelte_create_each_block(ctx) {
 		block,
 		id: Gallery_svelte_create_each_block.name,
 		type: "each",
-		source: "(79:4) {#each scaledImages as { index, ratio, scaledHeight, scaledWidth, isLastInRow, isLastRow, scaledWidthPc, ...image }",
+		source: "(78:4) {#each scaledImages as { index, ratio, scaledHeight, scaledWidth, isLastInRow, isLastRow, scaledWidthPc, ...image }",
 		ctx
 	});
 
@@ -10510,11 +11846,11 @@ function Gallery_svelte_create_fragment(ctx) {
 			attr_dev(div0, "class", "container svelte-1rbj9nr");
 			set_style(div0, "width", /*width*/ ctx[3] + "px");
 			toggle_class(div0, "hidden", !/*width*/ ctx[3]);
-			add_location(div0, Gallery_svelte_file, 100, 2, 1869);
+			add_location(div0, Gallery_svelte_file, 100, 2, 1810);
 			attr_dev(div1, "class", "masonry svelte-1rbj9nr");
 			scheduler_add_render_callback(() => /*div1_elementresize_handler*/ ctx[17].call(div1));
 			toggle_class(div1, "stashed", /*hidden*/ ctx[0]);
-			add_location(div1, Gallery_svelte_file, 99, 0, 1797);
+			add_location(div1, Gallery_svelte_file, 99, 0, 1738);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -10716,7 +12052,6 @@ function Gallery_svelte_instance($$self, $$props, $$invalidate) {
 	$$self.$capture_state = () => ({
 		Img: Img_svelte,
 		layout: layout,
-		play_pause_icon: (play_pause_default()),
 		onMount: onMount,
 		images,
 		rowHeight,
@@ -10864,10 +12199,7 @@ class Gallery extends SvelteComponentDev {
 }
 
 /* harmony default export */ const Gallery_svelte = (Gallery);
-// EXTERNAL MODULE: ./node_modules/lozad/dist/lozad.min.js
-var lozad_min = __webpack_require__(703);
-var lozad_min_default = /*#__PURE__*/__webpack_require__.n(lozad_min);
-;// CONCATENATED MODULE: ./src/components/svelte-zoom/matrix.js
+;// CONCATENATED MODULE: ./src/components/utils/svelte-zoom/matrix.js
 class Matrix {
   constructor(svg) {
     this.svg = svg || document.createElementNS("http://www.w3.org/2000/svg", "svg")
@@ -10953,7 +12285,7 @@ class Matrix {
   }
 }
 
-;// CONCATENATED MODULE: ./src/components/svelte-zoom/velocity.js
+;// CONCATENATED MODULE: ./src/components/utils/svelte-zoom/velocity.js
 class MultiTouchVelocity {
   constructor() {
     this.touchA = {
@@ -10998,7 +12330,7 @@ class MultiTouchVelocity {
 // EXTERNAL MODULE: ./public/forbid.svg
 var forbid = __webpack_require__(461);
 var forbid_default = /*#__PURE__*/__webpack_require__.n(forbid);
-;// CONCATENATED MODULE: ./src/components/svelte-zoom/other.js
+;// CONCATENATED MODULE: ./src/components/utils/svelte-zoom/other.js
 function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
   var ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight)
 
@@ -11011,8 +12343,8 @@ function getDistance(touchA, touchB) {
 
 
 
-;// CONCATENATED MODULE: ./src/components/svelte-zoom/index.svelte
-/* src\components\svelte-zoom\index.svelte generated by Svelte v4.2.0 */
+;// CONCATENATED MODULE: ./src/components/utils/svelte-zoom/ImageViewer.svelte
+/* src\components\utils\svelte-zoom\ImageViewer.svelte generated by Svelte v4.2.0 */
 
 
 
@@ -11021,14 +12353,14 @@ function getDistance(touchA, touchB) {
 
 
 
-const index_svelte_file = "src\\components\\svelte-zoom\\index.svelte";
+const ImageViewer_svelte_file = "src\\components\\utils\\svelte-zoom\\ImageViewer.svelte";
 
-function index_svelte_add_css(target) {
-	append_styles(target, "svelte-66qvuh", ".container.svelte-66qvuh{width:100%;height:100%;position:fixed;display:flex;flex-direction:column;align-items:center;width:100vw;height:100vh;margin-left:0;left:0;top:0;z-index:100;background:var(--accent-dark)}.c-svelteZoom.svelte-66qvuh{width:100%;height:100%;position:absolute;transform-origin:0 0;backface-visibility:hidden;-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-o-backface-visibility:hidden;-ms-backface-visibility:hidden;-webkit-user-drag:none;-moz-user-drag:none;-o-user-drag:none;user-drag:none;touch-action:none}.c-svelteZoom--contain.svelte-66qvuh{object-fit:contain}.c-svelteZoom--no-contain.svelte-66qvuh{object-fit:contain}.c-svelteZoom--transition.svelte-66qvuh{transition:transform 0.2s}.c-svelteZoom--visible.svelte-66qvuh{visibility:visible}.c-svelteZoom--hidden.svelte-66qvuh{visibility:hidden}.c-svelteZoom--willChange.svelte-66qvuh{will-change:transform}.close-button.svelte-66qvuh{z-index:1;background:var(--accent-dark);position:absolute;right:1rem;cursor:pointer}.close-button.svelte-66qvuh:hover{filter:invert(1)}.close-button.svelte-66qvuh svg{fill:var(--accent-light);stroke:var(--accent-light);aspect-ratio:1/1;width:6rem}.hidden.svelte-66qvuh{display:none}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguc3ZlbHRlIiwibWFwcGluZ3MiOiJBQStWYSx3QkFBUSxPQUVsQix5QkFDTSxjQUNOLEtBQU0sZUFDQyxDQUFHLE1BQUksWUFDVixDQUFHLE1BQUcsWUFDVCxhQUNBLGtEQUtELEtBQVUsMENBR1IsT0FDRCx5QkFHSSxDQUFDLHlCQUNBLHdCQUNBLE9BQWlCLDRCQUNBLFFBQ3pCLGdDQUVBLHNCQUFzQiwrQkFDRix5QkFDWCxDQUFNLElBQUUsZUFDZixLQUFjLDRCQUNSLGtCQUNOLENBQVEsS0FJVixvQ0FBcUIsV0FDWixnREFHRCxDQUNSLGtCQUVBLHdDQUVzQixXQUNYLENBQUMsU0FBUywwQ0FFRixXQUVaLENBQUcsUUFJVixvQ0FFQSxVQUFTLCtDQUdZLFlBQ1YsQ0FBRyxTQUNkLDRCQUdRLFFBQ1AsQ0FBTSxDQUFFLENBQ1QsOEJBRUEsUUFBTSxTQUFZLENBQ2xCLEtBQU0sTUFDTCxNQUFNLENBQUMsT0FDVCxDQUNBLDJCQUFhLE1BQUsiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiaW5kZXguc3ZlbHRlIl19 */");
+function ImageViewer_svelte_add_css(target) {
+	append_styles(target, "svelte-1smbsan", ".container.svelte-1smbsan{width:100%;height:100%;position:fixed;display:flex;flex-direction:column;align-items:center;width:100vw;height:100vh;margin-left:0;left:0;top:0;z-index:100;background:var(--accent-light)}.c-svelteZoom.svelte-1smbsan{width:100%;height:100%;position:absolute;transform-origin:0 0;backface-visibility:hidden;-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-o-backface-visibility:hidden;-ms-backface-visibility:hidden;-webkit-user-drag:none;-moz-user-drag:none;-o-user-drag:none;user-drag:none;touch-action:none}.c-svelteZoom--contain.svelte-1smbsan{object-fit:contain}.c-svelteZoom--no-contain.svelte-1smbsan{object-fit:contain}.c-svelteZoom--transition.svelte-1smbsan{transition:transform 0.2s}.c-svelteZoom--visible.svelte-1smbsan{visibility:visible}.c-svelteZoom--hidden.svelte-1smbsan{visibility:hidden}.c-svelteZoom--willChange.svelte-1smbsan{will-change:transform}.close-button.svelte-1smbsan{z-index:1;background:var(--accent-light);position:absolute;right:1rem;cursor:pointer}.close-button.svelte-1smbsan:hover{filter:invert(1)}.close-button.svelte-1smbsan svg{fill:var(--accent-dark);stroke:var(--accent-dark);aspect-ratio:1/1;width:6rem}.hidden.svelte-1smbsan{display:none}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiSW1hZ2VWaWV3ZXIuc3ZlbHRlIiwibWFwcGluZ3MiOiJBQStWYSx5QkFBUSxPQUVsQix5QkFDTSxjQUNOLEtBQU0sZUFDQyxDQUFHLE1BQUksWUFDVixDQUFHLE1BQUcsWUFDVCxhQUNBLGtEQUtELEtBQVUsNENBR1IsT0FDRCx5QkFHSSxDQUFDLHlCQUNBLHdCQUNBLE9BQWlCLDRCQUNBLFFBQ3pCLGdDQUVBLHNCQUFzQiwrQkFDRix5QkFDWCxDQUFNLElBQUUsZUFDZixLQUFjLDRCQUNSLGtCQUNOLENBQVEsS0FJVixxQ0FBcUIsV0FDWixpREFHRCxDQUNSLGtCQUVBLHlDQUVzQixXQUNYLENBQUMsU0FBUywyQ0FFRixXQUVaLENBQUcsUUFJVixxQ0FFQSxVQUFTLGdEQUdZLFlBQ1YsQ0FBRyxTQUNkLDZCQUdRLFFBQ1AsQ0FBTSxDQUFFLENBQ1QsK0JBRUEsUUFBTSxTQUFZLENBQ2xCLEtBQU0sTUFDTCxNQUFNLENBQUMsT0FDVCxDQUNBLDRCQUFhLE1BQUsiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiSW1hZ2VWaWV3ZXIuc3ZlbHRlIl19 */");
 }
 
 // (399:2) {:else}
-function index_svelte_create_else_block(ctx) {
+function ImageViewer_svelte_create_else_block(ctx) {
 	let img_1;
 	let img_1_src_value;
 	let mounted;
@@ -11057,8 +12389,8 @@ function index_svelte_create_else_block(ctx) {
 			toggle_class(img_1, "c-svelteZoom--visible", /*contain*/ ctx[8]);
 			toggle_class(img_1, "c-svelteZoom--hidden", /*contain*/ ctx[8] === null);
 			toggle_class(img_1, "c-svelteZoom--willChange", /*willChange*/ ctx[9]);
-			toggle_class(img_1, "svelte-66qvuh", true);
-			add_location(img_1, index_svelte_file, -1, 11609);
+			toggle_class(img_1, "svelte-1smbsan", true);
+			add_location(img_1, ImageViewer_svelte_file, -1, 11609);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, img_1, anchor);
@@ -11088,7 +12420,7 @@ function index_svelte_create_else_block(ctx) {
 			toggle_class(img_1, "c-svelteZoom--visible", /*contain*/ ctx[8]);
 			toggle_class(img_1, "c-svelteZoom--hidden", /*contain*/ ctx[8] === null);
 			toggle_class(img_1, "c-svelteZoom--willChange", /*willChange*/ ctx[9]);
-			toggle_class(img_1, "svelte-66qvuh", true);
+			toggle_class(img_1, "svelte-1smbsan", true);
 		},
 		d: function destroy(detaching) {
 			if (detaching) {
@@ -11103,7 +12435,7 @@ function index_svelte_create_else_block(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: index_svelte_create_else_block.name,
+		id: ImageViewer_svelte_create_else_block.name,
 		type: "else",
 		source: "(399:2) {:else}",
 		ctx
@@ -11113,7 +12445,7 @@ function index_svelte_create_else_block(ctx) {
 }
 
 // (366:2) {#if is_video}
-function index_svelte_create_if_block(ctx) {
+function ImageViewer_svelte_create_if_block(ctx) {
 	let video;
 	let video_src_value;
 	let mounted;
@@ -11143,8 +12475,8 @@ function index_svelte_create_if_block(ctx) {
 			toggle_class(video, "c-svelteZoom--visible", /*contain*/ ctx[8]);
 			toggle_class(video, "c-svelteZoom--hidden", /*contain*/ ctx[8] === null);
 			toggle_class(video, "c-svelteZoom--willChange", /*willChange*/ ctx[9]);
-			toggle_class(video, "svelte-66qvuh", true);
-			add_location(video, index_svelte_file, -1, 10585);
+			toggle_class(video, "svelte-1smbsan", true);
+			add_location(video, ImageViewer_svelte_file, -1, 10585);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, video, anchor);
@@ -11176,7 +12508,7 @@ function index_svelte_create_if_block(ctx) {
 			toggle_class(video, "c-svelteZoom--visible", /*contain*/ ctx[8]);
 			toggle_class(video, "c-svelteZoom--hidden", /*contain*/ ctx[8] === null);
 			toggle_class(video, "c-svelteZoom--willChange", /*willChange*/ ctx[9]);
-			toggle_class(video, "svelte-66qvuh", true);
+			toggle_class(video, "svelte-1smbsan", true);
 		},
 		d: function destroy(detaching) {
 			if (detaching) {
@@ -11191,7 +12523,7 @@ function index_svelte_create_if_block(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: index_svelte_create_if_block.name,
+		id: ImageViewer_svelte_create_if_block.name,
 		type: "if",
 		source: "(366:2) {#if is_video}",
 		ctx
@@ -11200,7 +12532,7 @@ function index_svelte_create_if_block(ctx) {
 	return block;
 }
 
-function index_svelte_create_fragment(ctx) {
+function ImageViewer_svelte_create_fragment(ctx) {
 	let div1;
 	let div0;
 	let t;
@@ -11208,8 +12540,8 @@ function index_svelte_create_fragment(ctx) {
 	let dispose;
 
 	function select_block_type(ctx, dirty) {
-		if (/*is_video*/ ctx[10]) return index_svelte_create_if_block;
-		return index_svelte_create_else_block;
+		if (/*is_video*/ ctx[10]) return ImageViewer_svelte_create_if_block;
+		return ImageViewer_svelte_create_else_block;
 	}
 
 	let current_block_type = select_block_type(ctx, [-1, -1]);
@@ -11221,11 +12553,11 @@ function index_svelte_create_fragment(ctx) {
 			div0 = dom_element("div");
 			t = space();
 			if_block.c();
-			attr_dev(div0, "class", "close-button svelte-66qvuh");
-			add_location(div0, index_svelte_file, -1, 10466);
-			attr_dev(div1, "class", "container svelte-66qvuh");
+			attr_dev(div0, "class", "close-button svelte-1smbsan");
+			add_location(div0, ImageViewer_svelte_file, -1, 10466);
+			attr_dev(div1, "class", "container svelte-1smbsan");
 			toggle_class(div1, "hidden", !/*opened*/ ctx[4]);
-			add_location(div1, index_svelte_file, -1, 10328);
+			add_location(div1, ImageViewer_svelte_file, -1, 10328);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -11276,7 +12608,7 @@ function index_svelte_create_fragment(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: index_svelte_create_fragment.name,
+		id: ImageViewer_svelte_create_fragment.name,
 		type: "component",
 		source: "",
 		ctx
@@ -11285,10 +12617,10 @@ function index_svelte_create_fragment(ctx) {
 	return block;
 }
 
-function index_svelte_instance($$self, $$props, $$invalidate) {
+function ImageViewer_svelte_instance($$self, $$props, $$invalidate) {
 	let is_video;
 	let { $$slots: slots = {}, $$scope } = $$props;
-	validate_slots('Svelte_zoom', slots, []);
+	validate_slots('ImageViewer', slots, []);
 	let { alt } = $$props;
 	let smooth = true;
 	let touchScreen = false;
@@ -11581,7 +12913,7 @@ function index_svelte_instance($$self, $$props, $$invalidate) {
 
 	$$self.$$.on_mount.push(function () {
 		if (alt === undefined && !('alt' in $$props || $$self.$$.bound[$$self.$$.props['alt']])) {
-			console.warn("<Svelte_zoom> was created without expected prop 'alt'");
+			console.warn("<ImageViewer> was created without expected prop 'alt'");
 		}
 	});
 
@@ -11746,15 +13078,15 @@ function index_svelte_instance($$self, $$props, $$invalidate) {
 	];
 }
 
-class Svelte_zoom extends SvelteComponentDev {
+class ImageViewer extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
 
 		init(
 			this,
 			options,
-			index_svelte_instance,
-			index_svelte_create_fragment,
+			ImageViewer_svelte_instance,
+			ImageViewer_svelte_create_fragment,
 			safe_not_equal,
 			{
 				alt: 0,
@@ -11762,15 +13094,15 @@ class Svelte_zoom extends SvelteComponentDev {
 				zoomIn: 16,
 				zoomOut: 17
 			},
-			index_svelte_add_css,
+			ImageViewer_svelte_add_css,
 			[-1, -1]
 		);
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
-			tagName: "Svelte_zoom",
+			tagName: "ImageViewer",
 			options,
-			id: index_svelte_create_fragment.name
+			id: ImageViewer_svelte_create_fragment.name
 		});
 	}
 
@@ -11788,7 +13120,7 @@ class Svelte_zoom extends SvelteComponentDev {
 	}
 
 	set open_image(value) {
-		throw new Error("<Svelte_zoom>: Cannot set read-only property 'open_image'");
+		throw new Error("<ImageViewer>: Cannot set read-only property 'open_image'");
 	}
 
 	get zoomIn() {
@@ -11796,7 +13128,7 @@ class Svelte_zoom extends SvelteComponentDev {
 	}
 
 	set zoomIn(value) {
-		throw new Error("<Svelte_zoom>: Cannot set read-only property 'zoomIn'");
+		throw new Error("<ImageViewer>: Cannot set read-only property 'zoomIn'");
 	}
 
 	get zoomOut() {
@@ -11804,11 +13136,11 @@ class Svelte_zoom extends SvelteComponentDev {
 	}
 
 	set zoomOut(value) {
-		throw new Error("<Svelte_zoom>: Cannot set read-only property 'zoomOut'");
+		throw new Error("<ImageViewer>: Cannot set read-only property 'zoomOut'");
 	}
 }
 
-/* harmony default export */ const index_svelte = (Svelte_zoom);
+/* harmony default export */ const ImageViewer_svelte = (ImageViewer);
 ;// CONCATENATED MODULE: ./src/components/artPage.svelte
 /* src\components\artPage.svelte generated by Svelte v4.2.0 */
 
@@ -11821,31 +13153,30 @@ const { Object: artPage_svelte_Object_1, console: artPage_svelte_console_1 } = g
 
 
 
-
 const artPage_svelte_file = "src\\components\\artPage.svelte";
 
 function artPage_svelte_add_css(target) {
-	append_styles(target, "svelte-1buuvps", "main.svelte-1buuvps *{color:var(--accent-dark);font-family:\"Petrona\";font-weight:400}main.svelte-1buuvps *::selection{background:var(--accent-dark);color:var(--accent-light)}.title-container.svelte-1buuvps.svelte-1buuvps{margin-left:1rem;width:fit-content;cursor:pointer;display:flex;align-items:center}.title-container.svelte-1buuvps svg.svelte-1buuvps{transition:transform 0.1s ease}.title-container.svelte-1buuvps.svelte-1buuvps:active{filter:invert(1);background:var(--accent-light)}.title-container.svelte-1buuvps .title.svelte-1buuvps{font-weight:bolder;font-size:2rem;margin-bottom:2rem;margin-top:2rem}main.svelte-1buuvps.svelte-1buuvps{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXJ0UGFnZS5zdmVsdGUiLCJtYXBwaW5ncyI6IkFBd0VpQixtQkFBTyxHQUN0QixNQUFTLGlCQUFTLEVBRW5CLFdBQU8sVUFBaUIsWUFDZixDQUFHLElBRVosbUJBQUUsY0FFRixVQUFTLGtCQUFlLENBQWdCLE1BQ3ZDLG1CQUFrQixnREFJaEIsQ0FDSCxpQkFLQSxLQUFNLFlBQWEsQ0FNbkIsTUFBTSxRQUFVLENBQ2hCLE9BQU0sTUFDTixXQUFNLE9BRU4sZ0NBQ1csOEJBQ0wsVUFBdUIseURBRTNCLE9BQWdCLE9BQ2hCLFFBQUcsYUFDRixtQkFBb0IsbUVBR2pCLE9BQUksV0FDUCxJQUFJLGNBRUosS0FBTSxXQUNOLE1BcUJILHdDQUNDLEtBQU0sVUFDTixNQUFhLFdBQ1Qsd0JBQ0YsNEJBQ1EsQ0FBQyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJhcnRQYWdlLnN2ZWx0ZSJdfQ== */");
+	append_styles(target, "svelte-1buuvps", "main.svelte-1buuvps *{color:var(--accent-dark);font-family:\"Petrona\";font-weight:400}main.svelte-1buuvps *::selection{background:var(--accent-dark);color:var(--accent-light)}.title-container.svelte-1buuvps.svelte-1buuvps{margin-left:1rem;width:fit-content;cursor:pointer;display:flex;align-items:center}.title-container.svelte-1buuvps svg.svelte-1buuvps{transition:transform 0.1s ease}.title-container.svelte-1buuvps.svelte-1buuvps:active{filter:invert(1);background:var(--accent-light)}.title-container.svelte-1buuvps .title.svelte-1buuvps{font-weight:bolder;font-size:2rem;margin-bottom:2rem;margin-top:2rem}main.svelte-1buuvps.svelte-1buuvps{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXJ0UGFnZS5zdmVsdGUiLCJtYXBwaW5ncyI6IkFBd0RrQixtQkFBQyxDQUFNLENBQVEsQ0FFaEMsS0FBTyxLQUFHLGFBQU0sRUFFaEIsV0FBTyxDQUFPLFNBQU0sQ0FDcEIsV0FBYSxJQUViLENBRUEsbUJBQUksYUFBeUIsQ0FJN0IsVUFBUyxrQkFBZSxDQUFnQixNQUN2QyxtQkFBa0IsZ0RBSWhCLENBQ0gsaUJBS0EsS0FBTSxZQUFhLENBTW5CLE1BQU0sUUFBVSxDQUNoQixPQUFNLE1BQ04sV0FBTSxPQUVOLGdDQUNXLDhCQUNMLFVBQXVCLHlEQUUzQixPQUFnQixPQUNoQixRQUFHLGFBQ0YsbUJBQW9CLG1FQUdqQixPQUFJLFdBQ1AsSUFBSSxjQUVKLEtBQU0sV0FDTixNQXFCSCx3Q0FDQyxLQUFNLFVBQ04sTUFBYSxXQUNULHdCQUNGLDRCQUNRLENBQUMiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiYXJ0UGFnZS5zdmVsdGUiXX0= */");
 }
 
 function artPage_svelte_get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[12] = list[i];
-	child_ctx[14] = i;
+	child_ctx[11] = list[i];
+	child_ctx[13] = i;
 	return child_ctx;
 }
 
 function artPage_svelte_get_each_context_1(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[12] = list[i];
-	child_ctx[14] = i;
+	child_ctx[11] = list[i];
+	child_ctx[13] = i;
 	return child_ctx;
 }
 
-// (130:2) {#each image_cats as image_cat, i}
+// (123:2) {#each image_cats as image_cat, i}
 function artPage_svelte_create_each_block_1(ctx) {
 	let a;
-	let t0_value = /*image_cat_names*/ ctx[4][/*i*/ ctx[14]] + "";
+	let t0_value = /*image_cat_names*/ ctx[4][/*i*/ ctx[13]] + "";
 	let t0;
 	let t1;
 	let a_href_value;
@@ -11853,7 +13184,7 @@ function artPage_svelte_create_each_block_1(ctx) {
 	let dispose;
 
 	function click_handler() {
-		return /*click_handler*/ ctx[6](/*i*/ ctx[14]);
+		return /*click_handler*/ ctx[6](/*i*/ ctx[13]);
 	}
 
 	const block = {
@@ -11861,9 +13192,9 @@ function artPage_svelte_create_each_block_1(ctx) {
 			a = dom_element("a");
 			t0 = dom_text(t0_value);
 			t1 = space();
-			attr_dev(a, "href", a_href_value = `#${/*image_cat_names*/ ctx[4][/*i*/ ctx[14]]}`);
+			attr_dev(a, "href", a_href_value = `#${/*image_cat_names*/ ctx[4][/*i*/ ctx[13]]}`);
 			attr_dev(a, "class", "menu-item");
-			add_location(a, artPage_svelte_file, -1, 3225);
+			add_location(a, artPage_svelte_file, -1, 3085);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -11892,14 +13223,14 @@ function artPage_svelte_create_each_block_1(ctx) {
 		block,
 		id: artPage_svelte_create_each_block_1.name,
 		type: "each",
-		source: "(130:2) {#each image_cats as image_cat, i}",
+		source: "(123:2) {#each image_cats as image_cat, i}",
 		ctx
 	});
 
 	return block;
 }
 
-// (129:1) <Bar>
+// (122:1) <Bar>
 function artPage_svelte_create_default_slot(ctx) {
 	let each_1_anchor;
 	let each_value_1 = ensure_array_like_dev(/*image_cats*/ ctx[3]);
@@ -11963,18 +13294,18 @@ function artPage_svelte_create_default_slot(ctx) {
 		block,
 		id: artPage_svelte_create_default_slot.name,
 		type: "slot",
-		source: "(129:1) <Bar>",
+		source: "(122:1) <Bar>",
 		ctx
 	});
 
 	return block;
 }
 
-// (140:1) {#each image_cats as image_cat, i}
+// (133:1) {#each image_cats as image_cat, i}
 function artPage_svelte_create_each_block(ctx) {
 	let div1;
 	let div0;
-	let t0_value = /*image_cat_names*/ ctx[4][/*i*/ ctx[14]] + "";
+	let t0_value = /*image_cat_names*/ ctx[4][/*i*/ ctx[13]] + "";
 	let t0;
 	let div0_id_value;
 	let t1;
@@ -11988,13 +13319,13 @@ function artPage_svelte_create_each_block(ctx) {
 	let dispose;
 
 	function click_handler_1() {
-		return /*click_handler_1*/ ctx[8](/*i*/ ctx[14]);
+		return /*click_handler_1*/ ctx[8](/*i*/ ctx[13]);
 	}
 
 	gallery = new Gallery_svelte({
 			props: {
-				images: /*image_cat*/ ctx[12],
-				hidden: /*image_cat_toggled*/ ctx[1][/*i*/ ctx[14]],
+				images: /*image_cat*/ ctx[11],
+				hidden: /*image_cat_toggled*/ ctx[1][/*i*/ ctx[13]],
 				open_image_callback: /*func*/ ctx[9]
 			},
 			$$inline: true
@@ -12011,23 +13342,23 @@ function artPage_svelte_create_each_block(ctx) {
 			t2 = space();
 			create_component(gallery.$$.fragment);
 			attr_dev(div0, "class", "title svelte-1buuvps");
-			attr_dev(div0, "id", div0_id_value = /*image_cat_names*/ ctx[4][/*i*/ ctx[14]]);
-			add_location(div0, artPage_svelte_file, -1, 3649);
+			attr_dev(div0, "id", div0_id_value = /*image_cat_names*/ ctx[4][/*i*/ ctx[13]]);
+			add_location(div0, artPage_svelte_file, -1, 3517);
 			attr_dev(path, "d", "M480-360 280-559h400L480-360Z");
-			add_location(path, artPage_svelte_file, -1, 3898);
+			add_location(path, artPage_svelte_file, -1, 3766);
 			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
 			attr_dev(svg, "height", "48");
 			attr_dev(svg, "viewBox", "0 -960 960 960");
 			attr_dev(svg, "width", "48");
 
-			attr_dev(svg, "style", svg_style_value = /*image_cat_toggled*/ ctx[1][/*i*/ ctx[14]]
+			attr_dev(svg, "style", svg_style_value = /*image_cat_toggled*/ ctx[1][/*i*/ ctx[13]]
 			? ""
 			: "transform: scaleY(-1);");
 
 			attr_dev(svg, "class", "svelte-1buuvps");
-			add_location(svg, artPage_svelte_file, -1, 3731);
+			add_location(svg, artPage_svelte_file, -1, 3599);
 			attr_dev(div1, "class", "title-container svelte-1buuvps");
-			add_location(div1, artPage_svelte_file, -1, 3554);
+			add_location(div1, artPage_svelte_file, -1, 3422);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div1, anchor);
@@ -12048,15 +13379,15 @@ function artPage_svelte_create_each_block(ctx) {
 		p: function update(new_ctx, dirty) {
 			ctx = new_ctx;
 
-			if (!current || dirty & /*image_cat_toggled*/ 2 && svg_style_value !== (svg_style_value = /*image_cat_toggled*/ ctx[1][/*i*/ ctx[14]]
+			if (!current || dirty & /*image_cat_toggled*/ 2 && svg_style_value !== (svg_style_value = /*image_cat_toggled*/ ctx[1][/*i*/ ctx[13]]
 			? ""
 			: "transform: scaleY(-1);")) {
 				attr_dev(svg, "style", svg_style_value);
 			}
 
 			const gallery_changes = {};
-			if (dirty & /*image_cat_toggled*/ 2) gallery_changes.hidden = /*image_cat_toggled*/ ctx[1][/*i*/ ctx[14]];
-			if (dirty & /*zoom_widget*/ 1) gallery_changes.open_image_callback = /*func*/ ctx[9];
+			if (dirty & /*image_cat_toggled*/ 2) gallery_changes.hidden = /*image_cat_toggled*/ ctx[1][/*i*/ ctx[13]];
+			if (dirty & /*image_viewer*/ 1) gallery_changes.open_image_callback = /*func*/ ctx[9];
 			gallery.$set(gallery_changes);
 		},
 		i: function intro(local) {
@@ -12084,7 +13415,7 @@ function artPage_svelte_create_each_block(ctx) {
 		block,
 		id: artPage_svelte_create_each_block.name,
 		type: "each",
-		source: "(140:1) {#each image_cats as image_cat, i}",
+		source: "(133:1) {#each image_cats as image_cat, i}",
 		ctx
 	});
 
@@ -12095,13 +13426,13 @@ function artPage_svelte_create_fragment(ctx) {
 	let main;
 	let bar;
 	let t0;
-	let zoom;
+	let imageviewer;
 	let t1;
 	let t2;
 	let footer;
 	let current;
 
-	bar = new Bar_svelte({
+	bar = new NavBar_svelte({
 			props: {
 				$$slots: { default: [artPage_svelte_create_default_slot] },
 				$$scope: { ctx }
@@ -12109,9 +13440,9 @@ function artPage_svelte_create_fragment(ctx) {
 			$$inline: true
 		});
 
-	let zoom_props = { src: "", alt: "..." };
-	zoom = new index_svelte({ props: zoom_props, $$inline: true });
-	/*zoom_binding*/ ctx[7](zoom);
+	let imageviewer_props = { src: "", alt: "..." };
+	imageviewer = new ImageViewer_svelte({ props: imageviewer_props, $$inline: true });
+	/*imageviewer_binding*/ ctx[7](imageviewer);
 	let each_value = ensure_array_like_dev(/*image_cats*/ ctx[3]);
 	let each_blocks = [];
 
@@ -12130,7 +13461,7 @@ function artPage_svelte_create_fragment(ctx) {
 			main = dom_element("main");
 			create_component(bar.$$.fragment);
 			t0 = space();
-			create_component(zoom.$$.fragment);
+			create_component(imageviewer.$$.fragment);
 			t1 = space();
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -12140,7 +13471,7 @@ function artPage_svelte_create_fragment(ctx) {
 			t2 = space();
 			create_component(footer.$$.fragment);
 			attr_dev(main, "class", "svelte-1buuvps");
-			add_location(main, artPage_svelte_file, -1, 3171);
+			add_location(main, artPage_svelte_file, -1, 3031);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -12149,7 +13480,7 @@ function artPage_svelte_create_fragment(ctx) {
 			insert_dev(target, main, anchor);
 			mount_component(bar, main, null);
 			append_dev(main, t0);
-			mount_component(zoom, main, null);
+			mount_component(imageviewer, main, null);
 			append_dev(main, t1);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -12165,15 +13496,15 @@ function artPage_svelte_create_fragment(ctx) {
 		p: function update(ctx, [dirty]) {
 			const bar_changes = {};
 
-			if (dirty & /*$$scope*/ 65536) {
+			if (dirty & /*$$scope*/ 32768) {
 				bar_changes.$$scope = { dirty, ctx };
 			}
 
 			bar.$set(bar_changes);
-			const zoom_changes = {};
-			zoom.$set(zoom_changes);
+			const imageviewer_changes = {};
+			imageviewer.$set(imageviewer_changes);
 
-			if (dirty & /*image_cats, image_cat_toggled, zoom_widget, image_cat_names*/ 27) {
+			if (dirty & /*image_cats, image_cat_toggled, image_viewer, image_cat_names*/ 27) {
 				each_value = ensure_array_like_dev(/*image_cats*/ ctx[3]);
 				let i;
 
@@ -12203,7 +13534,7 @@ function artPage_svelte_create_fragment(ctx) {
 		i: function intro(local) {
 			if (current) return;
 			transitions_transition_in(bar.$$.fragment, local);
-			transitions_transition_in(zoom.$$.fragment, local);
+			transitions_transition_in(imageviewer.$$.fragment, local);
 
 			for (let i = 0; i < each_value.length; i += 1) {
 				transitions_transition_in(each_blocks[i]);
@@ -12214,7 +13545,7 @@ function artPage_svelte_create_fragment(ctx) {
 		},
 		o: function outro(local) {
 			transitions_transition_out(bar.$$.fragment, local);
-			transitions_transition_out(zoom.$$.fragment, local);
+			transitions_transition_out(imageviewer.$$.fragment, local);
 			each_blocks = each_blocks.filter(Boolean);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -12230,8 +13561,8 @@ function artPage_svelte_create_fragment(ctx) {
 			}
 
 			destroy_component(bar);
-			/*zoom_binding*/ ctx[7](null);
-			destroy_component(zoom);
+			/*imageviewer_binding*/ ctx[7](null);
+			destroy_component(imageviewer);
 			destroy_each(each_blocks, detaching);
 			destroy_component(footer);
 		}
@@ -12251,14 +13582,7 @@ function artPage_svelte_create_fragment(ctx) {
 function artPage_svelte_instance($$self, $$props, $$invalidate) {
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('ArtPage', slots, []);
-	let zoom_widget;
-	let observer = lozad_min_default()();
-	observer.observe();
-
-	window.addEventListener('DOMContentLoaded', function () {
-		observer = lozad_min_default()();
-		observer.observe();
-	});
+	let image_viewer;
 
 	function scroll_to_view(selector) {
 		$$invalidate(1, image_cat_toggled[image_cat_names.indexOf(selector.replace("#", ""))] = false, image_cat_toggled);
@@ -12332,10 +13656,10 @@ function artPage_svelte_instance($$self, $$props, $$invalidate) {
 		scroll_to_view(`#${image_cat_names[i]}`);
 	};
 
-	function zoom_binding($$value) {
+	function imageviewer_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-			zoom_widget = $$value;
-			$$invalidate(0, zoom_widget);
+			image_viewer = $$value;
+			$$invalidate(0, image_viewer);
 		});
 	}
 
@@ -12345,7 +13669,7 @@ function artPage_svelte_instance($$self, $$props, $$invalidate) {
 
 	const func = // @ts-ignore
 	src => {
-		zoom_widget.open_image(src);
+		image_viewer.open_image(src);
 	};
 
 	$$self.$$set = $$props => {
@@ -12355,13 +13679,11 @@ function artPage_svelte_instance($$self, $$props, $$invalidate) {
 	$$self.$capture_state = () => ({
 		onMount: onMount,
 		onDestroy: onDestroy,
-		Bar: Bar_svelte,
+		Bar: NavBar_svelte,
 		Gallery: Gallery_svelte,
 		Footer: Footer_svelte,
-		lozad: (lozad_min_default()),
-		Zoom: index_svelte,
-		zoom_widget,
-		observer,
+		ImageViewer: ImageViewer_svelte,
+		image_viewer,
 		scroll_to_view,
 		image_folders,
 		image_cats,
@@ -12371,8 +13693,7 @@ function artPage_svelte_instance($$self, $$props, $$invalidate) {
 	});
 
 	$$self.$inject_state = $$props => {
-		if ('zoom_widget' in $$props) $$invalidate(0, zoom_widget = $$props.zoom_widget);
-		if ('observer' in $$props) observer = $$props.observer;
+		if ('image_viewer' in $$props) $$invalidate(0, image_viewer = $$props.image_viewer);
 		if ('url' in $$props) $$invalidate(5, url = $$props.url);
 	};
 
@@ -12381,14 +13702,14 @@ function artPage_svelte_instance($$self, $$props, $$invalidate) {
 	}
 
 	return [
-		zoom_widget,
+		image_viewer,
 		image_cat_toggled,
 		scroll_to_view,
 		image_cats,
 		image_cat_names,
 		url,
 		click_handler,
-		zoom_binding,
+		imageviewer_binding,
 		click_handler_1,
 		func
 	];
@@ -12475,7 +13796,7 @@ function projectsPage_svelte_create_fragment(ctx) {
 	let t22;
 	let footer;
 	let current;
-	bar = new Bar_svelte({ $$inline: true });
+	bar = new NavBar_svelte({ $$inline: true });
 	footer = new Footer_svelte({ $$inline: true });
 
 	const block = {
@@ -12524,53 +13845,53 @@ function projectsPage_svelte_create_fragment(ctx) {
 			t22 = space();
 			create_component(footer.$$.fragment);
 			attr_dev(div0, "class", "name svelte-1pobciu");
-			add_location(div0, projectsPage_svelte_file, -1, 944);
+			add_location(div0, projectsPage_svelte_file, -1, 959);
 			attr_dev(a0, "href", "https://github.com/wrightwriter/splunge");
 			attr_dev(a0, "target", "_blank");
 			attr_dev(a0, "class", "svelte-1pobciu");
-			add_location(a0, projectsPage_svelte_file, -1, 1024);
+			add_location(a0, projectsPage_svelte_file, -1, 1039);
 			attr_dev(a1, "href", "https://www.heavypaint.com");
 			attr_dev(a1, "target", "_blank");
 			attr_dev(a1, "class", "svelte-1pobciu");
-			add_location(a1, projectsPage_svelte_file, -1, 1152);
+			add_location(a1, projectsPage_svelte_file, -1, 1167);
 			attr_dev(div1, "class", "svelte-1pobciu");
-			add_location(div1, projectsPage_svelte_file, -1, 1014);
+			add_location(div1, projectsPage_svelte_file, -1, 1029);
 			attr_dev(wbr0, "class", "svelte-1pobciu");
-			add_location(wbr0, projectsPage_svelte_file, -1, 1236);
+			add_location(wbr0, projectsPage_svelte_file, -1, 1251);
 			attr_dev(a2, "href", "https://svelte.dev/");
 			attr_dev(a2, "target", "_blank");
 			attr_dev(a2, "class", "svelte-1pobciu");
-			add_location(a2, projectsPage_svelte_file, -1, 1438);
+			add_location(a2, projectsPage_svelte_file, -1, 1453);
 			attr_dev(a3, "href", "https://www.youtube.com/watch?v=3lOptjAeA2w");
 			attr_dev(a3, "target", "_blank");
 			attr_dev(a3, "class", "svelte-1pobciu");
-			add_location(a3, projectsPage_svelte_file, -1, 1501);
+			add_location(a3, projectsPage_svelte_file, -1, 1516);
 			attr_dev(div2, "class", "svelte-1pobciu");
-			add_location(div2, projectsPage_svelte_file, -1, 1247);
+			add_location(div2, projectsPage_svelte_file, -1, 1262);
 			attr_dev(wbr1, "class", "svelte-1pobciu");
-			add_location(wbr1, projectsPage_svelte_file, -1, 1748);
+			add_location(wbr1, projectsPage_svelte_file, -1, 1763);
 			attr_dev(div3, "class", "svelte-1pobciu");
-			add_location(div3, projectsPage_svelte_file, -1, 1759);
+			add_location(div3, projectsPage_svelte_file, -1, 1774);
 			attr_dev(wbr2, "class", "svelte-1pobciu");
-			add_location(wbr2, projectsPage_svelte_file, -1, 1822);
+			add_location(wbr2, projectsPage_svelte_file, -1, 1837);
 			attr_dev(div4, "class", "description svelte-1pobciu");
-			add_location(div4, projectsPage_svelte_file, -1, 985);
+			add_location(div4, projectsPage_svelte_file, -1, 1000);
 			if (!src_url_equal(img0.src, img0_src_value = window.LFS_PREPEND + "./images/paintings/adsg.png")) attr_dev(img0, "src", img0_src_value);
 			attr_dev(img0, "height", "345.5rem");
-			add_location(img0, projectsPage_svelte_file, -1, 1866);
+			add_location(img0, projectsPage_svelte_file, -1, 1881);
 			if (!src_url_equal(img1.src, img1_src_value = window.LFS_PREPEND + "./images/paintings/1689957895824_2 (1).png")) attr_dev(img1, "src", img1_src_value);
 			attr_dev(img1, "height", "345.5rem");
-			add_location(img1, projectsPage_svelte_file, -1, 1951);
+			add_location(img1, projectsPage_svelte_file, -1, 1966);
 			if (!src_url_equal(img2.src, img2_src_value = window.LFS_PREPEND + "./images/paintings/1690037672960_1 (1).png")) attr_dev(img2, "src", img2_src_value);
 			attr_dev(img2, "height", "290.5rem");
-			add_location(img2, projectsPage_svelte_file, -1, 2052);
+			add_location(img2, projectsPage_svelte_file, -1, 2067);
 			if (!src_url_equal(img3.src, img3_src_value = window.LFS_PREPEND + "./images/paintings/1690102042507_1[1].png")) attr_dev(img3, "src", img3_src_value);
 			attr_dev(img3, "height", "290.5rem");
-			add_location(img3, projectsPage_svelte_file, -1, 2154);
+			add_location(img3, projectsPage_svelte_file, -1, 2169);
 			attr_dev(div5, "class", "gallery svelte-1pobciu");
-			add_location(div5, projectsPage_svelte_file, -1, 1841);
+			add_location(div5, projectsPage_svelte_file, -1, 1856);
 			attr_dev(main, "class", "svelte-1pobciu");
-			add_location(main, projectsPage_svelte_file, -1, 926);
+			add_location(main, projectsPage_svelte_file, -1, 941);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -12662,7 +13983,7 @@ function projectsPage_svelte_instance($$self, $$props, $$invalidate) {
 		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<ProjectsPage> was created with unknown prop '${key}'`);
 	});
 
-	$$self.$capture_state = () => ({ onMount: onMount, onDestroy: onDestroy, Bar: Bar_svelte, Footer: Footer_svelte });
+	$$self.$capture_state = () => ({ onMount: onMount, onDestroy: onDestroy, Bar: NavBar_svelte, Footer: Footer_svelte });
 	return [];
 }
 
@@ -12739,7 +14060,7 @@ function aboutPage_svelte_create_fragment(ctx) {
 	let t24;
 	let footer;
 	let current;
-	bar = new Bar_svelte({ $$inline: true });
+	bar = new NavBar_svelte({ $$inline: true });
 	footer = new Footer_svelte({ $$inline: true });
 
 	const block = {
@@ -12764,7 +14085,7 @@ function aboutPage_svelte_create_fragment(ctx) {
 			wbr2 = dom_element("wbr");
 			t9 = space();
 			div3 = dom_element("div");
-			t10 = dom_text("petar.guglev — gmail\n\t\t\t\t");
+			t10 = dom_text("petar.guglev — at gee mail\n\t\t\t\t");
 			br0 = dom_element("br");
 			t11 = space();
 			br1 = dom_element("br");
@@ -12792,48 +14113,48 @@ function aboutPage_svelte_create_fragment(ctx) {
 			t24 = space();
 			create_component(footer.$$.fragment);
 			attr_dev(div0, "class", "svelte-1r0k0h8");
-			add_location(div0, aboutPage_svelte_file, 56, 0, 931);
+			add_location(div0, aboutPage_svelte_file, 56, 0, 946);
 			attr_dev(wbr0, "class", "svelte-1r0k0h8");
-			add_location(wbr0, aboutPage_svelte_file, -1, 971);
+			add_location(wbr0, aboutPage_svelte_file, -1, 986);
 			attr_dev(div1, "class", "svelte-1r0k0h8");
-			add_location(div1, aboutPage_svelte_file, -1, 982);
+			add_location(div1, aboutPage_svelte_file, -1, 997);
 			attr_dev(wbr1, "class", "svelte-1r0k0h8");
-			add_location(wbr1, aboutPage_svelte_file, -1, 1046);
+			add_location(wbr1, aboutPage_svelte_file, -1, 1061);
 			attr_dev(div2, "class", "svelte-1r0k0h8");
-			add_location(div2, aboutPage_svelte_file, -1, 1057);
+			add_location(div2, aboutPage_svelte_file, -1, 1072);
 			attr_dev(wbr2, "class", "svelte-1r0k0h8");
-			add_location(wbr2, aboutPage_svelte_file, -1, 1145);
+			add_location(wbr2, aboutPage_svelte_file, -1, 1160);
 			attr_dev(br0, "class", "svelte-1r0k0h8");
-			add_location(br0, aboutPage_svelte_file, -1, 1191);
+			add_location(br0, aboutPage_svelte_file, -1, 1212);
 			attr_dev(br1, "class", "svelte-1r0k0h8");
-			add_location(br1, aboutPage_svelte_file, -1, 1201);
+			add_location(br1, aboutPage_svelte_file, -1, 1222);
 			attr_dev(br2, "class", "svelte-1r0k0h8");
-			add_location(br2, aboutPage_svelte_file, -1, 1238);
+			add_location(br2, aboutPage_svelte_file, -1, 1259);
 			attr_dev(br3, "class", "svelte-1r0k0h8");
-			add_location(br3, aboutPage_svelte_file, -1, 1248);
+			add_location(br3, aboutPage_svelte_file, -1, 1269);
 			attr_dev(a0, "href", "https://twitter.com/wrightwrighter");
 			attr_dev(a0, "class", "svelte-1r0k0h8");
-			add_location(a0, aboutPage_svelte_file, -1, 1258);
+			add_location(a0, aboutPage_svelte_file, -1, 1279);
 			attr_dev(br4, "class", "svelte-1r0k0h8");
-			add_location(br4, aboutPage_svelte_file, -1, 1347);
+			add_location(br4, aboutPage_svelte_file, -1, 1368);
 			attr_dev(br5, "class", "svelte-1r0k0h8");
-			add_location(br5, aboutPage_svelte_file, -1, 1357);
+			add_location(br5, aboutPage_svelte_file, -1, 1378);
 			attr_dev(a1, "href", "https://github.com/wrightwriter");
 			attr_dev(a1, "class", "svelte-1r0k0h8");
-			add_location(a1, aboutPage_svelte_file, -1, 1367);
+			add_location(a1, aboutPage_svelte_file, -1, 1388);
 			attr_dev(br6, "class", "svelte-1r0k0h8");
-			add_location(br6, aboutPage_svelte_file, -1, 1450);
+			add_location(br6, aboutPage_svelte_file, -1, 1471);
 			attr_dev(br7, "class", "svelte-1r0k0h8");
-			add_location(br7, aboutPage_svelte_file, -1, 1460);
+			add_location(br7, aboutPage_svelte_file, -1, 1481);
 			attr_dev(a2, "href", "https://www.shadertoy.com/user/jeyko/sort=newest");
 			attr_dev(a2, "class", "svelte-1r0k0h8");
-			add_location(a2, aboutPage_svelte_file, -1, 1470);
+			add_location(a2, aboutPage_svelte_file, -1, 1491);
 			attr_dev(div3, "class", "svelte-1r0k0h8");
-			add_location(div3, aboutPage_svelte_file, -1, 1156);
+			add_location(div3, aboutPage_svelte_file, -1, 1171);
 			attr_dev(div4, "class", "description svelte-1r0k0h8");
-			add_location(div4, aboutPage_svelte_file, 55, 2, 902);
+			add_location(div4, aboutPage_svelte_file, 55, 2, 917);
 			attr_dev(main, "class", "svelte-1r0k0h8");
-			add_location(main, aboutPage_svelte_file, 51, 1, 884);
+			add_location(main, aboutPage_svelte_file, 51, 1, 899);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -12929,7 +14250,7 @@ function aboutPage_svelte_instance($$self, $$props, $$invalidate) {
 		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<AboutPage> was created with unknown prop '${key}'`);
 	});
 
-	$$self.$capture_state = () => ({ onMount: onMount, onDestroy: onDestroy, Bar: Bar_svelte, Footer: Footer_svelte });
+	$$self.$capture_state = () => ({ onMount: onMount, onDestroy: onDestroy, Bar: NavBar_svelte, Footer: Footer_svelte });
 	return [];
 }
 
@@ -17246,66 +18567,112 @@ const { Object: Splash_svelte_Object_1, console: Splash_svelte_console_1 } = glo
 
 
 
+
 const Splash_svelte_file = "src\\components\\Splash.svelte";
 
 function Splash_svelte_add_css(target) {
-	append_styles(target, "svelte-1xk11po", "main.svelte-1xk11po *{user-select:none}main.svelte-1xk11po *{color:var(--accent-dark)}main.svelte-1xk11po *::selection{background:var(--accent-dark);color:var(--accent-light)}main.svelte-1xk11po .menu-item{color:var(--accent-light);background:var(--accent-dark)}main.svelte-1xk11po .menu-item:hover{color:var(--accent-dark) !important;background:var(--accent-light)}main.svelte-1xk11po #logo{color:var(--accent-light);background:var(--accent-dark)}main.svelte-1xk11po{width:100%;max-width:40rem;height:100%;display:flex;flex-direction:column;max-width:var(--main-max-width);margin-right:auto;margin-left:auto}canvas.svelte-1xk11po{position:absolute;top:0;left:0;z-index:-5;width:100%;height:100%;margin:auto;padding:0}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU3BsYXNoLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFvV1EsbUJBQVUsQ0FBRSxhQUNaLDBCQUtBLFlBQ0osYUFBSSx1RUFJTCx3Q0FHQSxVQUFVLE1BQ1QsQ0FBRSxvQkFDSCw2QkFFRixDQUNELG1CQUFFLENBQU8saUJBQ1Qsb0NBQ0MsVUFBVyxDQUFDLElBQUsiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiU3BsYXNoLnN2ZWx0ZSJdfQ== */");
+	append_styles(target, "svelte-1xk11po", "main.svelte-1xk11po *{user-select:none}main.svelte-1xk11po *{color:var(--accent-dark)}main.svelte-1xk11po *::selection{background:var(--accent-dark);color:var(--accent-light)}main.svelte-1xk11po .menu-item{color:var(--accent-light);background:var(--accent-dark)}main.svelte-1xk11po .menu-item:hover{color:var(--accent-dark) !important;background:var(--accent-light)}main.svelte-1xk11po #logo{color:var(--accent-light);background:var(--accent-dark)}main.svelte-1xk11po{width:100%;max-width:40rem;height:100%;display:flex;flex-direction:column;max-width:var(--main-max-width);margin-right:auto;margin-left:auto}canvas.svelte-1xk11po{position:absolute;top:0;left:0;z-index:-5;width:100%;height:100%;margin:auto;padding:0}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU3BsYXNoLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFpV00sbUJBQVcsQ0FBRyxhQUVkLDBCQUlBLFFBQ0gsSUFBRyxhQUFTLHNCQUVQLFlBQWMsV0FDZixDQUFDLGlCQUFZLFFBQ2pCLElBQUcsY0FBYyxzQkFLZCxVQUFXLE9BQ2QsSUFBSyxjQUFZLFlBQ2IsQ0FBQyxpQkFBWSxzQkFJWixVQUFFLGFBQ1AsSUFBSyxhQUFJLEVBQVcsVUFBSSxXQUN2QixLQUFJLGNBQVksa0NBSWpCLDhCQUNBLHVDQUdBLENBQ0EsV0FFRixTQUFVLENBQUcsS0FBSSxDQUNoQixNQUFNLENBQUMsS0FDVCxhQUNDLGNBQVksQ0FBSyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJTcGxhc2guc3ZlbHRlIl19 */");
 }
 
-function Splash_svelte_create_fragment(ctx) {
+// (299:1) {#if $dark_mode}
+function Splash_svelte_create_if_block(ctx) {
 	let style;
-	let t1;
-	let div;
-	let main;
-	let bar;
-	let t2;
-	let footer;
-	let t3;
-	let canvas;
-	let current;
-	bar = new Bar_svelte({ $$inline: true });
-	footer = new Footer_svelte({ $$inline: true });
 
 	const block = {
 		c: function create() {
 			style = dom_element("style");
-			style.textContent = "*{\n\t\t\t--accent-light: white !important;\n\t\t\t--accent-dark: black !important;\n\t\t}";
-			t1 = space();
+			style.textContent = "*{\n\t\t}\n\t\t/* *{\n\t\t\t--accent-light: white !important;\n\t\t\t--accent-dark: black !important;\n\t\t} */\n\t\t#toggle-container svg {\n\t\t\t\tbackground: var(--accent-light);\n\t\t\t\tfill:var(--accent-dark);\n\t\t\t\tfilter: invert(1);\n\t\t\t\t&:active{\n\t\t\t\t\tfilter: invert(0) !important;\n\t\t\t\t\t/* background: var(--accent-light); */\n\t\t\t\t}\n\t\t\t}";
+			add_location(style, Splash_svelte_file, -1, 12109);
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, style, anchor);
+		},
+		d: function destroy(detaching) {
+			if (detaching) {
+				detach_dev(style);
+			}
+		}
+	};
+
+	dispatch_dev("SvelteRegisterBlock", {
+		block,
+		id: Splash_svelte_create_if_block.name,
+		type: "if",
+		source: "(299:1) {#if $dark_mode}",
+		ctx
+	});
+
+	return block;
+}
+
+function Splash_svelte_create_fragment(ctx) {
+	let if_block_anchor;
+	let t0;
+	let div;
+	let main;
+	let bar;
+	let t1;
+	let footer;
+	let t2;
+	let canvas;
+	let current;
+	let if_block = /*$dark_mode*/ ctx[1] && Splash_svelte_create_if_block(ctx);
+	bar = new NavBar_svelte({ $$inline: true });
+	footer = new Footer_svelte({ $$inline: true });
+
+	const block = {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = empty();
+			t0 = space();
 			div = dom_element("div");
 			main = dom_element("main");
 			create_component(bar.$$.fragment);
-			t2 = space();
+			t1 = space();
 			create_component(footer.$$.fragment);
-			t3 = space();
+			t2 = space();
 			canvas = dom_element("canvas");
-			add_location(style, Splash_svelte_file, -1, 12013);
 			attr_dev(main, "class", "svelte-1xk11po");
-			add_location(main, Splash_svelte_file, -1, 12172);
+			add_location(main, Splash_svelte_file, -1, 12509);
 			attr_dev(canvas, "draggable", "false");
 			attr_dev(canvas, "id", "canvas");
 			attr_dev(canvas, "class", "svelte-1xk11po");
-			add_location(canvas, Splash_svelte_file, -1, 12214);
+			add_location(canvas, Splash_svelte_file, -1, 12551);
 			set_style(div, "width", "100%");
 			set_style(div, "height", "100%");
-			add_location(div, Splash_svelte_file, -1, 12130);
+			add_location(div, Splash_svelte_file, -1, 12467);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
 		},
 		m: function mount(target, anchor) {
-			append_dev(document.head, style);
-			insert_dev(target, t1, anchor);
+			if (if_block) if_block.m(document.head, null);
+			append_dev(document.head, if_block_anchor);
+			insert_dev(target, t0, anchor);
 			insert_dev(target, div, anchor);
 			append_dev(div, main);
 			mount_component(bar, main, null);
-			append_dev(main, t2);
+			append_dev(main, t1);
 			mount_component(footer, main, null);
-			append_dev(div, t3);
+			append_dev(div, t2);
 			append_dev(div, canvas);
-			/*canvas_binding*/ ctx[2](canvas);
+			/*canvas_binding*/ ctx[3](canvas);
 			current = true;
 		},
-		p: utils_noop,
+		p: function update(ctx, [dirty]) {
+			if (/*$dark_mode*/ ctx[1]) {
+				if (if_block) {
+					
+				} else {
+					if_block = Splash_svelte_create_if_block(ctx);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.d(1);
+				if_block = null;
+			}
+		},
 		i: function intro(local) {
 			if (current) return;
 			transitions_transition_in(bar.$$.fragment, local);
@@ -17319,14 +18686,15 @@ function Splash_svelte_create_fragment(ctx) {
 		},
 		d: function destroy(detaching) {
 			if (detaching) {
-				detach_dev(t1);
+				detach_dev(t0);
 				detach_dev(div);
 			}
 
-			detach_dev(style);
+			if (if_block) if_block.d(detaching);
+			detach_dev(if_block_anchor);
 			destroy_component(bar);
 			destroy_component(footer);
-			/*canvas_binding*/ ctx[2](null);
+			/*canvas_binding*/ ctx[3](null);
 		}
 	};
 
@@ -17343,6 +18711,9 @@ function Splash_svelte_create_fragment(ctx) {
 
 function Splash_svelte_instance($$self, $$props, $$invalidate) {
 	let path_name;
+	let $dark_mode;
+	validate_store(dark_mode, 'dark_mode');
+	component_subscribe($$self, dark_mode, $$value => $$invalidate(1, $dark_mode = $$value));
 	let { $$slots: slots = {}, $$scope } = $$props;
 	validate_slots('Splash', slots, []);
 	let { url = "/" } = $$props;
@@ -17450,6 +18821,7 @@ function Splash_svelte_instance($$self, $$props, $$invalidate) {
 			ubo.buff.cpu_buff[5] = pointer_pressure;
 			ubo.buff.cpu_buff[6] = mouse_pos[0];
 			ubo.buff.cpu_buff[7] = mouse_pos[1];
+			ubo.buff.cpu_buff[8] = $dark_mode ? 1 : 0;
 			ubo.buff.upload();
 		};
 
@@ -17613,7 +18985,7 @@ function Splash_svelte_instance($$self, $$props, $$invalidate) {
 	}
 
 	$$self.$$set = $$props => {
-		if ('url' in $$props) $$invalidate(1, url = $$props.url);
+		if ('url' in $$props) $$invalidate(2, url = $$props.url);
 	};
 
 	$$self.$capture_state = () => ({
@@ -17627,12 +18999,13 @@ function Splash_svelte_instance($$self, $$props, $$invalidate) {
 		Texture: Texture,
 		ShaderProgram: ShaderProgram,
 		Thing: Thing,
-		Bar: Bar_svelte,
+		Bar: NavBar_svelte,
 		Footer: Footer_svelte,
 		Hash: Hash,
 		lerp: wmath_lerp,
 		min: min,
 		smoothstep: wmath_smoothstep,
+		dark_mode: dark_mode,
 		url,
 		canvasElement,
 		gl,
@@ -17643,11 +19016,12 @@ function Splash_svelte_instance($$self, $$props, $$invalidate) {
 		ubo,
 		t,
 		init_web_gl,
-		path_name
+		path_name,
+		$dark_mode
 	});
 
 	$$self.$inject_state = $$props => {
-		if ('url' in $$props) $$invalidate(1, url = $$props.url);
+		if ('url' in $$props) $$invalidate(2, url = $$props.url);
 		if ('canvasElement' in $$props) $$invalidate(0, canvasElement = $$props.canvasElement);
 		if ('gl' in $$props) gl = $$props.gl;
 		if ('default_framebuffer' in $$props) default_framebuffer = $$props.default_framebuffer;
@@ -17664,13 +19038,13 @@ function Splash_svelte_instance($$self, $$props, $$invalidate) {
 	}
 
 	$: path_name = location.pathname;
-	return [canvasElement, url, canvas_binding];
+	return [canvasElement, $dark_mode, url, canvas_binding];
 }
 
 class Splash extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init(this, options, Splash_svelte_instance, Splash_svelte_create_fragment, safe_not_equal, { url: 1 }, Splash_svelte_add_css);
+		init(this, options, Splash_svelte_instance, Splash_svelte_create_fragment, safe_not_equal, { url: 2 }, Splash_svelte_add_css);
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -17703,7 +19077,7 @@ const { Object: blogPage_svelte_Object_1 } = globals;
 const blogPage_svelte_file = "src\\components\\blogPage.svelte";
 
 function blogPage_svelte_add_css(target) {
-	append_styles(target, "svelte-hcu7n", "@charset \"UTF-8\";article{display:flex;flex-direction:column}video, img{max-width:30rem;margin-right:auto;margin-left:auto !important}.video-container{height:fit-content;margin:0px auto;max-width:30rem;width:30rem;display:table}.video-container div{position:relative;padding-bottom:75%;height:0px}.video-container div iframe{position:absolute;top:0px;left:0px;width:100%;height:100%}code{text-wrap:wrap !important;font-size:0.8rem !important}*::marker{list-style-type:\"👉\";content:\"܀ \";font-size:1.5rem;display:list-item;padding-inline-start:1ch}p{margin-bottom:0px}img{max-width:30rem;margin-left:auto;margin-right:auto}.date{margin-left:auto}.video-container{margin:0px auto;max-width:30rem;width:30rem}.video-container div.svelte-hcu7n.svelte-hcu7n{position:relative;padding-bottom:75%;height:0px}.blog-post.svelte-hcu7n.svelte-hcu7n{width:100%;display:flex;flex-direction:column}.blog-post.svelte-hcu7n .blog-post-name.svelte-hcu7n{font-size:2rem}.blog-post.svelte-hcu7n .blog-post-date.svelte-hcu7n{font-size:1.3rem;margin-left:auto}wbr.svelte-hcu7n.svelte-hcu7n{display:block;height:0.02rem;margin:none}main.svelte-hcu7n.svelte-hcu7n{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYmxvZ1BhZ2Uuc3ZlbHRlIiwibWFwcGluZ3MiOiJBQU1tQixTQUFPLFFBQ2xCLE9BQVMsQ0FDakIsT0FBTyxDQUFJLElBQUcsQ0FDZCxjQUFhLE9BQ2IsQ0FFTSxVQUFPLENBQ2IsU0FBVSxPQUNWLFlBQVMsTUFDVCxXQUFVLGdCQUNWLENBRU0sZ0JBQVUsQ0FDaEIsbUJBQ0UsTUFBSSxVQUNKLFNBQVMsT0FDVCxLQUFLLE9BQ1AsYUFDQSxDQUNBLHFCQUNDLFFBQU8sQ0FBSSxRQUNYLENBQ0EsY0FBUSxDQUFTLEdBQUMsQ0FNbEIsTUFBTyxDQUFHLEdBQ1YsQ0FHQSxnQkFBbUIsWUFDbEIsUUFBTyxVQUNULFFBQ0MsSUFBSyxDQUFDLEdBQUkiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiYmxvZ1BhZ2Uuc3ZlbHRlIl19 */");
+	append_styles(target, "svelte-2t3rj5", "@charset \"UTF-8\";article{display:flex;flex-direction:column}video, img{max-width:30rem;margin-right:auto;margin-left:auto !important}.video-container{height:fit-content;margin:0px auto;max-width:30rem;width:30rem;display:table}.video-container div{position:relative;padding-bottom:75%;height:0px}.video-container div iframe{position:absolute;top:0px;left:0px;width:100%;height:100%}code{text-wrap:wrap !important;font-size:0.8rem !important}*::marker{list-style-type:\"👉\";content:\"܀ \";font-size:1.5rem;display:list-item;padding-inline-start:1ch}p{margin-bottom:0px}img{max-width:30rem;margin-left:auto;margin-right:auto}.date{margin-left:auto}.video-container{margin:0px auto;max-width:30rem;width:30rem}.video-container div.svelte-2t3rj5.svelte-2t3rj5{position:relative;padding-bottom:75%;height:0px}.blog-posts-container.svelte-2t3rj5.svelte-2t3rj5{margin-top:1rem}.blog-posts-container.svelte-2t3rj5 .blog-post.svelte-2t3rj5{width:100%;display:flex;flex-direction:column}.blog-posts-container.svelte-2t3rj5 .blog-post .blog-post-name.svelte-2t3rj5{font-size:2rem}.blog-posts-container.svelte-2t3rj5 .blog-post .blog-post-date.svelte-2t3rj5{font-size:1.3rem;margin-left:auto}wbr.svelte-2t3rj5.svelte-2t3rj5{display:block;height:0.02rem;margin:none}main.svelte-2t3rj5.svelte-2t3rj5{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYmxvZ1BhZ2Uuc3ZlbHRlIiwibWFwcGluZ3MiOiJBQU1tQixTQUFPLE9BQVMsQ0FDM0IsT0FBUSxDQUNoQixPQUFTLENBQUUsSUFBRSxDQUNiLGNBQWUsT0FDZixDQUVNLFVBQVcsQ0FDakIsU0FBTyxDQUFNLEtBQUMsQ0FDZCxZQUFXLE1BQ1gsV0FBVSxnQkFDVixDQUVBLGlCQUNFLE1BQU0sQ0FBQyxZQUNQLE1BQUksSUFBTyxDQUFDLElBQUUsQ0FDaEIsZ0JBQ0UsS0FBSSxPQUNKLE9BQU8sQ0FBRSxLQUNYLENBQ0EscUJBQ0Esa0JBQ0EsbUJBQ0MsTUFBTyxJQUVQLENBTU8sZ0JBQVMsS0FBdUIsT0FDdkMsUUFBTyxTQUFZLENBR25CLE9BQVUsQ0FDVCxLQUFNLEdBQUMsQ0FDVCxXQUNDLE1BQU0iLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiYmxvZ1BhZ2Uuc3ZlbHRlIl19 */");
 }
 
 function blogPage_svelte_get_each_context(ctx, list, i) {
@@ -17715,7 +19089,7 @@ function blogPage_svelte_get_each_context(ctx, list, i) {
 const get_blog_post_slot_changes = dirty => ({});
 const get_blog_post_slot_context = ctx => ({});
 
-// (148:1) {#if !$$slots.blog_post}
+// (151:1) {#if !$$slots.blog_post}
 function blogPage_svelte_create_if_block(ctx) {
 	let each_1_anchor;
 	let each_value = ensure_array_like_dev(Object.keys(window.BLOG_POSTS));
@@ -17779,15 +19153,16 @@ function blogPage_svelte_create_if_block(ctx) {
 		block,
 		id: blogPage_svelte_create_if_block.name,
 		type: "if",
-		source: "(148:1) {#if !$$slots.blog_post}",
+		source: "(151:1) {#if !$$slots.blog_post}",
 		ctx
 	});
 
 	return block;
 }
 
-// (149:2) {#each Object.keys(window.BLOG_POSTS) as blog_post}
+// (152:2) {#each Object.keys(window.BLOG_POSTS) as blog_post}
 function blogPage_svelte_create_each_block(ctx) {
+	let div2;
 	let div1;
 	let a;
 	let t0_value = window.BLOG_POSTS[/*blog_post*/ ctx[3]].title + "";
@@ -17800,6 +19175,7 @@ function blogPage_svelte_create_each_block(ctx) {
 
 	const block = {
 		c: function create() {
+			div2 = dom_element("div");
 			div1 = dom_element("div");
 			a = dom_element("a");
 			t0 = dom_text(t0_value);
@@ -17809,17 +19185,20 @@ function blogPage_svelte_create_each_block(ctx) {
 			t3 = space();
 			wbr = dom_element("wbr");
 			attr_dev(a, "href", a_href_value = `blog/${/*blog_post*/ ctx[3]}${window.is_dev ? ".html" : ""}`);
-			attr_dev(a, "class", "blog-post-name svelte-hcu7n");
-			add_location(a, blogPage_svelte_file, -1, 2602);
-			attr_dev(div0, "class", "blog-post-date svelte-hcu7n");
-			add_location(div0, blogPage_svelte_file, -1, 2742);
-			attr_dev(div1, "class", "blog-post svelte-hcu7n");
-			add_location(div1, blogPage_svelte_file, -1, 2477);
-			attr_dev(wbr, "class", "svelte-hcu7n");
-			add_location(wbr, blogPage_svelte_file, -1, 2836);
+			attr_dev(a, "class", "blog-post-name svelte-2t3rj5");
+			add_location(a, blogPage_svelte_file, -1, 2769);
+			attr_dev(div0, "class", "blog-post-date svelte-2t3rj5");
+			add_location(div0, blogPage_svelte_file, -1, 2912);
+			attr_dev(div1, "class", "blog-post svelte-2t3rj5");
+			add_location(div1, blogPage_svelte_file, -1, 2642);
+			attr_dev(div2, "class", "blog-posts-container svelte-2t3rj5");
+			add_location(div2, blogPage_svelte_file, -1, 2603);
+			attr_dev(wbr, "class", "svelte-2t3rj5");
+			add_location(wbr, blogPage_svelte_file, -1, 3019);
 		},
 		m: function mount(target, anchor) {
-			insert_dev(target, div1, anchor);
+			insert_dev(target, div2, anchor);
+			append_dev(div2, div1);
 			append_dev(div1, a);
 			append_dev(a, t0);
 			append_dev(div1, t1);
@@ -17830,7 +19209,7 @@ function blogPage_svelte_create_each_block(ctx) {
 		p: utils_noop,
 		d: function destroy(detaching) {
 			if (detaching) {
-				detach_dev(div1);
+				detach_dev(div2);
 				detach_dev(t3);
 				detach_dev(wbr);
 			}
@@ -17841,7 +19220,7 @@ function blogPage_svelte_create_each_block(ctx) {
 		block,
 		id: blogPage_svelte_create_each_block.name,
 		type: "each",
-		source: "(149:2) {#each Object.keys(window.BLOG_POSTS) as blog_post}",
+		source: "(152:2) {#each Object.keys(window.BLOG_POSTS) as blog_post}",
 		ctx
 	});
 
@@ -17856,7 +19235,7 @@ function blogPage_svelte_create_fragment(ctx) {
 	let t2;
 	let footer;
 	let current;
-	bar = new Bar_svelte({ $$inline: true });
+	bar = new NavBar_svelte({ $$inline: true });
 	const blog_post_slot_template = /*#slots*/ ctx[2].blog_post;
 	const blog_post_slot = create_slot(blog_post_slot_template, ctx, /*$$scope*/ ctx[1], get_blog_post_slot_context);
 	let if_block = !/*$$slots*/ ctx[0].blog_post && blogPage_svelte_create_if_block(ctx);
@@ -17872,8 +19251,8 @@ function blogPage_svelte_create_fragment(ctx) {
 			if (if_block) if_block.c();
 			t2 = space();
 			create_component(footer.$$.fragment);
-			attr_dev(main, "class", "svelte-hcu7n");
-			add_location(main, blogPage_svelte_file, -1, 2352);
+			attr_dev(main, "class", "svelte-2t3rj5");
+			add_location(main, blogPage_svelte_file, -1, 2478);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -17977,7 +19356,7 @@ function blogPage_svelte_instance($$self, $$props, $$invalidate) {
 		if ('$$scope' in $$props) $$invalidate(1, $$scope = $$props.$$scope);
 	};
 
-	$$self.$capture_state = () => ({ onMount: onMount, onDestroy: onDestroy, Bar: Bar_svelte, Footer: Footer_svelte });
+	$$self.$capture_state = () => ({ onMount: onMount, onDestroy: onDestroy, Bar: NavBar_svelte, Footer: Footer_svelte });
 	return [$$slots, $$scope, slots];
 }
 
@@ -17996,6 +19375,9 @@ class BlogPage extends SvelteComponentDev {
 }
 
 /* harmony default export */ const blogPage_svelte = (BlogPage);
+// EXTERNAL MODULE: ./node_modules/lozad/dist/lozad.min.js
+var lozad_min = __webpack_require__(703);
+var lozad_min_default = /*#__PURE__*/__webpack_require__.n(lozad_min);
 ;// CONCATENATED MODULE: ./src/components/App.svelte
 /* src\components\App.svelte generated by Svelte v4.2.0 */
 
@@ -18013,13 +19395,14 @@ const { console: App_svelte_console_1 } = globals;
 
 
 
+
 const App_svelte_file = "src\\components\\App.svelte";
 
 function App_svelte_add_css(target) {
-	append_styles(target, "svelte-uzmk0t", "wbr{display:block;height:0.02rem;margin:none}*{font-family:\"Petrona\";font-weight:400;color:var(--accent-dark);-webkit-tap-highlight-color:transparent;--main-max-width:40rem;--text-font-weight:500;--link-font-weight:800}*::selection{background:var(--accent-dark);color:var(--accent-light)}a{text-decoration:underline;text-decoration-style:dashed;text-underline-offset:0.2rem}a:hover{color:var(--accent-light) !important;background:var(--accent-dark);text-decoration:none}a:hover *{color:var(--accent-light) !important;text-decoration:none}.menu-item{text-decoration:none;font-weight:900}#logo{text-decoration:none}::-webkit-scrollbar{background:var(--accent-dark)}::-webkit-scrollbar-track{background:var(--accent-light)}::-webkit-scrollbar-thumb{background:var(--accent-dark)}main>*{margin-left:1rem}main{width:100%;max-width:40rem;height:100%;display:flex;flex-direction:column;max-width:var(--main-max-width);margin-right:auto;margin-left:auto}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQXBwLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFpQnFCLEdBQVcsQ0FDOUIsT0FBRyxPQUNILE1BQUcsUUFBTyxDQUNWLE1BQUcsQ0FBSyxJQUNWLENBRU8sQ0FBRyxDQUNSLFdBQU0sV0FDTixXQUFFLEtBQ0YsS0FBRyxvQkFDSCwyQkFBTSxhQUNOLGdCQUFTLE9BQ1Qsa0JBQUksS0FDSixrQkFBSSxJQUNOLENBQ0EsYUFDQyxVQUFXLENBQUUsSUFDYixhQUFPLEVBRVAsS0FBTyxvQkFDUCxDQUlNLEVBSU4sZUFBZSxVQUFNLENBQ3JCLHFCQUFrQixRQUNsQixxQkFBZ0IsT0FDaEIsQ0FDTyxPQUFLLENBQ1osS0FBTyxLQUFNLGNBQU0sWUFBaUIsQ0FDcEMsVUFBVyxLQUFNLGVBQ2pCLGVBQVksS0FJWixDQUNPLFNBQVUsQ0FFaEIsS0FBRSxLQUFTLGNBQVksWUFBUSxDQUMvQixlQUFPLEtBQ1QiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQXBwLnN2ZWx0ZSJdfQ== */");
+	append_styles(target, "svelte-uzmk0t", "wbr{display:block;height:0.02rem;margin:none}*{font-family:\"Petrona\";font-weight:400;color:var(--accent-dark);-webkit-tap-highlight-color:transparent;--main-max-width:40rem;--text-font-weight:500;--link-font-weight:800}*::selection{background:var(--accent-dark);color:var(--accent-light)}a{text-decoration:underline;text-decoration-style:dashed;text-underline-offset:0.2rem}a:hover{color:var(--accent-light) !important;background:var(--accent-dark);text-decoration:none}a:hover *{color:var(--accent-light) !important;text-decoration:none}.menu-item{text-decoration:none;font-weight:900}#logo{text-decoration:none}::-webkit-scrollbar{background:var(--accent-dark)}::-webkit-scrollbar-track{background:var(--accent-light)}::-webkit-scrollbar-thumb{background:var(--accent-dark)}main>*{margin-left:1rem}main{width:100%;max-width:40rem;height:100%;display:flex;flex-direction:column;max-width:var(--main-max-width);margin-right:auto;margin-left:auto}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQXBwLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUF3QlEsSUFDTixPQUFFLE9BQ0YsTUFBRyxTQUNILE1BQU0sS0FDUixDQUVNLEVBQ04sc0JBQ0EsZ0JBQ0MsS0FBTSxDQUFDLElBQUssYUFDTCxFQUVQLDJCQUFPLFlBQXlCLENBQ2hDLGdCQUFPLE9BR1Isa0JBQU8sS0FDUCxrQkFBTyxJQUlOLENBQ08sWUFBVyxDQUNsQixVQUFVLEtBQU0sZUFDaEIsS0FBTyxtQkFBYyxDQUNyQixDQUVPLENBQUksQ0FDWCxlQUFZLFVBQVUsQ0FFckIscUJBQWtCLENBQU8sT0FFekIscUJBQXNCLE9BQ3RCLENBRU0sYUFDTixLQUFRLGNBQVUsdUJBQ1YsQ0FBQyxpQkFBUyxFQUNqQixvQkFJRixDQUNPLFNBQVUsQ0FFaEIsS0FBRSxLQUFTLGNBQVksWUFBUSxDQUMvQixlQUFPLEtBQ1QiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQXBwLnN2ZWx0ZSJdfQ== */");
 }
 
-// (128:1) {:else}
+// (135:1) {:else}
 function App_svelte_create_else_block(ctx) {
 	let splash;
 	let current;
@@ -18052,14 +19435,14 @@ function App_svelte_create_else_block(ctx) {
 		block,
 		id: App_svelte_create_else_block.name,
 		type: "else",
-		source: "(128:1) {:else}",
+		source: "(135:1) {:else}",
 		ctx
 	});
 
 	return block;
 }
 
-// (118:40) 
+// (125:40) 
 function create_if_block_6(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -18148,14 +19531,14 @@ function create_if_block_6(ctx) {
 		block,
 		id: create_if_block_6.name,
 		type: "if",
-		source: "(118:40) ",
+		source: "(125:40) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (116:64) 
+// (123:64) 
 function create_if_block_5(ctx) {
 	let blog;
 	let current;
@@ -18188,14 +19571,14 @@ function create_if_block_5(ctx) {
 		block,
 		id: create_if_block_5.name,
 		type: "if",
-		source: "(116:64) ",
+		source: "(123:64) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (114:66) 
+// (121:66) 
 function create_if_block_4(ctx) {
 	let about;
 	let current;
@@ -18228,14 +19611,14 @@ function create_if_block_4(ctx) {
 		block,
 		id: create_if_block_4.name,
 		type: "if",
-		source: "(114:66) ",
+		source: "(121:66) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (112:72) 
+// (119:72) 
 function create_if_block_3(ctx) {
 	let projects;
 	let current;
@@ -18268,15 +19651,15 @@ function create_if_block_3(ctx) {
 		block,
 		id: create_if_block_3.name,
 		type: "if",
-		source: "(112:72) ",
+		source: "(119:72) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (110:62) 
-function create_if_block_2(ctx) {
+// (117:62) 
+function App_svelte_create_if_block_2(ctx) {
 	let art;
 	let current;
 	art = new artPage_svelte({ $$inline: true });
@@ -18306,17 +19689,17 @@ function create_if_block_2(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_2.name,
+		id: App_svelte_create_if_block_2.name,
 		type: "if",
-		source: "(110:62) ",
+		source: "(117:62) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (108:66) 
-function create_if_block_1(ctx) {
+// (115:66) 
+function App_svelte_create_if_block_1(ctx) {
 	let music;
 	let current;
 	music = new musicPage_svelte({ $$inline: true });
@@ -18346,16 +19729,16 @@ function create_if_block_1(ctx) {
 
 	dispatch_dev("SvelteRegisterBlock", {
 		block,
-		id: create_if_block_1.name,
+		id: App_svelte_create_if_block_1.name,
 		type: "if",
-		source: "(108:66) ",
+		source: "(115:66) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (106:1) {#if path_name === "/favdemos" || path_name === "/favdemos.html" }
+// (113:1) {#if path_name === "/favdemos" || path_name === "/favdemos.html" }
 function App_svelte_create_if_block(ctx) {
 	let favdemos;
 	let current;
@@ -18388,14 +19771,14 @@ function App_svelte_create_if_block(ctx) {
 		block,
 		id: App_svelte_create_if_block.name,
 		type: "if",
-		source: "(106:1) {#if path_name === \\\"/favdemos\\\" || path_name === \\\"/favdemos.html\\\" }",
+		source: "(113:1) {#if path_name === \\\"/favdemos\\\" || path_name === \\\"/favdemos.html\\\" }",
 		ctx
 	});
 
 	return block;
 }
 
-// (124:145) 
+// (131:145) 
 function create_if_block_9(ctx) {
 	let blog;
 	let current;
@@ -18434,14 +19817,14 @@ function create_if_block_9(ctx) {
 		block,
 		id: create_if_block_9.name,
 		type: "if",
-		source: "(124:145) ",
+		source: "(131:145) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (122:155) 
+// (129:155) 
 function create_if_block_8(ctx) {
 	let blog;
 	let current;
@@ -18480,14 +19863,14 @@ function create_if_block_8(ctx) {
 		block,
 		id: create_if_block_8.name,
 		type: "if",
-		source: "(122:155) ",
+		source: "(129:155) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (121:0) {#if false}
+// (128:0) {#if false}
 function create_if_block_7(ctx) {
 	const block = {
 		c: utils_noop,
@@ -18501,14 +19884,14 @@ function create_if_block_7(ctx) {
 		block,
 		id: create_if_block_7.name,
 		type: "if",
-		source: "(121:0) {#if false}",
+		source: "(128:0) {#if false}",
 		ctx
 	});
 
 	return block;
 }
 
-// (125:7) 
+// (132:7) 
 function create_blog_post_slot_1(ctx) {
 	let l2023_08_17_flame_fractals_in_comp_shader;
 	let current;
@@ -18545,14 +19928,14 @@ function create_blog_post_slot_1(ctx) {
 		block,
 		id: create_blog_post_slot_1.name,
 		type: "slot",
-		source: "(125:7) ",
+		source: "(132:7) ",
 		ctx
 	});
 
 	return block;
 }
 
-// (123:7) 
+// (130:7) 
 function create_blog_post_slot(ctx) {
 	let l2023_08_18_forward_pathtracing_in_comp_shader;
 	let current;
@@ -18589,7 +19972,7 @@ function create_blog_post_slot(ctx) {
 		block,
 		id: create_blog_post_slot.name,
 		type: "slot",
-		source: "(123:7) ",
+		source: "(130:7) ",
 		ctx
 	});
 
@@ -18610,8 +19993,8 @@ function App_svelte_create_fragment(ctx) {
 
 	const if_block_creators = [
 		App_svelte_create_if_block,
-		create_if_block_1,
-		create_if_block_2,
+		App_svelte_create_if_block_1,
+		App_svelte_create_if_block_2,
 		create_if_block_3,
 		create_if_block_4,
 		create_if_block_5,
@@ -18648,15 +20031,15 @@ function App_svelte_create_fragment(ctx) {
 			attr_dev(link0, "type", "image/png");
 			attr_dev(link0, "href", link0_href_value = `${window.LFS_PREPEND}/favicon-32.png`);
 			attr_dev(link0, "sizes", "32x32");
-			add_location(link0, App_svelte_file, -1, 2308);
+			add_location(link0, App_svelte_file, -1, 2466);
 			attr_dev(link1, "rel", "icon");
 			attr_dev(link1, "type", "image/png");
 			attr_dev(link1, "href", link1_href_value = `${window.LFS_PREPEND}/favicon-128.png`);
 			attr_dev(link1, "sizes", "128x128");
-			add_location(link1, App_svelte_file, -1, 2406);
+			add_location(link1, App_svelte_file, -1, 2564);
 			set_style(div, "width", "100%");
 			set_style(div, "height", "100%");
-			add_location(div, App_svelte_file, -1, 2523);
+			add_location(div, App_svelte_file, -1, 2681);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -18739,6 +20122,14 @@ function App_svelte_instance($$self, $$props, $$invalidate) {
 	: 'https://media.githubusercontent.com/media/wrightwriter/wrightwriter.github.io/master/';
 
 	console.log({"public":{"favicon-32.png":{"src":"favicon-32.png"},"favicon-128.png":{"src":"favicon-128.png"},"dummy.png":{"src":"dummy.png"},"images":{"1690102042507_1[1].png":{"src":"images\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12"},"paintings":{"unknown.png":{"src":"images\\paintings\\unknown.png","width":386,"height":381,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},"adsg.png":{"src":"images\\paintings\\adsg.png","width":826,"height":877,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"adsg.png"},"868.png":{"src":"images\\paintings\\868.png","width":1918,"height":3074,"src_thumb":"images\\paintings\\_thumb_868.jpg","is_video":false,"creation_date":"2022-5-5","name":"868.png"},"1690102042507_1[1].png":{"src":"images\\paintings\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\paintings\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12","name":"1690102042507_1[1].png"},"1690037672960_1 (1).png":{"src":"images\\paintings\\1690037672960_1 (1).png","width":1804,"height":1785,"src_thumb":"images\\paintings\\_thumb_1690037672960_1 (1).jpg","is_video":false,"creation_date":"2023-8-13","name":"1690037672960_1 (1).png"},"1689957895824_2 (1).png":{"src":"images\\paintings\\1689957895824_2 (1).png","width":1437,"height":1701,"src_thumb":"images\\paintings\\_thumb_1689957895824_2 (1).jpg","is_video":false,"creation_date":"2023-8-14","name":"1689957895824_2 (1).png"},"1137-a.png":{"src":"images\\paintings\\1137-a.png","width":1920,"height":1880,"src_thumb":"images\\paintings\\_thumb_1137-a.jpg","is_video":false,"creation_date":"2023-8-15","name":"1137-a.png"},"1135-c.png":{"src":"images\\paintings\\1135-c.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1135-c.jpg","is_video":false,"creation_date":"2023-8-15","name":"1135-c.png"},"1132-a.png":{"src":"images\\paintings\\1132-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1132-a.jpg","is_video":false,"creation_date":"2023-1-24","name":"1132-a.png"},"1131-a.png":{"src":"images\\paintings\\1131-a.png","width":1920,"height":2880,"src_thumb":"images\\paintings\\_thumb_1131-a.jpg","is_video":false,"creation_date":"2023-1-23","name":"1131-a.png"},"1130-b.png":{"src":"images\\paintings\\1130-b.png","width":1920,"height":2680,"src_thumb":"images\\paintings\\_thumb_1130-b.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-b.png"},"1130-a.png":{"src":"images\\paintings\\1130-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1130-a.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-a.png"},"1129-pat-a.png":{"src":"images\\paintings\\1129-pat-a.png","width":2020,"height":1280,"src_thumb":"images\\paintings\\_thumb_1129-pat-a.jpg","is_video":false,"creation_date":"2023-1-21","name":"1129-pat-a.png"},"1123-e.png":{"src":"images\\paintings\\1123-e.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1123-e.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-e.png"},"1123-c.png":{"src":"images\\paintings\\1123-c.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1123-c.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-c.png"},"1119.png":{"src":"images\\paintings\\1119.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1119.jpg","is_video":false,"creation_date":"2023-1-11","name":"1119.png"},"1117-2.png":{"src":"images\\paintings\\1117-2.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1117-2.jpg","is_video":false,"creation_date":"2023-1-9","name":"1117-2.png"},"1112.png":{"src":"images\\paintings\\1112.png","width":1170,"height":1860,"src_thumb":"images\\paintings\\_thumb_1112.jpg","is_video":false,"creation_date":"2023-1-4","name":"1112.png"},"1055.png":{"src":"images\\paintings\\1055.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1055.jpg","is_video":false,"creation_date":"2022-11-8","name":"1055.png"},"1041.png":{"src":"images\\paintings\\1041.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1041.jpg","is_video":false,"creation_date":"2022-10-25","name":"1041.png"},"1135-b (1).jpg":{"src":"images\\paintings\\1135-b (1).jpg","width":1920,"height":2780,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"1135-b (1).jpg"},"sorted":[{"src":"images\\paintings\\1137-a.png","width":1920,"height":1880,"src_thumb":"images\\paintings\\_thumb_1137-a.jpg","is_video":false,"creation_date":"2023-8-15","name":"1137-a.png"},{"src":"images\\paintings\\1135-c.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1135-c.jpg","is_video":false,"creation_date":"2023-8-15","name":"1135-c.png"},{"src":"images\\paintings\\1135-b (1).jpg","width":1920,"height":2780,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"1135-b (1).jpg"},{"src":"images\\paintings\\1689957895824_2 (1).png","width":1437,"height":1701,"src_thumb":"images\\paintings\\_thumb_1689957895824_2 (1).jpg","is_video":false,"creation_date":"2023-8-14","name":"1689957895824_2 (1).png"},{"src":"images\\paintings\\1690037672960_1 (1).png","width":1804,"height":1785,"src_thumb":"images\\paintings\\_thumb_1690037672960_1 (1).jpg","is_video":false,"creation_date":"2023-8-13","name":"1690037672960_1 (1).png"},{"src":"images\\paintings\\adsg.png","width":826,"height":877,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"adsg.png"},{"src":"images\\paintings\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\paintings\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12","name":"1690102042507_1[1].png"},{"src":"images\\paintings\\1132-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1132-a.jpg","is_video":false,"creation_date":"2023-1-24","name":"1132-a.png"},{"src":"images\\paintings\\1131-a.png","width":1920,"height":2880,"src_thumb":"images\\paintings\\_thumb_1131-a.jpg","is_video":false,"creation_date":"2023-1-23","name":"1131-a.png"},{"src":"images\\paintings\\1130-b.png","width":1920,"height":2680,"src_thumb":"images\\paintings\\_thumb_1130-b.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-b.png"},{"src":"images\\paintings\\1130-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1130-a.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-a.png"},{"src":"images\\paintings\\1129-pat-a.png","width":2020,"height":1280,"src_thumb":"images\\paintings\\_thumb_1129-pat-a.jpg","is_video":false,"creation_date":"2023-1-21","name":"1129-pat-a.png"},{"src":"images\\paintings\\1123-e.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1123-e.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-e.png"},{"src":"images\\paintings\\1123-c.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1123-c.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-c.png"},{"src":"images\\paintings\\1119.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1119.jpg","is_video":false,"creation_date":"2023-1-11","name":"1119.png"},{"src":"images\\paintings\\1117-2.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1117-2.jpg","is_video":false,"creation_date":"2023-1-9","name":"1117-2.png"},{"src":"images\\paintings\\1112.png","width":1170,"height":1860,"src_thumb":"images\\paintings\\_thumb_1112.jpg","is_video":false,"creation_date":"2023-1-4","name":"1112.png"},{"src":"images\\paintings\\1055.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1055.jpg","is_video":false,"creation_date":"2022-11-8","name":"1055.png"},{"src":"images\\paintings\\1041.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1041.jpg","is_video":false,"creation_date":"2022-10-25","name":"1041.png"},{"src":"images\\paintings\\868.png","width":1918,"height":3074,"src_thumb":"images\\paintings\\_thumb_868.jpg","is_video":false,"creation_date":"2022-5-5","name":"868.png"},{"src":"images\\paintings\\unknown.png","width":386,"height":381,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"}]},"graphic_design":{"995_out.png":{"src":"images\\graphic_design\\995_out.png","width":4416,"height":6092,"src_thumb":"images\\graphic_design\\_thumb_995_out.jpg","is_video":false,"creation_date":"2022-9-9","name":"995_out.png"},"940.png":{"src":"images\\graphic_design\\940.png","width":2495,"height":3230,"src_thumb":"images\\graphic_design\\_thumb_940.jpg","is_video":false,"creation_date":"2022-7-16","name":"940.png"},"934 out.png":{"src":"images\\graphic_design\\934 out.png","width":5000,"height":3168,"src_thumb":"images\\graphic_design\\_thumb_934 out.jpg","is_video":false,"creation_date":"2022-7-10","name":"934 out.png"},"919.png":{"src":"images\\graphic_design\\919.png","width":2334,"height":3500,"src_thumb":"images\\graphic_design\\_thumb_919.jpg","is_video":false,"creation_date":"2022-6-25","name":"919.png"},"713-output.png":{"src":"images\\graphic_design\\713-output.png","width":1920,"height":1080,"src_thumb":"images\\graphic_design\\_thumb_713-output.jpg","is_video":false,"creation_date":"2021-12-1","name":"713-output.png"},"593.png":{"src":"images\\graphic_design\\593.png","width":4000,"height":4788,"src_thumb":"images\\graphic_design\\_thumb_593.jpg","is_video":false,"creation_date":"2021-8-3","name":"593.png"},"592-out.png":{"src":"images\\graphic_design\\592-out.png","width":2256,"height":3300,"src_thumb":"images\\graphic_design\\_thumb_592-out.jpg","is_video":false,"creation_date":"2021-8-2","name":"592-out.png"},"591.png":{"src":"images\\graphic_design\\591.png","width":2160,"height":3840,"src_thumb":"images\\graphic_design\\_thumb_591.jpg","is_video":false,"creation_date":"2021-8-1","name":"591.png"},"583-оут.png":{"src":"images\\graphic_design\\583-оут.png","width":1500,"height":1500,"src_thumb":"images\\graphic_design\\_thumb_583-оут.jpg","is_video":false,"creation_date":"2021-7-24","name":"583-оут.png"},"555.png":{"src":"images\\graphic_design\\555.png","width":2319,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_555.jpg","is_video":false,"creation_date":"2021-6-26","name":"555.png"},"499.png":{"src":"images\\graphic_design\\499.png","width":3370,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_499.jpg","is_video":false,"creation_date":"2021-5-1","name":"499.png"},"493.png":{"src":"images\\graphic_design\\493.png","width":596,"height":657,"src_thumb":"","is_video":false,"creation_date":"2021-4-26","name":"493.png"},"1x935_out.png":{"src":"images\\graphic_design\\1x935_out.png","width":3402,"height":5222,"src_thumb":"images\\graphic_design\\_thumb_1x935_out.jpg","is_video":false,"creation_date":"2022-7-11","name":"1x935_out.png"},"1x933.png":{"src":"images\\graphic_design\\1x933.png","width":5000,"height":3182,"src_thumb":"images\\graphic_design\\_thumb_1x933.jpg","is_video":false,"creation_date":"2022-7-9","name":"1x933.png"},"1x929.png":{"src":"images\\graphic_design\\1x929.png","width":5802,"height":8000,"src_thumb":"images\\graphic_design\\_thumb_1x929.jpg","is_video":false,"creation_date":"2022-7-6","name":"1x929.png"},"1x925 (1).png":{"src":"images\\graphic_design\\1x925 (1).png","width":2115,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_1x925 (1).jpg","is_video":false,"creation_date":"2022-7-2","name":"1x925 (1).png"},"1155-out.png":{"src":"images\\graphic_design\\1155-out.png","width":3840,"height":4710,"src_thumb":"images\\graphic_design\\_thumb_1155-out.jpg","is_video":false,"creation_date":"2023-2-16","name":"1155-out.png"},"1093.png":{"src":"images\\graphic_design\\1093.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1093.jpg","is_video":false,"creation_date":"2022-12-16","name":"1093.png"},"1090.png":{"src":"images\\graphic_design\\1090.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1090.jpg","is_video":false,"creation_date":"2022-12-13","name":"1090.png"},"1089.png":{"src":"images\\graphic_design\\1089.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1089.jpg","is_video":false,"creation_date":"2022-12-12","name":"1089.png"},"1087_out.png":{"src":"images\\graphic_design\\1087_out.png","width":1887,"height":1880,"src_thumb":"images\\graphic_design\\_thumb_1087_out.jpg","is_video":false,"creation_date":"2022-12-10","name":"1087_out.png"},"1052_out.png":{"src":"images\\graphic_design\\1052_out.png","width":4320,"height":4320,"src_thumb":"images\\graphic_design\\_thumb_1052_out.jpg","is_video":false,"creation_date":"2022-11-5","name":"1052_out.png"},"1048_out.png":{"src":"images\\graphic_design\\1048_out.png","width":4290,"height":5400,"src_thumb":"images\\graphic_design\\_thumb_1048_out.jpg","is_video":false,"creation_date":"2022-11-1","name":"1048_out.png"},"1030_in.png":{"src":"images\\graphic_design\\1030_in.png","width":2540,"height":3525,"src_thumb":"images\\graphic_design\\_thumb_1030_in.jpg","is_video":false,"creation_date":"2022-10-14","name":"1030_in.png"},"1013_out.png":{"src":"images\\graphic_design\\1013_out.png","width":4096,"height":4092,"src_thumb":"images\\graphic_design\\_thumb_1013_out.jpg","is_video":false,"creation_date":"2022-9-27","name":"1013_out.png"},"1008_out.png":{"src":"images\\graphic_design\\1008_out.png","width":4000,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_1008_out.jpg","is_video":false,"creation_date":"2022-9-22","name":"1008_out.png"},"1007_out.png":{"src":"images\\graphic_design\\1007_out.png","width":3840,"height":3872,"src_thumb":"images\\graphic_design\\_thumb_1007_out.jpg","is_video":false,"creation_date":"2022-9-21","name":"1007_out.png"},"1006.png":{"src":"images\\graphic_design\\1006.png","width":3084,"height":4316,"src_thumb":"images\\graphic_design\\_thumb_1006.jpg","is_video":false,"creation_date":"2022-9-20","name":"1006.png"},"1005_out.png":{"src":"images\\graphic_design\\1005_out.png","width":2870,"height":4104,"src_thumb":"images\\graphic_design\\_thumb_1005_out.jpg","is_video":false,"creation_date":"2022-9-19","name":"1005_out.png"},"1004_out.png":{"src":"images\\graphic_design\\1004_out.png","width":2964,"height":4268,"src_thumb":"images\\graphic_design\\_thumb_1004_out.jpg","is_video":false,"creation_date":"2022-9-18","name":"1004_out.png"},"1002.png":{"src":"images\\graphic_design\\1002.png","width":3258,"height":4435,"src_thumb":"images\\graphic_design\\_thumb_1002.jpg","is_video":false,"creation_date":"2022-9-17","name":"1002.png"},"1001-b.png":{"src":"images\\graphic_design\\1001-b.png","width":4224,"height":4290,"src_thumb":"images\\graphic_design\\_thumb_1001-b.jpg","is_video":false,"creation_date":"2022-9-15","name":"1001-b.png"},"sorted":[{"src":"images\\graphic_design\\1155-out.png","width":3840,"height":4710,"src_thumb":"images\\graphic_design\\_thumb_1155-out.jpg","is_video":false,"creation_date":"2023-2-16","name":"1155-out.png"},{"src":"images\\graphic_design\\1093.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1093.jpg","is_video":false,"creation_date":"2022-12-16","name":"1093.png"},{"src":"images\\graphic_design\\1090.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1090.jpg","is_video":false,"creation_date":"2022-12-13","name":"1090.png"},{"src":"images\\graphic_design\\1089.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1089.jpg","is_video":false,"creation_date":"2022-12-12","name":"1089.png"},{"src":"images\\graphic_design\\1087_out.png","width":1887,"height":1880,"src_thumb":"images\\graphic_design\\_thumb_1087_out.jpg","is_video":false,"creation_date":"2022-12-10","name":"1087_out.png"},{"src":"images\\graphic_design\\1052_out.png","width":4320,"height":4320,"src_thumb":"images\\graphic_design\\_thumb_1052_out.jpg","is_video":false,"creation_date":"2022-11-5","name":"1052_out.png"},{"src":"images\\graphic_design\\1048_out.png","width":4290,"height":5400,"src_thumb":"images\\graphic_design\\_thumb_1048_out.jpg","is_video":false,"creation_date":"2022-11-1","name":"1048_out.png"},{"src":"images\\graphic_design\\1030_in.png","width":2540,"height":3525,"src_thumb":"images\\graphic_design\\_thumb_1030_in.jpg","is_video":false,"creation_date":"2022-10-14","name":"1030_in.png"},{"src":"images\\graphic_design\\1013_out.png","width":4096,"height":4092,"src_thumb":"images\\graphic_design\\_thumb_1013_out.jpg","is_video":false,"creation_date":"2022-9-27","name":"1013_out.png"},{"src":"images\\graphic_design\\1008_out.png","width":4000,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_1008_out.jpg","is_video":false,"creation_date":"2022-9-22","name":"1008_out.png"},{"src":"images\\graphic_design\\1007_out.png","width":3840,"height":3872,"src_thumb":"images\\graphic_design\\_thumb_1007_out.jpg","is_video":false,"creation_date":"2022-9-21","name":"1007_out.png"},{"src":"images\\graphic_design\\1006.png","width":3084,"height":4316,"src_thumb":"images\\graphic_design\\_thumb_1006.jpg","is_video":false,"creation_date":"2022-9-20","name":"1006.png"},{"src":"images\\graphic_design\\1005_out.png","width":2870,"height":4104,"src_thumb":"images\\graphic_design\\_thumb_1005_out.jpg","is_video":false,"creation_date":"2022-9-19","name":"1005_out.png"},{"src":"images\\graphic_design\\1004_out.png","width":2964,"height":4268,"src_thumb":"images\\graphic_design\\_thumb_1004_out.jpg","is_video":false,"creation_date":"2022-9-18","name":"1004_out.png"},{"src":"images\\graphic_design\\1002.png","width":3258,"height":4435,"src_thumb":"images\\graphic_design\\_thumb_1002.jpg","is_video":false,"creation_date":"2022-9-17","name":"1002.png"},{"src":"images\\graphic_design\\1001-b.png","width":4224,"height":4290,"src_thumb":"images\\graphic_design\\_thumb_1001-b.jpg","is_video":false,"creation_date":"2022-9-15","name":"1001-b.png"},{"src":"images\\graphic_design\\995_out.png","width":4416,"height":6092,"src_thumb":"images\\graphic_design\\_thumb_995_out.jpg","is_video":false,"creation_date":"2022-9-9","name":"995_out.png"},{"src":"images\\graphic_design\\940.png","width":2495,"height":3230,"src_thumb":"images\\graphic_design\\_thumb_940.jpg","is_video":false,"creation_date":"2022-7-16","name":"940.png"},{"src":"images\\graphic_design\\1x935_out.png","width":3402,"height":5222,"src_thumb":"images\\graphic_design\\_thumb_1x935_out.jpg","is_video":false,"creation_date":"2022-7-11","name":"1x935_out.png"},{"src":"images\\graphic_design\\934 out.png","width":5000,"height":3168,"src_thumb":"images\\graphic_design\\_thumb_934 out.jpg","is_video":false,"creation_date":"2022-7-10","name":"934 out.png"},{"src":"images\\graphic_design\\1x933.png","width":5000,"height":3182,"src_thumb":"images\\graphic_design\\_thumb_1x933.jpg","is_video":false,"creation_date":"2022-7-9","name":"1x933.png"},{"src":"images\\graphic_design\\1x929.png","width":5802,"height":8000,"src_thumb":"images\\graphic_design\\_thumb_1x929.jpg","is_video":false,"creation_date":"2022-7-6","name":"1x929.png"},{"src":"images\\graphic_design\\1x925 (1).png","width":2115,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_1x925 (1).jpg","is_video":false,"creation_date":"2022-7-2","name":"1x925 (1).png"},{"src":"images\\graphic_design\\919.png","width":2334,"height":3500,"src_thumb":"images\\graphic_design\\_thumb_919.jpg","is_video":false,"creation_date":"2022-6-25","name":"919.png"},{"src":"images\\graphic_design\\713-output.png","width":1920,"height":1080,"src_thumb":"images\\graphic_design\\_thumb_713-output.jpg","is_video":false,"creation_date":"2021-12-1","name":"713-output.png"},{"src":"images\\graphic_design\\593.png","width":4000,"height":4788,"src_thumb":"images\\graphic_design\\_thumb_593.jpg","is_video":false,"creation_date":"2021-8-3","name":"593.png"},{"src":"images\\graphic_design\\592-out.png","width":2256,"height":3300,"src_thumb":"images\\graphic_design\\_thumb_592-out.jpg","is_video":false,"creation_date":"2021-8-2","name":"592-out.png"},{"src":"images\\graphic_design\\591.png","width":2160,"height":3840,"src_thumb":"images\\graphic_design\\_thumb_591.jpg","is_video":false,"creation_date":"2021-8-1","name":"591.png"},{"src":"images\\graphic_design\\583-оут.png","width":1500,"height":1500,"src_thumb":"images\\graphic_design\\_thumb_583-оут.jpg","is_video":false,"creation_date":"2021-7-24","name":"583-оут.png"},{"src":"images\\graphic_design\\555.png","width":2319,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_555.jpg","is_video":false,"creation_date":"2021-6-26","name":"555.png"},{"src":"images\\graphic_design\\499.png","width":3370,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_499.jpg","is_video":false,"creation_date":"2021-5-1","name":"499.png"},{"src":"images\\graphic_design\\493.png","width":596,"height":657,"src_thumb":"","is_video":false,"creation_date":"2021-4-26","name":"493.png"}]},"generative_static":{"unknown.png":{"src":"images\\generative_static\\unknown.png","width":1254,"height":701,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},"unknown (9).png":{"src":"images\\generative_static\\unknown (9).png","width":578,"height":577,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (9).png"},"unknown (8).png":{"src":"images\\generative_static\\unknown (8).png","width":792,"height":807,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (8).png"},"unknown (7).png":{"src":"images\\generative_static\\unknown (7).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (7).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (7).png"},"unknown (6).png":{"src":"images\\generative_static\\unknown (6).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (6).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (6).png"},"unknown (5).png":{"src":"images\\generative_static\\unknown (5).png","width":2004,"height":901,"src_thumb":"images\\generative_static\\_thumb_unknown (5).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (5).png"},"unknown (4).png":{"src":"images\\generative_static\\unknown (4).png","width":1189,"height":729,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (4).png"},"unknown (3).png":{"src":"images\\generative_static\\unknown (3).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (3).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (3).png"},"unknown (2).png":{"src":"images\\generative_static\\unknown (2).png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (2).png"},"unknown (11).png":{"src":"images\\generative_static\\unknown (11).png","width":1270,"height":710,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (11).png"},"unknown (10).png":{"src":"images\\generative_static\\unknown (10).png","width":2000,"height":2000,"src_thumb":"images\\generative_static\\_thumb_unknown (10).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (10).png"},"unknown (1).png":{"src":"images\\generative_static\\unknown (1).png","width":800,"height":450,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (1).png"},"spectracer.png":{"src":"images\\generative_static\\spectracer.png","width":518,"height":493,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer.png"},"spectracer (5).png":{"src":"images\\generative_static\\spectracer (5).png","width":877,"height":490,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (5).png"},"spectracer (4).png":{"src":"images\\generative_static\\spectracer (4).png","width":558,"height":309,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (4).png"},"spectracer (3).png":{"src":"images\\generative_static\\spectracer (3).png","width":574,"height":449,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (3).png"},"spectracer (2).png":{"src":"images\\generative_static\\spectracer (2).png","width":795,"height":443,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (2).png"},"spectracer (1).png":{"src":"images\\generative_static\\spectracer (1).png","width":793,"height":442,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (1).png"},"S138LuQAAAABJRU5ErkJggg.png":{"src":"images\\generative_static\\S138LuQAAAABJRU5ErkJggg.png","width":1920,"height":1023,"src_thumb":"images\\generative_static\\_thumb_S138LuQAAAABJRU5ErkJggg.jpg","is_video":false,"creation_date":"2021-3-31","name":"S138LuQAAAABJRU5ErkJggg.png"},"P0y3BNk6U271AAAAAElFTkSuQmCC.png":{"src":"images\\generative_static\\P0y3BNk6U271AAAAAElFTkSuQmCC.png","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"P0y3BNk6U271AAAAAElFTkSuQmCC.png"},"image (29).png":{"src":"images\\generative_static\\image (29).png","width":890,"height":497,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (29).png"},"image (27).png":{"src":"images\\generative_static\\image (27).png","width":729,"height":404,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (27).png"},"image (26).png":{"src":"images\\generative_static\\image (26).png","width":1180,"height":660,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (26).png"},"image (25).png":{"src":"images\\generative_static\\image (25).png","width":1210,"height":673,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (25).png"},"idklol-out.png":{"src":"images\\generative_static\\idklol-out.png","width":2854,"height":2804,"src_thumb":"images\\generative_static\\_thumb_idklol-out.jpg","is_video":false,"creation_date":"2022-1-24","name":"idklol-out.png"},"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png":{"src":"images\\generative_static\\Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png","width":1920,"height":1080,"src_thumb":"images\\generative_static\\_thumb_Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.jpg","is_video":false,"creation_date":"2021-3-31","name":"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png"},"Ha2Ch0D.png":{"src":"images\\generative_static\\Ha2Ch0D.png","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"Ha2Ch0D.png"},"flowers.png":{"src":"images\\generative_static\\flowers.png","width":1055,"height":682,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"flowers.png"},"FJ5S5FKWQAMjtjO.png":{"src":"images\\generative_static\\FJ5S5FKWQAMjtjO.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_FJ5S5FKWQAMjtjO.jpg","is_video":false,"creation_date":"2023-8-15","name":"FJ5S5FKWQAMjtjO.png"},"FbPBBI7XkAIz10q.png":{"src":"images\\generative_static\\FbPBBI7XkAIz10q.png","width":680,"height":435,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"FbPBBI7XkAIz10q.png"},"F3mGHzuXwAAqOTA.png":{"src":"images\\generative_static\\F3mGHzuXwAAqOTA.png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-17","name":"F3mGHzuXwAAqOTA.png"},"767.png":{"src":"images\\generative_static\\767.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_767.jpg","is_video":false,"creation_date":"2022-1-24","name":"767.png"},"765.png":{"src":"images\\generative_static\\765.png","width":1400,"height":1860,"src_thumb":"images\\generative_static\\_thumb_765.jpg","is_video":false,"creation_date":"2023-8-15","name":"765.png"},"757-out.png":{"src":"images\\generative_static\\757-out.png","width":3000,"height":3000,"src_thumb":"images\\generative_static\\_thumb_757-out.jpg","is_video":false,"creation_date":"2022-1-14","name":"757-out.png"},"717.png":{"src":"images\\generative_static\\717.png","width":2488,"height":1440,"src_thumb":"images\\generative_static\\_thumb_717.jpg","is_video":false,"creation_date":"2021-12-5","name":"717.png"},"54.png":{"src":"images\\generative_static\\54.png","width":881,"height":496,"src_thumb":"","is_video":false,"creation_date":"2020-2-25","name":"54.png"},"172-a-toned.png":{"src":"images\\generative_static\\172-a-toned.png","width":893,"height":1374,"src_thumb":"","is_video":false,"creation_date":"2020-6-9","name":"172-a-toned.png"},"FR56Q9mWQAA7U4X.jpg":{"src":"images\\generative_static\\FR56Q9mWQAA7U4X.jpg","width":1000,"height":1834,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FR56Q9mWQAA7U4X.jpg"},"FbPBBI7XkAIz10q.jpg":{"src":"images\\generative_static\\FbPBBI7XkAIz10q.jpg","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbPBBI7XkAIz10q.jpg"},"FbBtUi9XoAEHFrV.jpg":{"src":"images\\generative_static\\FbBtUi9XoAEHFrV.jpg","width":1200,"height":675,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbBtUi9XoAEHFrV.jpg"},"3tycWV.jpg":{"src":"images\\generative_static\\3tycWV.jpg","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-8-25","name":"3tycWV.jpg"},"1XTPsDi.mp4":{"src":"images\\generative_static\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},"sorted":[{"src":"images\\generative_static\\F3mGHzuXwAAqOTA.png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-17","name":"F3mGHzuXwAAqOTA.png"},{"src":"images\\generative_static\\unknown (9).png","width":578,"height":577,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (9).png"},{"src":"images\\generative_static\\unknown (8).png","width":792,"height":807,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (8).png"},{"src":"images\\generative_static\\unknown (7).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (7).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (7).png"},{"src":"images\\generative_static\\unknown (6).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (6).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (6).png"},{"src":"images\\generative_static\\unknown (5).png","width":2004,"height":901,"src_thumb":"images\\generative_static\\_thumb_unknown (5).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (5).png"},{"src":"images\\generative_static\\unknown (4).png","width":1189,"height":729,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (4).png"},{"src":"images\\generative_static\\unknown (3).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (3).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (3).png"},{"src":"images\\generative_static\\unknown (2).png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (2).png"},{"src":"images\\generative_static\\unknown (11).png","width":1270,"height":710,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (11).png"},{"src":"images\\generative_static\\unknown (10).png","width":2000,"height":2000,"src_thumb":"images\\generative_static\\_thumb_unknown (10).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (10).png"},{"src":"images\\generative_static\\unknown (1).png","width":800,"height":450,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (1).png"},{"src":"images\\generative_static\\spectracer.png","width":518,"height":493,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer.png"},{"src":"images\\generative_static\\spectracer (5).png","width":877,"height":490,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (5).png"},{"src":"images\\generative_static\\spectracer (4).png","width":558,"height":309,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (4).png"},{"src":"images\\generative_static\\spectracer (3).png","width":574,"height":449,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (3).png"},{"src":"images\\generative_static\\spectracer (2).png","width":795,"height":443,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (2).png"},{"src":"images\\generative_static\\spectracer (1).png","width":793,"height":442,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (1).png"},{"src":"images\\generative_static\\image (29).png","width":890,"height":497,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (29).png"},{"src":"images\\generative_static\\image (27).png","width":729,"height":404,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (27).png"},{"src":"images\\generative_static\\image (26).png","width":1180,"height":660,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (26).png"},{"src":"images\\generative_static\\image (25).png","width":1210,"height":673,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (25).png"},{"src":"images\\generative_static\\FJ5S5FKWQAMjtjO.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_FJ5S5FKWQAMjtjO.jpg","is_video":false,"creation_date":"2023-8-15","name":"FJ5S5FKWQAMjtjO.png"},{"src":"images\\generative_static\\765.png","width":1400,"height":1860,"src_thumb":"images\\generative_static\\_thumb_765.jpg","is_video":false,"creation_date":"2023-8-15","name":"765.png"},{"src":"images\\generative_static\\FR56Q9mWQAA7U4X.jpg","width":1000,"height":1834,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FR56Q9mWQAA7U4X.jpg"},{"src":"images\\generative_static\\FbPBBI7XkAIz10q.jpg","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbPBBI7XkAIz10q.jpg"},{"src":"images\\generative_static\\FbBtUi9XoAEHFrV.jpg","width":1200,"height":675,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbBtUi9XoAEHFrV.jpg"},{"src":"images\\generative_static\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},{"src":"images\\generative_static\\FbPBBI7XkAIz10q.png","width":680,"height":435,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"FbPBBI7XkAIz10q.png"},{"src":"images\\generative_static\\idklol-out.png","width":2854,"height":2804,"src_thumb":"images\\generative_static\\_thumb_idklol-out.jpg","is_video":false,"creation_date":"2022-1-24","name":"idklol-out.png"},{"src":"images\\generative_static\\767.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_767.jpg","is_video":false,"creation_date":"2022-1-24","name":"767.png"},{"src":"images\\generative_static\\757-out.png","width":3000,"height":3000,"src_thumb":"images\\generative_static\\_thumb_757-out.jpg","is_video":false,"creation_date":"2022-1-14","name":"757-out.png"},{"src":"images\\generative_static\\717.png","width":2488,"height":1440,"src_thumb":"images\\generative_static\\_thumb_717.jpg","is_video":false,"creation_date":"2021-12-5","name":"717.png"},{"src":"images\\generative_static\\3tycWV.jpg","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-8-25","name":"3tycWV.jpg"},{"src":"images\\generative_static\\unknown.png","width":1254,"height":701,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},{"src":"images\\generative_static\\S138LuQAAAABJRU5ErkJggg.png","width":1920,"height":1023,"src_thumb":"images\\generative_static\\_thumb_S138LuQAAAABJRU5ErkJggg.jpg","is_video":false,"creation_date":"2021-3-31","name":"S138LuQAAAABJRU5ErkJggg.png"},{"src":"images\\generative_static\\P0y3BNk6U271AAAAAElFTkSuQmCC.png","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"P0y3BNk6U271AAAAAElFTkSuQmCC.png"},{"src":"images\\generative_static\\Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png","width":1920,"height":1080,"src_thumb":"images\\generative_static\\_thumb_Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.jpg","is_video":false,"creation_date":"2021-3-31","name":"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png"},{"src":"images\\generative_static\\Ha2Ch0D.png","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"Ha2Ch0D.png"},{"src":"images\\generative_static\\flowers.png","width":1055,"height":682,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"flowers.png"},{"src":"images\\generative_static\\172-a-toned.png","width":893,"height":1374,"src_thumb":"","is_video":false,"creation_date":"2020-6-9","name":"172-a-toned.png"},{"src":"images\\generative_static\\54.png","width":881,"height":496,"src_thumb":"","is_video":false,"creation_date":"2020-2-25","name":"54.png"}]},"noise_tex.webp":{"src":"images\\noise_tex.webp","width":720,"height":720,"src_thumb":"","is_video":false,"creation_date":"2023-8-9"},"generative_mograph":{"capture - 2021-02-23T161035.355.webm":{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.webm","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-2-23","name":"capture - 2021-02-23T161035.355.webm"},"capture (59).webm":{"src":"images\\generative_mograph\\capture (59).webm","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2020-11-17","name":"capture (59).webm"},"WQC0rBl.mp4":{"src":"images\\generative_mograph\\WQC0rBl.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"WQC0rBl.mp4"},"pOiFoUR.mp4":{"src":"images\\generative_mograph\\pOiFoUR.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"pOiFoUR.mp4"},"OUT (3).mp4":{"src":"images\\generative_mograph\\OUT (3).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (3).mp4"},"OUT (2).mp4":{"src":"images\\generative_mograph\\OUT (2).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (2).mp4"},"OUT (1).mp4":{"src":"images\\generative_mograph\\OUT (1).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (1).mp4"},"chrome_xOHw6iea45.mp4":{"src":"images\\generative_mograph\\chrome_xOHw6iea45.mp4","width":798,"height":442,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_xOHw6iea45.mp4"},"chrome_UDlKJV4jdZ.mp4":{"src":"images\\generative_mograph\\chrome_UDlKJV4jdZ.mp4","width":784,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_UDlKJV4jdZ.mp4"},"chrome_RazqupSsRS.mp4":{"src":"images\\generative_mograph\\chrome_RazqupSsRS.mp4","width":794,"height":440,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_RazqupSsRS.mp4"},"chrome_ibz88JN1To.mp4":{"src":"images\\generative_mograph\\chrome_ibz88JN1To.mp4","width":792,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_ibz88JN1To.mp4"},"chrome_foG6RANRoM.mp4":{"src":"images\\generative_mograph\\chrome_foG6RANRoM.mp4","width":874,"height":488,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_foG6RANRoM.mp4"},"capture - 2021-04-01T215056.436.mp4":{"src":"images\\generative_mograph\\capture - 2021-04-01T215056.436.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-04-01T215056.436.mp4"},"capture - 2021-02-24T174055.362.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-24T174055.362.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-24T174055.362.mp4"},"capture - 2021-02-23T161035.355.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T161035.355.mp4"},"capture - 2021-02-23T135750.665.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-23T135750.665.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T135750.665.mp4"},"capture - 2021-02-22T191650.873.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-22T191650.873.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-22T191650.873.mp4"},"capture - 2021-02-15T183608.531.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-15T183608.531.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-15T183608.531.mp4"},"capture - 2021-02-06T155448.767.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-06T155448.767.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-06T155448.767.mp4"},"capture - 2021-02-04T235908.915.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-04T235908.915.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-04T235908.915.mp4"},"capture - 2021-01-25T215853.813.mp4":{"src":"images\\generative_mograph\\capture - 2021-01-25T215853.813.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-01-25T215853.813.mp4"},"capture (71).mp4":{"src":"images\\generative_mograph\\capture (71).mp4","width":800,"height":450,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (71).mp4"},"capture (61).mp4":{"src":"images\\generative_mograph\\capture (61).mp4","width":1100,"height":900,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (61).mp4"},"capture (60).mp4":{"src":"images\\generative_mograph\\capture (60).mp4","width":1100,"height":700,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (60).mp4"},"capture (51).mp4":{"src":"images\\generative_mograph\\capture (51).mp4","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (51).mp4"},"1XTPsDi.mp4":{"src":"images\\generative_mograph\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},"166.mp4":{"src":"images\\generative_mograph\\166.mp4","width":640,"height":400,"src_thumb":"","is_video":true,"creation_date":"2021-8-25","name":"166.mp4"},"soDroUS.gif":{"src":"images\\generative_mograph\\soDroUS.gif","width":500,"height":500,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"soDroUS.gif"},"129.gif":{"src":"images\\generative_mograph\\129.gif","width":400,"height":400,"src_thumb":"","is_video":false,"creation_date":"2020-4-26","name":"129.gif"},"126.gif":{"src":"images\\generative_mograph\\126.gif","width":256,"height":256,"src_thumb":"","is_video":false,"creation_date":"2020-4-23","name":"126.gif"},"123.gif":{"src":"images\\generative_mograph\\123.gif","width":512,"height":512,"src_thumb":"","is_video":false,"creation_date":"2020-4-20","name":"123.gif"},"sorted":[{"src":"images\\generative_mograph\\WQC0rBl.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"WQC0rBl.mp4"},{"src":"images\\generative_mograph\\pOiFoUR.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"pOiFoUR.mp4"},{"src":"images\\generative_mograph\\OUT (3).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (3).mp4"},{"src":"images\\generative_mograph\\OUT (2).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (2).mp4"},{"src":"images\\generative_mograph\\OUT (1).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (1).mp4"},{"src":"images\\generative_mograph\\chrome_xOHw6iea45.mp4","width":798,"height":442,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_xOHw6iea45.mp4"},{"src":"images\\generative_mograph\\chrome_UDlKJV4jdZ.mp4","width":784,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_UDlKJV4jdZ.mp4"},{"src":"images\\generative_mograph\\chrome_RazqupSsRS.mp4","width":794,"height":440,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_RazqupSsRS.mp4"},{"src":"images\\generative_mograph\\chrome_ibz88JN1To.mp4","width":792,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_ibz88JN1To.mp4"},{"src":"images\\generative_mograph\\chrome_foG6RANRoM.mp4","width":874,"height":488,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_foG6RANRoM.mp4"},{"src":"images\\generative_mograph\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},{"src":"images\\generative_mograph\\166.mp4","width":640,"height":400,"src_thumb":"","is_video":true,"creation_date":"2021-8-25","name":"166.mp4"},{"src":"images\\generative_mograph\\capture - 2021-04-01T215056.436.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-04-01T215056.436.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-24T174055.362.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-24T174055.362.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T161035.355.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-23T135750.665.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T135750.665.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-22T191650.873.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-22T191650.873.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-15T183608.531.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-15T183608.531.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-06T155448.767.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-06T155448.767.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-04T235908.915.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-04T235908.915.mp4"},{"src":"images\\generative_mograph\\capture - 2021-01-25T215853.813.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-01-25T215853.813.mp4"},{"src":"images\\generative_mograph\\capture (71).mp4","width":800,"height":450,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (71).mp4"},{"src":"images\\generative_mograph\\capture (61).mp4","width":1100,"height":900,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (61).mp4"},{"src":"images\\generative_mograph\\capture (60).mp4","width":1100,"height":700,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (60).mp4"},{"src":"images\\generative_mograph\\capture (51).mp4","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (51).mp4"},{"src":"images\\generative_mograph\\soDroUS.gif","width":500,"height":500,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"soDroUS.gif"},{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.webm","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-2-23","name":"capture - 2021-02-23T161035.355.webm"},{"src":"images\\generative_mograph\\capture (59).webm","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2020-11-17","name":"capture (59).webm"},{"src":"images\\generative_mograph\\129.gif","width":400,"height":400,"src_thumb":"","is_video":false,"creation_date":"2020-4-26","name":"129.gif"},{"src":"images\\generative_mograph\\126.gif","width":256,"height":256,"src_thumb":"","is_video":false,"creation_date":"2020-4-23","name":"126.gif"},{"src":"images\\generative_mograph\\123.gif","width":512,"height":512,"src_thumb":"","is_video":false,"creation_date":"2020-4-20","name":"123.gif"}]}},"blog":{"preview_pathtracing.png":{"src":"blog\\preview_pathtracing.png"},"vorpol_dawn_by_technochroma.jpg":{"src":"blog\\vorpol_dawn_by_technochroma.jpg"},"lyc-sketch.gif":{"src":"blog\\lyc-sketch.gif"}},"audio":{"moody":{"wip4e.mp3":{"src":"audio\\moody\\wip4e.mp3","creation_date":"2021-7-14","name":"wip4e.mp3"},"926.mp3":{"src":"audio\\moody\\926.mp3","creation_date":"2022-7-2","name":"926.mp3"},"691.mp3":{"src":"audio\\moody\\691.mp3","creation_date":"2021-11-9","name":"691.mp3"},"590.mp3":{"src":"audio\\moody\\590.mp3","creation_date":"2021-7-31","name":"590.mp3"},"574-radiator .mp3":{"src":"audio\\moody\\574-radiator .mp3","creation_date":"2021-7-14","name":"574-radiator .mp3"},"570 - mark thing wip.mp3":{"src":"audio\\moody\\570 - mark thing wip.mp3","creation_date":"2021-7-11","name":"570 - mark thing wip.mp3"},"524.mp3":{"src":"audio\\moody\\524.mp3","creation_date":"2021-5-26","name":"524.mp3"},"460.mp3":{"src":"audio\\moody\\460.mp3","creation_date":"2021-3-24","name":"460.mp3"},"256.mp3":{"src":"audio\\moody\\256.mp3","creation_date":"2020-9-1","name":"256.mp3"},"255-v2 - Copy.mp3":{"src":"audio\\moody\\255-v2 - Copy.mp3","creation_date":"2020-8-31","name":"255-v2 - Copy.mp3"},"1244 ok 2023-08-07 1915.mp3":{"src":"audio\\moody\\1244 ok 2023-08-07 1915.mp3","creation_date":"2023-8-7","name":"1244 ok 2023-08-07 1915.mp3"},"1188 2023-08-07 1946.mp3":{"src":"audio\\moody\\1188 2023-08-07 1946.mp3","creation_date":"2023-8-7","name":"1188 2023-08-07 1946.mp3"},"sorted":[{"src":"audio\\moody\\1244 ok 2023-08-07 1915.mp3","creation_date":"2023-8-7","name":"1244 ok 2023-08-07 1915.mp3"},{"src":"audio\\moody\\1188 2023-08-07 1946.mp3","creation_date":"2023-8-7","name":"1188 2023-08-07 1946.mp3"},{"src":"audio\\moody\\926.mp3","creation_date":"2022-7-2","name":"926.mp3"},{"src":"audio\\moody\\691.mp3","creation_date":"2021-11-9","name":"691.mp3"},{"src":"audio\\moody\\590.mp3","creation_date":"2021-7-31","name":"590.mp3"},{"src":"audio\\moody\\wip4e.mp3","creation_date":"2021-7-14","name":"wip4e.mp3"},{"src":"audio\\moody\\574-radiator .mp3","creation_date":"2021-7-14","name":"574-radiator .mp3"},{"src":"audio\\moody\\570 - mark thing wip.mp3","creation_date":"2021-7-11","name":"570 - mark thing wip.mp3"},{"src":"audio\\moody\\524.mp3","creation_date":"2021-5-26","name":"524.mp3"},{"src":"audio\\moody\\460.mp3","creation_date":"2021-3-24","name":"460.mp3"},{"src":"audio\\moody\\256.mp3","creation_date":"2020-9-1","name":"256.mp3"},{"src":"audio\\moody\\255-v2 - Copy.mp3","creation_date":"2020-8-31","name":"255-v2 - Copy.mp3"}]},"melodic":{"jajaja.mp3":{"src":"audio\\melodic\\jajaja.mp3","creation_date":"2020-6-8","name":"jajaja.mp3"},"932.mp3":{"src":"audio\\melodic\\932.mp3","creation_date":"2022-7-8","name":"932.mp3"},"927.mp3":{"src":"audio\\melodic\\927.mp3","creation_date":"2022-7-3","name":"927.mp3"},"797-b.mp3":{"src":"audio\\melodic\\797-b.mp3","creation_date":"2022-4-16","name":"797-b.mp3"},"730.mp3":{"src":"audio\\melodic\\730.mp3","creation_date":"2021-12-18","name":"730.mp3"},"692.mp3":{"src":"audio\\melodic\\692.mp3","creation_date":"2021-11-10","name":"692.mp3"},"690_unnoised.mp3":{"src":"audio\\melodic\\690_unnoised.mp3","creation_date":"2021-11-8","name":"690_unnoised.mp3"},"662.mp3":{"src":"audio\\melodic\\662.mp3","creation_date":"2021-10-12","name":"662.mp3"},"626.mp3":{"src":"audio\\melodic\\626.mp3","creation_date":"2021-9-5","name":"626.mp3"},"576-fuji-rmx.mp3":{"src":"audio\\melodic\\576-fuji-rmx.mp3","creation_date":"2021-7-17","name":"576-fuji-rmx.mp3"},"575-2k.mp3":{"src":"audio\\melodic\\575-2k.mp3","creation_date":"2021-7-15","name":"575-2k.mp3"},"527.mp3":{"src":"audio\\melodic\\527.mp3","creation_date":"2021-5-29","name":"527.mp3"},"481.mp3":{"src":"audio\\melodic\\481.mp3","creation_date":"2021-4-13","name":"481.mp3"},"465.mp3":{"src":"audio\\melodic\\465.mp3","creation_date":"2021-3-30","name":"465.mp3"},"236.mp3":{"src":"audio\\melodic\\236.mp3","creation_date":"2020-8-12","name":"236.mp3"},"222.mp3":{"src":"audio\\melodic\\222.mp3","creation_date":"2020-7-29","name":"222.mp3"},"219.mp3":{"src":"audio\\melodic\\219.mp3","creation_date":"2020-7-26","name":"219.mp3"},"138.mp3":{"src":"audio\\melodic\\138.mp3","creation_date":"2020-5-5","name":"138.mp3"},"1243.mp3":{"src":"audio\\melodic\\1243.mp3","creation_date":"2023-8-7","name":"1243.mp3"},"1140.mp3":{"src":"audio\\melodic\\1140.mp3","creation_date":"2023-2-1","name":"1140.mp3"},"1121.mp3":{"src":"audio\\melodic\\1121.mp3","creation_date":"2023-1-13","name":"1121.mp3"},"1071.mp3":{"src":"audio\\melodic\\1071.mp3","creation_date":"2022-11-27","name":"1071.mp3"},"1069.mp3":{"src":"audio\\melodic\\1069.mp3","creation_date":"2022-11-22","name":"1069.mp3"},"1034.mp3":{"src":"audio\\melodic\\1034.mp3","creation_date":"2022-10-18","name":"1034.mp3"},"1025.mp3":{"src":"audio\\melodic\\1025.mp3","creation_date":"2022-10-9","name":"1025.mp3"},"1021.mp3":{"src":"audio\\melodic\\1021.mp3","creation_date":"2022-10-5","name":"1021.mp3"},"sorted":[{"src":"audio\\melodic\\1243.mp3","creation_date":"2023-8-7","name":"1243.mp3"},{"src":"audio\\melodic\\1140.mp3","creation_date":"2023-2-1","name":"1140.mp3"},{"src":"audio\\melodic\\1121.mp3","creation_date":"2023-1-13","name":"1121.mp3"},{"src":"audio\\melodic\\1071.mp3","creation_date":"2022-11-27","name":"1071.mp3"},{"src":"audio\\melodic\\1069.mp3","creation_date":"2022-11-22","name":"1069.mp3"},{"src":"audio\\melodic\\1034.mp3","creation_date":"2022-10-18","name":"1034.mp3"},{"src":"audio\\melodic\\1025.mp3","creation_date":"2022-10-9","name":"1025.mp3"},{"src":"audio\\melodic\\1021.mp3","creation_date":"2022-10-5","name":"1021.mp3"},{"src":"audio\\melodic\\932.mp3","creation_date":"2022-7-8","name":"932.mp3"},{"src":"audio\\melodic\\927.mp3","creation_date":"2022-7-3","name":"927.mp3"},{"src":"audio\\melodic\\797-b.mp3","creation_date":"2022-4-16","name":"797-b.mp3"},{"src":"audio\\melodic\\730.mp3","creation_date":"2021-12-18","name":"730.mp3"},{"src":"audio\\melodic\\692.mp3","creation_date":"2021-11-10","name":"692.mp3"},{"src":"audio\\melodic\\690_unnoised.mp3","creation_date":"2021-11-8","name":"690_unnoised.mp3"},{"src":"audio\\melodic\\662.mp3","creation_date":"2021-10-12","name":"662.mp3"},{"src":"audio\\melodic\\626.mp3","creation_date":"2021-9-5","name":"626.mp3"},{"src":"audio\\melodic\\576-fuji-rmx.mp3","creation_date":"2021-7-17","name":"576-fuji-rmx.mp3"},{"src":"audio\\melodic\\575-2k.mp3","creation_date":"2021-7-15","name":"575-2k.mp3"},{"src":"audio\\melodic\\527.mp3","creation_date":"2021-5-29","name":"527.mp3"},{"src":"audio\\melodic\\481.mp3","creation_date":"2021-4-13","name":"481.mp3"},{"src":"audio\\melodic\\465.mp3","creation_date":"2021-3-30","name":"465.mp3"},{"src":"audio\\melodic\\236.mp3","creation_date":"2020-8-12","name":"236.mp3"},{"src":"audio\\melodic\\222.mp3","creation_date":"2020-7-29","name":"222.mp3"},{"src":"audio\\melodic\\219.mp3","creation_date":"2020-7-26","name":"219.mp3"},{"src":"audio\\melodic\\jajaja.mp3","creation_date":"2020-6-8","name":"jajaja.mp3"},{"src":"audio\\melodic\\138.mp3","creation_date":"2020-5-5","name":"138.mp3"}]},"chill":{"hmmm.mp3":{"src":"audio\\chill\\hmmm.mp3","creation_date":"2020-5-16","name":"hmmm.mp3"},"330.mp3":{"src":"audio\\chill\\330.mp3","creation_date":"2020-11-18","name":"330.mp3"},"319.mp3":{"src":"audio\\chill\\319.mp3","creation_date":"2020-11-4","name":"319.mp3"},"257-2.mp3":{"src":"audio\\chill\\257-2.mp3","creation_date":"2020-9-2","name":"257-2.mp3"},"244.mp3":{"src":"audio\\chill\\244.mp3","creation_date":"2020-8-20","name":"244.mp3"},"1180 2023-03-13 vcv.mp3":{"src":"audio\\chill\\1180 2023-03-13 vcv.mp3","creation_date":"2023-3-13","name":"1180 2023-03-13 vcv.mp3"},"1116-toomb-ludum-dare.mp3":{"src":"audio\\chill\\1116-toomb-ludum-dare.mp3","creation_date":"2023-1-8","name":"1116-toomb-ludum-dare.mp3"},"1099-toomb4.mp3":{"src":"audio\\chill\\1099-toomb4.mp3","creation_date":"2022-12-22","name":"1099-toomb4.mp3"},"1098-toomb3 (1).mp3":{"src":"audio\\chill\\1098-toomb3 (1).mp3","creation_date":"2022-12-21","name":"1098-toomb3 (1).mp3"},"1096-toomb2.mp3":{"src":"audio\\chill\\1096-toomb2.mp3","creation_date":"2022-12-19","name":"1096-toomb2.mp3"},"1095-toomb.mp3":{"src":"audio\\chill\\1095-toomb.mp3","creation_date":"2022-12-18","name":"1095-toomb.mp3"},"1014.mp3":{"src":"audio\\chill\\1014.mp3","creation_date":"2022-9-28","name":"1014.mp3"},"sorted":[{"src":"audio\\chill\\1180 2023-03-13 vcv.mp3","creation_date":"2023-3-13","name":"1180 2023-03-13 vcv.mp3"},{"src":"audio\\chill\\1116-toomb-ludum-dare.mp3","creation_date":"2023-1-8","name":"1116-toomb-ludum-dare.mp3"},{"src":"audio\\chill\\1099-toomb4.mp3","creation_date":"2022-12-22","name":"1099-toomb4.mp3"},{"src":"audio\\chill\\1098-toomb3 (1).mp3","creation_date":"2022-12-21","name":"1098-toomb3 (1).mp3"},{"src":"audio\\chill\\1096-toomb2.mp3","creation_date":"2022-12-19","name":"1096-toomb2.mp3"},{"src":"audio\\chill\\1095-toomb.mp3","creation_date":"2022-12-18","name":"1095-toomb.mp3"},{"src":"audio\\chill\\1014.mp3","creation_date":"2022-9-28","name":"1014.mp3"},{"src":"audio\\chill\\330.mp3","creation_date":"2020-11-18","name":"330.mp3"},{"src":"audio\\chill\\319.mp3","creation_date":"2020-11-4","name":"319.mp3"},{"src":"audio\\chill\\257-2.mp3","creation_date":"2020-9-2","name":"257-2.mp3"},{"src":"audio\\chill\\244.mp3","creation_date":"2020-8-20","name":"244.mp3"},{"src":"audio\\chill\\hmmm.mp3","creation_date":"2020-5-16","name":"hmmm.mp3"}]},"bass":{"836.mp3":{"src":"audio\\bass\\836.mp3","creation_date":"2022-4-3","name":"836.mp3"},"801.mp3":{"src":"audio\\bass\\801.mp3","creation_date":"2022-2-27","name":"801.mp3"},"642 other.mp3":{"src":"audio\\bass\\642 other.mp3","creation_date":"2021-9-22","name":"642 other.mp3"},"589.mp3":{"src":"audio\\bass\\589.mp3","creation_date":"2021-7-30","name":"589.mp3"},"560-v2.mp3":{"src":"audio\\bass\\560-v2.mp3","creation_date":"2021-7-1","name":"560-v2.mp3"},"515.mp3":{"src":"audio\\bass\\515.mp3","creation_date":"2021-5-17","name":"515.mp3"},"316.mp3":{"src":"audio\\bass\\316.mp3","creation_date":"2020-11-1","name":"316.mp3"},"309 not te4no.mp3":{"src":"audio\\bass\\309 not te4no.mp3","creation_date":"2020-10-24","name":"309 not te4no.mp3"},"254.mp3":{"src":"audio\\bass\\254.mp3","creation_date":"2020-8-30","name":"254.mp3"},"1187 2023-03-20 2255.mp3":{"src":"audio\\bass\\1187 2023-03-20 2255.mp3","creation_date":"2023-3-20","name":"1187 2023-03-20 2255.mp3"},"1162.mp3":{"src":"audio\\bass\\1162.mp3","creation_date":"2023-2-23","name":"1162.mp3"},"sorted":[{"src":"audio\\bass\\1187 2023-03-20 2255.mp3","creation_date":"2023-3-20","name":"1187 2023-03-20 2255.mp3"},{"src":"audio\\bass\\1162.mp3","creation_date":"2023-2-23","name":"1162.mp3"},{"src":"audio\\bass\\836.mp3","creation_date":"2022-4-3","name":"836.mp3"},{"src":"audio\\bass\\801.mp3","creation_date":"2022-2-27","name":"801.mp3"},{"src":"audio\\bass\\642 other.mp3","creation_date":"2021-9-22","name":"642 other.mp3"},{"src":"audio\\bass\\589.mp3","creation_date":"2021-7-30","name":"589.mp3"},{"src":"audio\\bass\\560-v2.mp3","creation_date":"2021-7-1","name":"560-v2.mp3"},{"src":"audio\\bass\\515.mp3","creation_date":"2021-5-17","name":"515.mp3"},{"src":"audio\\bass\\316.mp3","creation_date":"2020-11-1","name":"316.mp3"},{"src":"audio\\bass\\309 not te4no.mp3","creation_date":"2020-10-24","name":"309 not te4no.mp3"},{"src":"audio\\bass\\254.mp3","creation_date":"2020-8-30","name":"254.mp3"}]}}}});
+	let observer = lozad_min_default()();
+	observer.observe();
+
+	window.addEventListener('DOMContentLoaded', function () {
+		observer = lozad_min_default()();
+		observer.observe();
+	});
+
 	let { url = "/" } = $$props;
 	const writable_props = ['url'];
 
@@ -18760,12 +20151,15 @@ function App_svelte_instance($$self, $$props, $$invalidate) {
 		About: aboutPage_svelte,
 		Splash: Splash_svelte,
 		Blog: blogPage_svelte,
+		lozad: (lozad_min_default()),
+		observer,
 		url,
 		path_name,
 		head_title
 	});
 
 	$$self.$inject_state = $$props => {
+		if ('observer' in $$props) observer = $$props.observer;
 		if ('url' in $$props) $$invalidate(1, url = $$props.url);
 		if ('path_name' in $$props) $$invalidate(0, path_name = $$props.path_name);
 		if ('head_title' in $$props) head_title = $$props.head_title;
@@ -18808,6 +20202,7 @@ class App extends SvelteComponentDev {
 window.is_dev = "production" === 'development';
 window.RESOURCES = {"public":{"favicon-32.png":{"src":"favicon-32.png"},"favicon-128.png":{"src":"favicon-128.png"},"dummy.png":{"src":"dummy.png"},"images":{"1690102042507_1[1].png":{"src":"images\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12"},"paintings":{"unknown.png":{"src":"images\\paintings\\unknown.png","width":386,"height":381,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},"adsg.png":{"src":"images\\paintings\\adsg.png","width":826,"height":877,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"adsg.png"},"868.png":{"src":"images\\paintings\\868.png","width":1918,"height":3074,"src_thumb":"images\\paintings\\_thumb_868.jpg","is_video":false,"creation_date":"2022-5-5","name":"868.png"},"1690102042507_1[1].png":{"src":"images\\paintings\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\paintings\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12","name":"1690102042507_1[1].png"},"1690037672960_1 (1).png":{"src":"images\\paintings\\1690037672960_1 (1).png","width":1804,"height":1785,"src_thumb":"images\\paintings\\_thumb_1690037672960_1 (1).jpg","is_video":false,"creation_date":"2023-8-13","name":"1690037672960_1 (1).png"},"1689957895824_2 (1).png":{"src":"images\\paintings\\1689957895824_2 (1).png","width":1437,"height":1701,"src_thumb":"images\\paintings\\_thumb_1689957895824_2 (1).jpg","is_video":false,"creation_date":"2023-8-14","name":"1689957895824_2 (1).png"},"1137-a.png":{"src":"images\\paintings\\1137-a.png","width":1920,"height":1880,"src_thumb":"images\\paintings\\_thumb_1137-a.jpg","is_video":false,"creation_date":"2023-8-15","name":"1137-a.png"},"1135-c.png":{"src":"images\\paintings\\1135-c.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1135-c.jpg","is_video":false,"creation_date":"2023-8-15","name":"1135-c.png"},"1132-a.png":{"src":"images\\paintings\\1132-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1132-a.jpg","is_video":false,"creation_date":"2023-1-24","name":"1132-a.png"},"1131-a.png":{"src":"images\\paintings\\1131-a.png","width":1920,"height":2880,"src_thumb":"images\\paintings\\_thumb_1131-a.jpg","is_video":false,"creation_date":"2023-1-23","name":"1131-a.png"},"1130-b.png":{"src":"images\\paintings\\1130-b.png","width":1920,"height":2680,"src_thumb":"images\\paintings\\_thumb_1130-b.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-b.png"},"1130-a.png":{"src":"images\\paintings\\1130-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1130-a.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-a.png"},"1129-pat-a.png":{"src":"images\\paintings\\1129-pat-a.png","width":2020,"height":1280,"src_thumb":"images\\paintings\\_thumb_1129-pat-a.jpg","is_video":false,"creation_date":"2023-1-21","name":"1129-pat-a.png"},"1123-e.png":{"src":"images\\paintings\\1123-e.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1123-e.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-e.png"},"1123-c.png":{"src":"images\\paintings\\1123-c.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1123-c.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-c.png"},"1119.png":{"src":"images\\paintings\\1119.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1119.jpg","is_video":false,"creation_date":"2023-1-11","name":"1119.png"},"1117-2.png":{"src":"images\\paintings\\1117-2.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1117-2.jpg","is_video":false,"creation_date":"2023-1-9","name":"1117-2.png"},"1112.png":{"src":"images\\paintings\\1112.png","width":1170,"height":1860,"src_thumb":"images\\paintings\\_thumb_1112.jpg","is_video":false,"creation_date":"2023-1-4","name":"1112.png"},"1055.png":{"src":"images\\paintings\\1055.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1055.jpg","is_video":false,"creation_date":"2022-11-8","name":"1055.png"},"1041.png":{"src":"images\\paintings\\1041.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1041.jpg","is_video":false,"creation_date":"2022-10-25","name":"1041.png"},"1135-b (1).jpg":{"src":"images\\paintings\\1135-b (1).jpg","width":1920,"height":2780,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"1135-b (1).jpg"},"sorted":[{"src":"images\\paintings\\1137-a.png","width":1920,"height":1880,"src_thumb":"images\\paintings\\_thumb_1137-a.jpg","is_video":false,"creation_date":"2023-8-15","name":"1137-a.png"},{"src":"images\\paintings\\1135-c.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1135-c.jpg","is_video":false,"creation_date":"2023-8-15","name":"1135-c.png"},{"src":"images\\paintings\\1135-b (1).jpg","width":1920,"height":2780,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"1135-b (1).jpg"},{"src":"images\\paintings\\1689957895824_2 (1).png","width":1437,"height":1701,"src_thumb":"images\\paintings\\_thumb_1689957895824_2 (1).jpg","is_video":false,"creation_date":"2023-8-14","name":"1689957895824_2 (1).png"},{"src":"images\\paintings\\1690037672960_1 (1).png","width":1804,"height":1785,"src_thumb":"images\\paintings\\_thumb_1690037672960_1 (1).jpg","is_video":false,"creation_date":"2023-8-13","name":"1690037672960_1 (1).png"},{"src":"images\\paintings\\adsg.png","width":826,"height":877,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"adsg.png"},{"src":"images\\paintings\\1690102042507_1[1].png","width":1616,"height":1448,"src_thumb":"images\\paintings\\_thumb_1690102042507_1[1].jpg","is_video":false,"creation_date":"2023-8-12","name":"1690102042507_1[1].png"},{"src":"images\\paintings\\1132-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1132-a.jpg","is_video":false,"creation_date":"2023-1-24","name":"1132-a.png"},{"src":"images\\paintings\\1131-a.png","width":1920,"height":2880,"src_thumb":"images\\paintings\\_thumb_1131-a.jpg","is_video":false,"creation_date":"2023-1-23","name":"1131-a.png"},{"src":"images\\paintings\\1130-b.png","width":1920,"height":2680,"src_thumb":"images\\paintings\\_thumb_1130-b.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-b.png"},{"src":"images\\paintings\\1130-a.png","width":1920,"height":2580,"src_thumb":"images\\paintings\\_thumb_1130-a.jpg","is_video":false,"creation_date":"2023-1-22","name":"1130-a.png"},{"src":"images\\paintings\\1129-pat-a.png","width":2020,"height":1280,"src_thumb":"images\\paintings\\_thumb_1129-pat-a.jpg","is_video":false,"creation_date":"2023-1-21","name":"1129-pat-a.png"},{"src":"images\\paintings\\1123-e.png","width":1920,"height":1080,"src_thumb":"images\\paintings\\_thumb_1123-e.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-e.png"},{"src":"images\\paintings\\1123-c.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1123-c.jpg","is_video":false,"creation_date":"2023-1-21","name":"1123-c.png"},{"src":"images\\paintings\\1119.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1119.jpg","is_video":false,"creation_date":"2023-1-11","name":"1119.png"},{"src":"images\\paintings\\1117-2.png","width":1920,"height":1920,"src_thumb":"images\\paintings\\_thumb_1117-2.jpg","is_video":false,"creation_date":"2023-1-9","name":"1117-2.png"},{"src":"images\\paintings\\1112.png","width":1170,"height":1860,"src_thumb":"images\\paintings\\_thumb_1112.jpg","is_video":false,"creation_date":"2023-1-4","name":"1112.png"},{"src":"images\\paintings\\1055.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1055.jpg","is_video":false,"creation_date":"2022-11-8","name":"1055.png"},{"src":"images\\paintings\\1041.png","width":1920,"height":2600,"src_thumb":"images\\paintings\\_thumb_1041.jpg","is_video":false,"creation_date":"2022-10-25","name":"1041.png"},{"src":"images\\paintings\\868.png","width":1918,"height":3074,"src_thumb":"images\\paintings\\_thumb_868.jpg","is_video":false,"creation_date":"2022-5-5","name":"868.png"},{"src":"images\\paintings\\unknown.png","width":386,"height":381,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"}]},"graphic_design":{"995_out.png":{"src":"images\\graphic_design\\995_out.png","width":4416,"height":6092,"src_thumb":"images\\graphic_design\\_thumb_995_out.jpg","is_video":false,"creation_date":"2022-9-9","name":"995_out.png"},"940.png":{"src":"images\\graphic_design\\940.png","width":2495,"height":3230,"src_thumb":"images\\graphic_design\\_thumb_940.jpg","is_video":false,"creation_date":"2022-7-16","name":"940.png"},"934 out.png":{"src":"images\\graphic_design\\934 out.png","width":5000,"height":3168,"src_thumb":"images\\graphic_design\\_thumb_934 out.jpg","is_video":false,"creation_date":"2022-7-10","name":"934 out.png"},"919.png":{"src":"images\\graphic_design\\919.png","width":2334,"height":3500,"src_thumb":"images\\graphic_design\\_thumb_919.jpg","is_video":false,"creation_date":"2022-6-25","name":"919.png"},"713-output.png":{"src":"images\\graphic_design\\713-output.png","width":1920,"height":1080,"src_thumb":"images\\graphic_design\\_thumb_713-output.jpg","is_video":false,"creation_date":"2021-12-1","name":"713-output.png"},"593.png":{"src":"images\\graphic_design\\593.png","width":4000,"height":4788,"src_thumb":"images\\graphic_design\\_thumb_593.jpg","is_video":false,"creation_date":"2021-8-3","name":"593.png"},"592-out.png":{"src":"images\\graphic_design\\592-out.png","width":2256,"height":3300,"src_thumb":"images\\graphic_design\\_thumb_592-out.jpg","is_video":false,"creation_date":"2021-8-2","name":"592-out.png"},"591.png":{"src":"images\\graphic_design\\591.png","width":2160,"height":3840,"src_thumb":"images\\graphic_design\\_thumb_591.jpg","is_video":false,"creation_date":"2021-8-1","name":"591.png"},"583-оут.png":{"src":"images\\graphic_design\\583-оут.png","width":1500,"height":1500,"src_thumb":"images\\graphic_design\\_thumb_583-оут.jpg","is_video":false,"creation_date":"2021-7-24","name":"583-оут.png"},"555.png":{"src":"images\\graphic_design\\555.png","width":2319,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_555.jpg","is_video":false,"creation_date":"2021-6-26","name":"555.png"},"499.png":{"src":"images\\graphic_design\\499.png","width":3370,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_499.jpg","is_video":false,"creation_date":"2021-5-1","name":"499.png"},"493.png":{"src":"images\\graphic_design\\493.png","width":596,"height":657,"src_thumb":"","is_video":false,"creation_date":"2021-4-26","name":"493.png"},"1x935_out.png":{"src":"images\\graphic_design\\1x935_out.png","width":3402,"height":5222,"src_thumb":"images\\graphic_design\\_thumb_1x935_out.jpg","is_video":false,"creation_date":"2022-7-11","name":"1x935_out.png"},"1x933.png":{"src":"images\\graphic_design\\1x933.png","width":5000,"height":3182,"src_thumb":"images\\graphic_design\\_thumb_1x933.jpg","is_video":false,"creation_date":"2022-7-9","name":"1x933.png"},"1x929.png":{"src":"images\\graphic_design\\1x929.png","width":5802,"height":8000,"src_thumb":"images\\graphic_design\\_thumb_1x929.jpg","is_video":false,"creation_date":"2022-7-6","name":"1x929.png"},"1x925 (1).png":{"src":"images\\graphic_design\\1x925 (1).png","width":2115,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_1x925 (1).jpg","is_video":false,"creation_date":"2022-7-2","name":"1x925 (1).png"},"1155-out.png":{"src":"images\\graphic_design\\1155-out.png","width":3840,"height":4710,"src_thumb":"images\\graphic_design\\_thumb_1155-out.jpg","is_video":false,"creation_date":"2023-2-16","name":"1155-out.png"},"1093.png":{"src":"images\\graphic_design\\1093.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1093.jpg","is_video":false,"creation_date":"2022-12-16","name":"1093.png"},"1090.png":{"src":"images\\graphic_design\\1090.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1090.jpg","is_video":false,"creation_date":"2022-12-13","name":"1090.png"},"1089.png":{"src":"images\\graphic_design\\1089.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1089.jpg","is_video":false,"creation_date":"2022-12-12","name":"1089.png"},"1087_out.png":{"src":"images\\graphic_design\\1087_out.png","width":1887,"height":1880,"src_thumb":"images\\graphic_design\\_thumb_1087_out.jpg","is_video":false,"creation_date":"2022-12-10","name":"1087_out.png"},"1052_out.png":{"src":"images\\graphic_design\\1052_out.png","width":4320,"height":4320,"src_thumb":"images\\graphic_design\\_thumb_1052_out.jpg","is_video":false,"creation_date":"2022-11-5","name":"1052_out.png"},"1048_out.png":{"src":"images\\graphic_design\\1048_out.png","width":4290,"height":5400,"src_thumb":"images\\graphic_design\\_thumb_1048_out.jpg","is_video":false,"creation_date":"2022-11-1","name":"1048_out.png"},"1030_in.png":{"src":"images\\graphic_design\\1030_in.png","width":2540,"height":3525,"src_thumb":"images\\graphic_design\\_thumb_1030_in.jpg","is_video":false,"creation_date":"2022-10-14","name":"1030_in.png"},"1013_out.png":{"src":"images\\graphic_design\\1013_out.png","width":4096,"height":4092,"src_thumb":"images\\graphic_design\\_thumb_1013_out.jpg","is_video":false,"creation_date":"2022-9-27","name":"1013_out.png"},"1008_out.png":{"src":"images\\graphic_design\\1008_out.png","width":4000,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_1008_out.jpg","is_video":false,"creation_date":"2022-9-22","name":"1008_out.png"},"1007_out.png":{"src":"images\\graphic_design\\1007_out.png","width":3840,"height":3872,"src_thumb":"images\\graphic_design\\_thumb_1007_out.jpg","is_video":false,"creation_date":"2022-9-21","name":"1007_out.png"},"1006.png":{"src":"images\\graphic_design\\1006.png","width":3084,"height":4316,"src_thumb":"images\\graphic_design\\_thumb_1006.jpg","is_video":false,"creation_date":"2022-9-20","name":"1006.png"},"1005_out.png":{"src":"images\\graphic_design\\1005_out.png","width":2870,"height":4104,"src_thumb":"images\\graphic_design\\_thumb_1005_out.jpg","is_video":false,"creation_date":"2022-9-19","name":"1005_out.png"},"1004_out.png":{"src":"images\\graphic_design\\1004_out.png","width":2964,"height":4268,"src_thumb":"images\\graphic_design\\_thumb_1004_out.jpg","is_video":false,"creation_date":"2022-9-18","name":"1004_out.png"},"1002.png":{"src":"images\\graphic_design\\1002.png","width":3258,"height":4435,"src_thumb":"images\\graphic_design\\_thumb_1002.jpg","is_video":false,"creation_date":"2022-9-17","name":"1002.png"},"1001-b.png":{"src":"images\\graphic_design\\1001-b.png","width":4224,"height":4290,"src_thumb":"images\\graphic_design\\_thumb_1001-b.jpg","is_video":false,"creation_date":"2022-9-15","name":"1001-b.png"},"sorted":[{"src":"images\\graphic_design\\1155-out.png","width":3840,"height":4710,"src_thumb":"images\\graphic_design\\_thumb_1155-out.jpg","is_video":false,"creation_date":"2023-2-16","name":"1155-out.png"},{"src":"images\\graphic_design\\1093.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1093.jpg","is_video":false,"creation_date":"2022-12-16","name":"1093.png"},{"src":"images\\graphic_design\\1090.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1090.jpg","is_video":false,"creation_date":"2022-12-13","name":"1090.png"},{"src":"images\\graphic_design\\1089.png","width":3584,"height":4684,"src_thumb":"images\\graphic_design\\_thumb_1089.jpg","is_video":false,"creation_date":"2022-12-12","name":"1089.png"},{"src":"images\\graphic_design\\1087_out.png","width":1887,"height":1880,"src_thumb":"images\\graphic_design\\_thumb_1087_out.jpg","is_video":false,"creation_date":"2022-12-10","name":"1087_out.png"},{"src":"images\\graphic_design\\1052_out.png","width":4320,"height":4320,"src_thumb":"images\\graphic_design\\_thumb_1052_out.jpg","is_video":false,"creation_date":"2022-11-5","name":"1052_out.png"},{"src":"images\\graphic_design\\1048_out.png","width":4290,"height":5400,"src_thumb":"images\\graphic_design\\_thumb_1048_out.jpg","is_video":false,"creation_date":"2022-11-1","name":"1048_out.png"},{"src":"images\\graphic_design\\1030_in.png","width":2540,"height":3525,"src_thumb":"images\\graphic_design\\_thumb_1030_in.jpg","is_video":false,"creation_date":"2022-10-14","name":"1030_in.png"},{"src":"images\\graphic_design\\1013_out.png","width":4096,"height":4092,"src_thumb":"images\\graphic_design\\_thumb_1013_out.jpg","is_video":false,"creation_date":"2022-9-27","name":"1013_out.png"},{"src":"images\\graphic_design\\1008_out.png","width":4000,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_1008_out.jpg","is_video":false,"creation_date":"2022-9-22","name":"1008_out.png"},{"src":"images\\graphic_design\\1007_out.png","width":3840,"height":3872,"src_thumb":"images\\graphic_design\\_thumb_1007_out.jpg","is_video":false,"creation_date":"2022-9-21","name":"1007_out.png"},{"src":"images\\graphic_design\\1006.png","width":3084,"height":4316,"src_thumb":"images\\graphic_design\\_thumb_1006.jpg","is_video":false,"creation_date":"2022-9-20","name":"1006.png"},{"src":"images\\graphic_design\\1005_out.png","width":2870,"height":4104,"src_thumb":"images\\graphic_design\\_thumb_1005_out.jpg","is_video":false,"creation_date":"2022-9-19","name":"1005_out.png"},{"src":"images\\graphic_design\\1004_out.png","width":2964,"height":4268,"src_thumb":"images\\graphic_design\\_thumb_1004_out.jpg","is_video":false,"creation_date":"2022-9-18","name":"1004_out.png"},{"src":"images\\graphic_design\\1002.png","width":3258,"height":4435,"src_thumb":"images\\graphic_design\\_thumb_1002.jpg","is_video":false,"creation_date":"2022-9-17","name":"1002.png"},{"src":"images\\graphic_design\\1001-b.png","width":4224,"height":4290,"src_thumb":"images\\graphic_design\\_thumb_1001-b.jpg","is_video":false,"creation_date":"2022-9-15","name":"1001-b.png"},{"src":"images\\graphic_design\\995_out.png","width":4416,"height":6092,"src_thumb":"images\\graphic_design\\_thumb_995_out.jpg","is_video":false,"creation_date":"2022-9-9","name":"995_out.png"},{"src":"images\\graphic_design\\940.png","width":2495,"height":3230,"src_thumb":"images\\graphic_design\\_thumb_940.jpg","is_video":false,"creation_date":"2022-7-16","name":"940.png"},{"src":"images\\graphic_design\\1x935_out.png","width":3402,"height":5222,"src_thumb":"images\\graphic_design\\_thumb_1x935_out.jpg","is_video":false,"creation_date":"2022-7-11","name":"1x935_out.png"},{"src":"images\\graphic_design\\934 out.png","width":5000,"height":3168,"src_thumb":"images\\graphic_design\\_thumb_934 out.jpg","is_video":false,"creation_date":"2022-7-10","name":"934 out.png"},{"src":"images\\graphic_design\\1x933.png","width":5000,"height":3182,"src_thumb":"images\\graphic_design\\_thumb_1x933.jpg","is_video":false,"creation_date":"2022-7-9","name":"1x933.png"},{"src":"images\\graphic_design\\1x929.png","width":5802,"height":8000,"src_thumb":"images\\graphic_design\\_thumb_1x929.jpg","is_video":false,"creation_date":"2022-7-6","name":"1x929.png"},{"src":"images\\graphic_design\\1x925 (1).png","width":2115,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_1x925 (1).jpg","is_video":false,"creation_date":"2022-7-2","name":"1x925 (1).png"},{"src":"images\\graphic_design\\919.png","width":2334,"height":3500,"src_thumb":"images\\graphic_design\\_thumb_919.jpg","is_video":false,"creation_date":"2022-6-25","name":"919.png"},{"src":"images\\graphic_design\\713-output.png","width":1920,"height":1080,"src_thumb":"images\\graphic_design\\_thumb_713-output.jpg","is_video":false,"creation_date":"2021-12-1","name":"713-output.png"},{"src":"images\\graphic_design\\593.png","width":4000,"height":4788,"src_thumb":"images\\graphic_design\\_thumb_593.jpg","is_video":false,"creation_date":"2021-8-3","name":"593.png"},{"src":"images\\graphic_design\\592-out.png","width":2256,"height":3300,"src_thumb":"images\\graphic_design\\_thumb_592-out.jpg","is_video":false,"creation_date":"2021-8-2","name":"592-out.png"},{"src":"images\\graphic_design\\591.png","width":2160,"height":3840,"src_thumb":"images\\graphic_design\\_thumb_591.jpg","is_video":false,"creation_date":"2021-8-1","name":"591.png"},{"src":"images\\graphic_design\\583-оут.png","width":1500,"height":1500,"src_thumb":"images\\graphic_design\\_thumb_583-оут.jpg","is_video":false,"creation_date":"2021-7-24","name":"583-оут.png"},{"src":"images\\graphic_design\\555.png","width":2319,"height":3000,"src_thumb":"images\\graphic_design\\_thumb_555.jpg","is_video":false,"creation_date":"2021-6-26","name":"555.png"},{"src":"images\\graphic_design\\499.png","width":3370,"height":4000,"src_thumb":"images\\graphic_design\\_thumb_499.jpg","is_video":false,"creation_date":"2021-5-1","name":"499.png"},{"src":"images\\graphic_design\\493.png","width":596,"height":657,"src_thumb":"","is_video":false,"creation_date":"2021-4-26","name":"493.png"}]},"generative_static":{"unknown.png":{"src":"images\\generative_static\\unknown.png","width":1254,"height":701,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},"unknown (9).png":{"src":"images\\generative_static\\unknown (9).png","width":578,"height":577,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (9).png"},"unknown (8).png":{"src":"images\\generative_static\\unknown (8).png","width":792,"height":807,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (8).png"},"unknown (7).png":{"src":"images\\generative_static\\unknown (7).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (7).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (7).png"},"unknown (6).png":{"src":"images\\generative_static\\unknown (6).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (6).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (6).png"},"unknown (5).png":{"src":"images\\generative_static\\unknown (5).png","width":2004,"height":901,"src_thumb":"images\\generative_static\\_thumb_unknown (5).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (5).png"},"unknown (4).png":{"src":"images\\generative_static\\unknown (4).png","width":1189,"height":729,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (4).png"},"unknown (3).png":{"src":"images\\generative_static\\unknown (3).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (3).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (3).png"},"unknown (2).png":{"src":"images\\generative_static\\unknown (2).png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (2).png"},"unknown (11).png":{"src":"images\\generative_static\\unknown (11).png","width":1270,"height":710,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (11).png"},"unknown (10).png":{"src":"images\\generative_static\\unknown (10).png","width":2000,"height":2000,"src_thumb":"images\\generative_static\\_thumb_unknown (10).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (10).png"},"unknown (1).png":{"src":"images\\generative_static\\unknown (1).png","width":800,"height":450,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (1).png"},"spectracer.png":{"src":"images\\generative_static\\spectracer.png","width":518,"height":493,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer.png"},"spectracer (5).png":{"src":"images\\generative_static\\spectracer (5).png","width":877,"height":490,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (5).png"},"spectracer (4).png":{"src":"images\\generative_static\\spectracer (4).png","width":558,"height":309,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (4).png"},"spectracer (3).png":{"src":"images\\generative_static\\spectracer (3).png","width":574,"height":449,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (3).png"},"spectracer (2).png":{"src":"images\\generative_static\\spectracer (2).png","width":795,"height":443,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (2).png"},"spectracer (1).png":{"src":"images\\generative_static\\spectracer (1).png","width":793,"height":442,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (1).png"},"S138LuQAAAABJRU5ErkJggg.png":{"src":"images\\generative_static\\S138LuQAAAABJRU5ErkJggg.png","width":1920,"height":1023,"src_thumb":"images\\generative_static\\_thumb_S138LuQAAAABJRU5ErkJggg.jpg","is_video":false,"creation_date":"2021-3-31","name":"S138LuQAAAABJRU5ErkJggg.png"},"P0y3BNk6U271AAAAAElFTkSuQmCC.png":{"src":"images\\generative_static\\P0y3BNk6U271AAAAAElFTkSuQmCC.png","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"P0y3BNk6U271AAAAAElFTkSuQmCC.png"},"image (29).png":{"src":"images\\generative_static\\image (29).png","width":890,"height":497,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (29).png"},"image (27).png":{"src":"images\\generative_static\\image (27).png","width":729,"height":404,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (27).png"},"image (26).png":{"src":"images\\generative_static\\image (26).png","width":1180,"height":660,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (26).png"},"image (25).png":{"src":"images\\generative_static\\image (25).png","width":1210,"height":673,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (25).png"},"idklol-out.png":{"src":"images\\generative_static\\idklol-out.png","width":2854,"height":2804,"src_thumb":"images\\generative_static\\_thumb_idklol-out.jpg","is_video":false,"creation_date":"2022-1-24","name":"idklol-out.png"},"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png":{"src":"images\\generative_static\\Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png","width":1920,"height":1080,"src_thumb":"images\\generative_static\\_thumb_Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.jpg","is_video":false,"creation_date":"2021-3-31","name":"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png"},"Ha2Ch0D.png":{"src":"images\\generative_static\\Ha2Ch0D.png","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"Ha2Ch0D.png"},"flowers.png":{"src":"images\\generative_static\\flowers.png","width":1055,"height":682,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"flowers.png"},"FJ5S5FKWQAMjtjO.png":{"src":"images\\generative_static\\FJ5S5FKWQAMjtjO.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_FJ5S5FKWQAMjtjO.jpg","is_video":false,"creation_date":"2023-8-15","name":"FJ5S5FKWQAMjtjO.png"},"FbPBBI7XkAIz10q.png":{"src":"images\\generative_static\\FbPBBI7XkAIz10q.png","width":680,"height":435,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"FbPBBI7XkAIz10q.png"},"F3mGHzuXwAAqOTA.png":{"src":"images\\generative_static\\F3mGHzuXwAAqOTA.png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-17","name":"F3mGHzuXwAAqOTA.png"},"767.png":{"src":"images\\generative_static\\767.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_767.jpg","is_video":false,"creation_date":"2022-1-24","name":"767.png"},"765.png":{"src":"images\\generative_static\\765.png","width":1400,"height":1860,"src_thumb":"images\\generative_static\\_thumb_765.jpg","is_video":false,"creation_date":"2023-8-15","name":"765.png"},"757-out.png":{"src":"images\\generative_static\\757-out.png","width":3000,"height":3000,"src_thumb":"images\\generative_static\\_thumb_757-out.jpg","is_video":false,"creation_date":"2022-1-14","name":"757-out.png"},"717.png":{"src":"images\\generative_static\\717.png","width":2488,"height":1440,"src_thumb":"images\\generative_static\\_thumb_717.jpg","is_video":false,"creation_date":"2021-12-5","name":"717.png"},"54.png":{"src":"images\\generative_static\\54.png","width":881,"height":496,"src_thumb":"","is_video":false,"creation_date":"2020-2-25","name":"54.png"},"172-a-toned.png":{"src":"images\\generative_static\\172-a-toned.png","width":893,"height":1374,"src_thumb":"","is_video":false,"creation_date":"2020-6-9","name":"172-a-toned.png"},"FR56Q9mWQAA7U4X.jpg":{"src":"images\\generative_static\\FR56Q9mWQAA7U4X.jpg","width":1000,"height":1834,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FR56Q9mWQAA7U4X.jpg"},"FbPBBI7XkAIz10q.jpg":{"src":"images\\generative_static\\FbPBBI7XkAIz10q.jpg","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbPBBI7XkAIz10q.jpg"},"FbBtUi9XoAEHFrV.jpg":{"src":"images\\generative_static\\FbBtUi9XoAEHFrV.jpg","width":1200,"height":675,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbBtUi9XoAEHFrV.jpg"},"3tycWV.jpg":{"src":"images\\generative_static\\3tycWV.jpg","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-8-25","name":"3tycWV.jpg"},"1XTPsDi.mp4":{"src":"images\\generative_static\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},"sorted":[{"src":"images\\generative_static\\F3mGHzuXwAAqOTA.png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-17","name":"F3mGHzuXwAAqOTA.png"},{"src":"images\\generative_static\\unknown (9).png","width":578,"height":577,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (9).png"},{"src":"images\\generative_static\\unknown (8).png","width":792,"height":807,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (8).png"},{"src":"images\\generative_static\\unknown (7).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (7).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (7).png"},{"src":"images\\generative_static\\unknown (6).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (6).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (6).png"},{"src":"images\\generative_static\\unknown (5).png","width":2004,"height":901,"src_thumb":"images\\generative_static\\_thumb_unknown (5).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (5).png"},{"src":"images\\generative_static\\unknown (4).png","width":1189,"height":729,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (4).png"},{"src":"images\\generative_static\\unknown (3).png","width":2560,"height":1440,"src_thumb":"images\\generative_static\\_thumb_unknown (3).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (3).png"},{"src":"images\\generative_static\\unknown (2).png","width":876,"height":836,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (2).png"},{"src":"images\\generative_static\\unknown (11).png","width":1270,"height":710,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (11).png"},{"src":"images\\generative_static\\unknown (10).png","width":2000,"height":2000,"src_thumb":"images\\generative_static\\_thumb_unknown (10).jpg","is_video":false,"creation_date":"2023-8-15","name":"unknown (10).png"},{"src":"images\\generative_static\\unknown (1).png","width":800,"height":450,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"unknown (1).png"},{"src":"images\\generative_static\\spectracer.png","width":518,"height":493,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer.png"},{"src":"images\\generative_static\\spectracer (5).png","width":877,"height":490,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (5).png"},{"src":"images\\generative_static\\spectracer (4).png","width":558,"height":309,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (4).png"},{"src":"images\\generative_static\\spectracer (3).png","width":574,"height":449,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (3).png"},{"src":"images\\generative_static\\spectracer (2).png","width":795,"height":443,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (2).png"},{"src":"images\\generative_static\\spectracer (1).png","width":793,"height":442,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"spectracer (1).png"},{"src":"images\\generative_static\\image (29).png","width":890,"height":497,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (29).png"},{"src":"images\\generative_static\\image (27).png","width":729,"height":404,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (27).png"},{"src":"images\\generative_static\\image (26).png","width":1180,"height":660,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (26).png"},{"src":"images\\generative_static\\image (25).png","width":1210,"height":673,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"image (25).png"},{"src":"images\\generative_static\\FJ5S5FKWQAMjtjO.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_FJ5S5FKWQAMjtjO.jpg","is_video":false,"creation_date":"2023-8-15","name":"FJ5S5FKWQAMjtjO.png"},{"src":"images\\generative_static\\765.png","width":1400,"height":1860,"src_thumb":"images\\generative_static\\_thumb_765.jpg","is_video":false,"creation_date":"2023-8-15","name":"765.png"},{"src":"images\\generative_static\\FR56Q9mWQAA7U4X.jpg","width":1000,"height":1834,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FR56Q9mWQAA7U4X.jpg"},{"src":"images\\generative_static\\FbPBBI7XkAIz10q.jpg","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbPBBI7XkAIz10q.jpg"},{"src":"images\\generative_static\\FbBtUi9XoAEHFrV.jpg","width":1200,"height":675,"src_thumb":"","is_video":false,"creation_date":"2023-8-15","name":"FbBtUi9XoAEHFrV.jpg"},{"src":"images\\generative_static\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},{"src":"images\\generative_static\\FbPBBI7XkAIz10q.png","width":680,"height":435,"src_thumb":"","is_video":false,"creation_date":"2023-8-12","name":"FbPBBI7XkAIz10q.png"},{"src":"images\\generative_static\\idklol-out.png","width":2854,"height":2804,"src_thumb":"images\\generative_static\\_thumb_idklol-out.jpg","is_video":false,"creation_date":"2022-1-24","name":"idklol-out.png"},{"src":"images\\generative_static\\767.png","width":2610,"height":1902,"src_thumb":"images\\generative_static\\_thumb_767.jpg","is_video":false,"creation_date":"2022-1-24","name":"767.png"},{"src":"images\\generative_static\\757-out.png","width":3000,"height":3000,"src_thumb":"images\\generative_static\\_thumb_757-out.jpg","is_video":false,"creation_date":"2022-1-14","name":"757-out.png"},{"src":"images\\generative_static\\717.png","width":2488,"height":1440,"src_thumb":"images\\generative_static\\_thumb_717.jpg","is_video":false,"creation_date":"2021-12-5","name":"717.png"},{"src":"images\\generative_static\\3tycWV.jpg","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-8-25","name":"3tycWV.jpg"},{"src":"images\\generative_static\\unknown.png","width":1254,"height":701,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"unknown.png"},{"src":"images\\generative_static\\S138LuQAAAABJRU5ErkJggg.png","width":1920,"height":1023,"src_thumb":"images\\generative_static\\_thumb_S138LuQAAAABJRU5ErkJggg.jpg","is_video":false,"creation_date":"2021-3-31","name":"S138LuQAAAABJRU5ErkJggg.png"},{"src":"images\\generative_static\\P0y3BNk6U271AAAAAElFTkSuQmCC.png","width":640,"height":360,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"P0y3BNk6U271AAAAAElFTkSuQmCC.png"},{"src":"images\\generative_static\\Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png","width":1920,"height":1080,"src_thumb":"images\\generative_static\\_thumb_Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.jpg","is_video":false,"creation_date":"2021-3-31","name":"Hhdk6NsUzCUWqcE4gnJieEEyKSKS8vt737P2VPffLRXxkbz7BZnD8Efmjz5R9f6P8CJBYa1YeaSScAAAAASUVORK5CYII.png"},{"src":"images\\generative_static\\Ha2Ch0D.png","width":1064,"height":681,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"Ha2Ch0D.png"},{"src":"images\\generative_static\\flowers.png","width":1055,"height":682,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"flowers.png"},{"src":"images\\generative_static\\172-a-toned.png","width":893,"height":1374,"src_thumb":"","is_video":false,"creation_date":"2020-6-9","name":"172-a-toned.png"},{"src":"images\\generative_static\\54.png","width":881,"height":496,"src_thumb":"","is_video":false,"creation_date":"2020-2-25","name":"54.png"}]},"noise_tex.webp":{"src":"images\\noise_tex.webp","width":720,"height":720,"src_thumb":"","is_video":false,"creation_date":"2023-8-9"},"generative_mograph":{"capture - 2021-02-23T161035.355.webm":{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.webm","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-2-23","name":"capture - 2021-02-23T161035.355.webm"},"capture (59).webm":{"src":"images\\generative_mograph\\capture (59).webm","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2020-11-17","name":"capture (59).webm"},"WQC0rBl.mp4":{"src":"images\\generative_mograph\\WQC0rBl.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"WQC0rBl.mp4"},"pOiFoUR.mp4":{"src":"images\\generative_mograph\\pOiFoUR.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"pOiFoUR.mp4"},"OUT (3).mp4":{"src":"images\\generative_mograph\\OUT (3).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (3).mp4"},"OUT (2).mp4":{"src":"images\\generative_mograph\\OUT (2).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (2).mp4"},"OUT (1).mp4":{"src":"images\\generative_mograph\\OUT (1).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (1).mp4"},"chrome_xOHw6iea45.mp4":{"src":"images\\generative_mograph\\chrome_xOHw6iea45.mp4","width":798,"height":442,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_xOHw6iea45.mp4"},"chrome_UDlKJV4jdZ.mp4":{"src":"images\\generative_mograph\\chrome_UDlKJV4jdZ.mp4","width":784,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_UDlKJV4jdZ.mp4"},"chrome_RazqupSsRS.mp4":{"src":"images\\generative_mograph\\chrome_RazqupSsRS.mp4","width":794,"height":440,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_RazqupSsRS.mp4"},"chrome_ibz88JN1To.mp4":{"src":"images\\generative_mograph\\chrome_ibz88JN1To.mp4","width":792,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_ibz88JN1To.mp4"},"chrome_foG6RANRoM.mp4":{"src":"images\\generative_mograph\\chrome_foG6RANRoM.mp4","width":874,"height":488,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_foG6RANRoM.mp4"},"capture - 2021-04-01T215056.436.mp4":{"src":"images\\generative_mograph\\capture - 2021-04-01T215056.436.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-04-01T215056.436.mp4"},"capture - 2021-02-24T174055.362.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-24T174055.362.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-24T174055.362.mp4"},"capture - 2021-02-23T161035.355.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T161035.355.mp4"},"capture - 2021-02-23T135750.665.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-23T135750.665.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T135750.665.mp4"},"capture - 2021-02-22T191650.873.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-22T191650.873.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-22T191650.873.mp4"},"capture - 2021-02-15T183608.531.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-15T183608.531.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-15T183608.531.mp4"},"capture - 2021-02-06T155448.767.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-06T155448.767.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-06T155448.767.mp4"},"capture - 2021-02-04T235908.915.mp4":{"src":"images\\generative_mograph\\capture - 2021-02-04T235908.915.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-04T235908.915.mp4"},"capture - 2021-01-25T215853.813.mp4":{"src":"images\\generative_mograph\\capture - 2021-01-25T215853.813.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-01-25T215853.813.mp4"},"capture (71).mp4":{"src":"images\\generative_mograph\\capture (71).mp4","width":800,"height":450,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (71).mp4"},"capture (61).mp4":{"src":"images\\generative_mograph\\capture (61).mp4","width":1100,"height":900,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (61).mp4"},"capture (60).mp4":{"src":"images\\generative_mograph\\capture (60).mp4","width":1100,"height":700,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (60).mp4"},"capture (51).mp4":{"src":"images\\generative_mograph\\capture (51).mp4","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (51).mp4"},"1XTPsDi.mp4":{"src":"images\\generative_mograph\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},"166.mp4":{"src":"images\\generative_mograph\\166.mp4","width":640,"height":400,"src_thumb":"","is_video":true,"creation_date":"2021-8-25","name":"166.mp4"},"soDroUS.gif":{"src":"images\\generative_mograph\\soDroUS.gif","width":500,"height":500,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"soDroUS.gif"},"129.gif":{"src":"images\\generative_mograph\\129.gif","width":400,"height":400,"src_thumb":"","is_video":false,"creation_date":"2020-4-26","name":"129.gif"},"126.gif":{"src":"images\\generative_mograph\\126.gif","width":256,"height":256,"src_thumb":"","is_video":false,"creation_date":"2020-4-23","name":"126.gif"},"123.gif":{"src":"images\\generative_mograph\\123.gif","width":512,"height":512,"src_thumb":"","is_video":false,"creation_date":"2020-4-20","name":"123.gif"},"sorted":[{"src":"images\\generative_mograph\\WQC0rBl.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"WQC0rBl.mp4"},{"src":"images\\generative_mograph\\pOiFoUR.mp4","width":960,"height":960,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"pOiFoUR.mp4"},{"src":"images\\generative_mograph\\OUT (3).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (3).mp4"},{"src":"images\\generative_mograph\\OUT (2).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (2).mp4"},{"src":"images\\generative_mograph\\OUT (1).mp4","width":900,"height":900,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"OUT (1).mp4"},{"src":"images\\generative_mograph\\chrome_xOHw6iea45.mp4","width":798,"height":442,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_xOHw6iea45.mp4"},{"src":"images\\generative_mograph\\chrome_UDlKJV4jdZ.mp4","width":784,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_UDlKJV4jdZ.mp4"},{"src":"images\\generative_mograph\\chrome_RazqupSsRS.mp4","width":794,"height":440,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_RazqupSsRS.mp4"},{"src":"images\\generative_mograph\\chrome_ibz88JN1To.mp4","width":792,"height":438,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_ibz88JN1To.mp4"},{"src":"images\\generative_mograph\\chrome_foG6RANRoM.mp4","width":874,"height":488,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"chrome_foG6RANRoM.mp4"},{"src":"images\\generative_mograph\\1XTPsDi.mp4","width":960,"height":536,"src_thumb":"","is_video":true,"creation_date":"2023-8-15","name":"1XTPsDi.mp4"},{"src":"images\\generative_mograph\\166.mp4","width":640,"height":400,"src_thumb":"","is_video":true,"creation_date":"2021-8-25","name":"166.mp4"},{"src":"images\\generative_mograph\\capture - 2021-04-01T215056.436.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-04-01T215056.436.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-24T174055.362.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-24T174055.362.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T161035.355.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-23T135750.665.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-23T135750.665.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-22T191650.873.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-22T191650.873.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-15T183608.531.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-15T183608.531.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-06T155448.767.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-06T155448.767.mp4"},{"src":"images\\generative_mograph\\capture - 2021-02-04T235908.915.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-02-04T235908.915.mp4"},{"src":"images\\generative_mograph\\capture - 2021-01-25T215853.813.mp4","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture - 2021-01-25T215853.813.mp4"},{"src":"images\\generative_mograph\\capture (71).mp4","width":800,"height":450,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (71).mp4"},{"src":"images\\generative_mograph\\capture (61).mp4","width":1100,"height":900,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (61).mp4"},{"src":"images\\generative_mograph\\capture (60).mp4","width":1100,"height":700,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (60).mp4"},{"src":"images\\generative_mograph\\capture (51).mp4","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2021-4-1","name":"capture (51).mp4"},{"src":"images\\generative_mograph\\soDroUS.gif","width":500,"height":500,"src_thumb":"","is_video":false,"creation_date":"2021-3-31","name":"soDroUS.gif"},{"src":"images\\generative_mograph\\capture - 2021-02-23T161035.355.webm","width":640,"height":360,"src_thumb":"","is_video":true,"creation_date":"2021-2-23","name":"capture - 2021-02-23T161035.355.webm"},{"src":"images\\generative_mograph\\capture (59).webm","width":1000,"height":1000,"src_thumb":"","is_video":true,"creation_date":"2020-11-17","name":"capture (59).webm"},{"src":"images\\generative_mograph\\129.gif","width":400,"height":400,"src_thumb":"","is_video":false,"creation_date":"2020-4-26","name":"129.gif"},{"src":"images\\generative_mograph\\126.gif","width":256,"height":256,"src_thumb":"","is_video":false,"creation_date":"2020-4-23","name":"126.gif"},{"src":"images\\generative_mograph\\123.gif","width":512,"height":512,"src_thumb":"","is_video":false,"creation_date":"2020-4-20","name":"123.gif"}]}},"blog":{"preview_pathtracing.png":{"src":"blog\\preview_pathtracing.png"},"vorpol_dawn_by_technochroma.jpg":{"src":"blog\\vorpol_dawn_by_technochroma.jpg"},"lyc-sketch.gif":{"src":"blog\\lyc-sketch.gif"}},"audio":{"moody":{"wip4e.mp3":{"src":"audio\\moody\\wip4e.mp3","creation_date":"2021-7-14","name":"wip4e.mp3"},"926.mp3":{"src":"audio\\moody\\926.mp3","creation_date":"2022-7-2","name":"926.mp3"},"691.mp3":{"src":"audio\\moody\\691.mp3","creation_date":"2021-11-9","name":"691.mp3"},"590.mp3":{"src":"audio\\moody\\590.mp3","creation_date":"2021-7-31","name":"590.mp3"},"574-radiator .mp3":{"src":"audio\\moody\\574-radiator .mp3","creation_date":"2021-7-14","name":"574-radiator .mp3"},"570 - mark thing wip.mp3":{"src":"audio\\moody\\570 - mark thing wip.mp3","creation_date":"2021-7-11","name":"570 - mark thing wip.mp3"},"524.mp3":{"src":"audio\\moody\\524.mp3","creation_date":"2021-5-26","name":"524.mp3"},"460.mp3":{"src":"audio\\moody\\460.mp3","creation_date":"2021-3-24","name":"460.mp3"},"256.mp3":{"src":"audio\\moody\\256.mp3","creation_date":"2020-9-1","name":"256.mp3"},"255-v2 - Copy.mp3":{"src":"audio\\moody\\255-v2 - Copy.mp3","creation_date":"2020-8-31","name":"255-v2 - Copy.mp3"},"1244 ok 2023-08-07 1915.mp3":{"src":"audio\\moody\\1244 ok 2023-08-07 1915.mp3","creation_date":"2023-8-7","name":"1244 ok 2023-08-07 1915.mp3"},"1188 2023-08-07 1946.mp3":{"src":"audio\\moody\\1188 2023-08-07 1946.mp3","creation_date":"2023-8-7","name":"1188 2023-08-07 1946.mp3"},"sorted":[{"src":"audio\\moody\\1244 ok 2023-08-07 1915.mp3","creation_date":"2023-8-7","name":"1244 ok 2023-08-07 1915.mp3"},{"src":"audio\\moody\\1188 2023-08-07 1946.mp3","creation_date":"2023-8-7","name":"1188 2023-08-07 1946.mp3"},{"src":"audio\\moody\\926.mp3","creation_date":"2022-7-2","name":"926.mp3"},{"src":"audio\\moody\\691.mp3","creation_date":"2021-11-9","name":"691.mp3"},{"src":"audio\\moody\\590.mp3","creation_date":"2021-7-31","name":"590.mp3"},{"src":"audio\\moody\\wip4e.mp3","creation_date":"2021-7-14","name":"wip4e.mp3"},{"src":"audio\\moody\\574-radiator .mp3","creation_date":"2021-7-14","name":"574-radiator .mp3"},{"src":"audio\\moody\\570 - mark thing wip.mp3","creation_date":"2021-7-11","name":"570 - mark thing wip.mp3"},{"src":"audio\\moody\\524.mp3","creation_date":"2021-5-26","name":"524.mp3"},{"src":"audio\\moody\\460.mp3","creation_date":"2021-3-24","name":"460.mp3"},{"src":"audio\\moody\\256.mp3","creation_date":"2020-9-1","name":"256.mp3"},{"src":"audio\\moody\\255-v2 - Copy.mp3","creation_date":"2020-8-31","name":"255-v2 - Copy.mp3"}]},"melodic":{"jajaja.mp3":{"src":"audio\\melodic\\jajaja.mp3","creation_date":"2020-6-8","name":"jajaja.mp3"},"932.mp3":{"src":"audio\\melodic\\932.mp3","creation_date":"2022-7-8","name":"932.mp3"},"927.mp3":{"src":"audio\\melodic\\927.mp3","creation_date":"2022-7-3","name":"927.mp3"},"797-b.mp3":{"src":"audio\\melodic\\797-b.mp3","creation_date":"2022-4-16","name":"797-b.mp3"},"730.mp3":{"src":"audio\\melodic\\730.mp3","creation_date":"2021-12-18","name":"730.mp3"},"692.mp3":{"src":"audio\\melodic\\692.mp3","creation_date":"2021-11-10","name":"692.mp3"},"690_unnoised.mp3":{"src":"audio\\melodic\\690_unnoised.mp3","creation_date":"2021-11-8","name":"690_unnoised.mp3"},"662.mp3":{"src":"audio\\melodic\\662.mp3","creation_date":"2021-10-12","name":"662.mp3"},"626.mp3":{"src":"audio\\melodic\\626.mp3","creation_date":"2021-9-5","name":"626.mp3"},"576-fuji-rmx.mp3":{"src":"audio\\melodic\\576-fuji-rmx.mp3","creation_date":"2021-7-17","name":"576-fuji-rmx.mp3"},"575-2k.mp3":{"src":"audio\\melodic\\575-2k.mp3","creation_date":"2021-7-15","name":"575-2k.mp3"},"527.mp3":{"src":"audio\\melodic\\527.mp3","creation_date":"2021-5-29","name":"527.mp3"},"481.mp3":{"src":"audio\\melodic\\481.mp3","creation_date":"2021-4-13","name":"481.mp3"},"465.mp3":{"src":"audio\\melodic\\465.mp3","creation_date":"2021-3-30","name":"465.mp3"},"236.mp3":{"src":"audio\\melodic\\236.mp3","creation_date":"2020-8-12","name":"236.mp3"},"222.mp3":{"src":"audio\\melodic\\222.mp3","creation_date":"2020-7-29","name":"222.mp3"},"219.mp3":{"src":"audio\\melodic\\219.mp3","creation_date":"2020-7-26","name":"219.mp3"},"138.mp3":{"src":"audio\\melodic\\138.mp3","creation_date":"2020-5-5","name":"138.mp3"},"1243.mp3":{"src":"audio\\melodic\\1243.mp3","creation_date":"2023-8-7","name":"1243.mp3"},"1140.mp3":{"src":"audio\\melodic\\1140.mp3","creation_date":"2023-2-1","name":"1140.mp3"},"1121.mp3":{"src":"audio\\melodic\\1121.mp3","creation_date":"2023-1-13","name":"1121.mp3"},"1071.mp3":{"src":"audio\\melodic\\1071.mp3","creation_date":"2022-11-27","name":"1071.mp3"},"1069.mp3":{"src":"audio\\melodic\\1069.mp3","creation_date":"2022-11-22","name":"1069.mp3"},"1034.mp3":{"src":"audio\\melodic\\1034.mp3","creation_date":"2022-10-18","name":"1034.mp3"},"1025.mp3":{"src":"audio\\melodic\\1025.mp3","creation_date":"2022-10-9","name":"1025.mp3"},"1021.mp3":{"src":"audio\\melodic\\1021.mp3","creation_date":"2022-10-5","name":"1021.mp3"},"sorted":[{"src":"audio\\melodic\\1243.mp3","creation_date":"2023-8-7","name":"1243.mp3"},{"src":"audio\\melodic\\1140.mp3","creation_date":"2023-2-1","name":"1140.mp3"},{"src":"audio\\melodic\\1121.mp3","creation_date":"2023-1-13","name":"1121.mp3"},{"src":"audio\\melodic\\1071.mp3","creation_date":"2022-11-27","name":"1071.mp3"},{"src":"audio\\melodic\\1069.mp3","creation_date":"2022-11-22","name":"1069.mp3"},{"src":"audio\\melodic\\1034.mp3","creation_date":"2022-10-18","name":"1034.mp3"},{"src":"audio\\melodic\\1025.mp3","creation_date":"2022-10-9","name":"1025.mp3"},{"src":"audio\\melodic\\1021.mp3","creation_date":"2022-10-5","name":"1021.mp3"},{"src":"audio\\melodic\\932.mp3","creation_date":"2022-7-8","name":"932.mp3"},{"src":"audio\\melodic\\927.mp3","creation_date":"2022-7-3","name":"927.mp3"},{"src":"audio\\melodic\\797-b.mp3","creation_date":"2022-4-16","name":"797-b.mp3"},{"src":"audio\\melodic\\730.mp3","creation_date":"2021-12-18","name":"730.mp3"},{"src":"audio\\melodic\\692.mp3","creation_date":"2021-11-10","name":"692.mp3"},{"src":"audio\\melodic\\690_unnoised.mp3","creation_date":"2021-11-8","name":"690_unnoised.mp3"},{"src":"audio\\melodic\\662.mp3","creation_date":"2021-10-12","name":"662.mp3"},{"src":"audio\\melodic\\626.mp3","creation_date":"2021-9-5","name":"626.mp3"},{"src":"audio\\melodic\\576-fuji-rmx.mp3","creation_date":"2021-7-17","name":"576-fuji-rmx.mp3"},{"src":"audio\\melodic\\575-2k.mp3","creation_date":"2021-7-15","name":"575-2k.mp3"},{"src":"audio\\melodic\\527.mp3","creation_date":"2021-5-29","name":"527.mp3"},{"src":"audio\\melodic\\481.mp3","creation_date":"2021-4-13","name":"481.mp3"},{"src":"audio\\melodic\\465.mp3","creation_date":"2021-3-30","name":"465.mp3"},{"src":"audio\\melodic\\236.mp3","creation_date":"2020-8-12","name":"236.mp3"},{"src":"audio\\melodic\\222.mp3","creation_date":"2020-7-29","name":"222.mp3"},{"src":"audio\\melodic\\219.mp3","creation_date":"2020-7-26","name":"219.mp3"},{"src":"audio\\melodic\\jajaja.mp3","creation_date":"2020-6-8","name":"jajaja.mp3"},{"src":"audio\\melodic\\138.mp3","creation_date":"2020-5-5","name":"138.mp3"}]},"chill":{"hmmm.mp3":{"src":"audio\\chill\\hmmm.mp3","creation_date":"2020-5-16","name":"hmmm.mp3"},"330.mp3":{"src":"audio\\chill\\330.mp3","creation_date":"2020-11-18","name":"330.mp3"},"319.mp3":{"src":"audio\\chill\\319.mp3","creation_date":"2020-11-4","name":"319.mp3"},"257-2.mp3":{"src":"audio\\chill\\257-2.mp3","creation_date":"2020-9-2","name":"257-2.mp3"},"244.mp3":{"src":"audio\\chill\\244.mp3","creation_date":"2020-8-20","name":"244.mp3"},"1180 2023-03-13 vcv.mp3":{"src":"audio\\chill\\1180 2023-03-13 vcv.mp3","creation_date":"2023-3-13","name":"1180 2023-03-13 vcv.mp3"},"1116-toomb-ludum-dare.mp3":{"src":"audio\\chill\\1116-toomb-ludum-dare.mp3","creation_date":"2023-1-8","name":"1116-toomb-ludum-dare.mp3"},"1099-toomb4.mp3":{"src":"audio\\chill\\1099-toomb4.mp3","creation_date":"2022-12-22","name":"1099-toomb4.mp3"},"1098-toomb3 (1).mp3":{"src":"audio\\chill\\1098-toomb3 (1).mp3","creation_date":"2022-12-21","name":"1098-toomb3 (1).mp3"},"1096-toomb2.mp3":{"src":"audio\\chill\\1096-toomb2.mp3","creation_date":"2022-12-19","name":"1096-toomb2.mp3"},"1095-toomb.mp3":{"src":"audio\\chill\\1095-toomb.mp3","creation_date":"2022-12-18","name":"1095-toomb.mp3"},"1014.mp3":{"src":"audio\\chill\\1014.mp3","creation_date":"2022-9-28","name":"1014.mp3"},"sorted":[{"src":"audio\\chill\\1180 2023-03-13 vcv.mp3","creation_date":"2023-3-13","name":"1180 2023-03-13 vcv.mp3"},{"src":"audio\\chill\\1116-toomb-ludum-dare.mp3","creation_date":"2023-1-8","name":"1116-toomb-ludum-dare.mp3"},{"src":"audio\\chill\\1099-toomb4.mp3","creation_date":"2022-12-22","name":"1099-toomb4.mp3"},{"src":"audio\\chill\\1098-toomb3 (1).mp3","creation_date":"2022-12-21","name":"1098-toomb3 (1).mp3"},{"src":"audio\\chill\\1096-toomb2.mp3","creation_date":"2022-12-19","name":"1096-toomb2.mp3"},{"src":"audio\\chill\\1095-toomb.mp3","creation_date":"2022-12-18","name":"1095-toomb.mp3"},{"src":"audio\\chill\\1014.mp3","creation_date":"2022-9-28","name":"1014.mp3"},{"src":"audio\\chill\\330.mp3","creation_date":"2020-11-18","name":"330.mp3"},{"src":"audio\\chill\\319.mp3","creation_date":"2020-11-4","name":"319.mp3"},{"src":"audio\\chill\\257-2.mp3","creation_date":"2020-9-2","name":"257-2.mp3"},{"src":"audio\\chill\\244.mp3","creation_date":"2020-8-20","name":"244.mp3"},{"src":"audio\\chill\\hmmm.mp3","creation_date":"2020-5-16","name":"hmmm.mp3"}]},"bass":{"836.mp3":{"src":"audio\\bass\\836.mp3","creation_date":"2022-4-3","name":"836.mp3"},"801.mp3":{"src":"audio\\bass\\801.mp3","creation_date":"2022-2-27","name":"801.mp3"},"642 other.mp3":{"src":"audio\\bass\\642 other.mp3","creation_date":"2021-9-22","name":"642 other.mp3"},"589.mp3":{"src":"audio\\bass\\589.mp3","creation_date":"2021-7-30","name":"589.mp3"},"560-v2.mp3":{"src":"audio\\bass\\560-v2.mp3","creation_date":"2021-7-1","name":"560-v2.mp3"},"515.mp3":{"src":"audio\\bass\\515.mp3","creation_date":"2021-5-17","name":"515.mp3"},"316.mp3":{"src":"audio\\bass\\316.mp3","creation_date":"2020-11-1","name":"316.mp3"},"309 not te4no.mp3":{"src":"audio\\bass\\309 not te4no.mp3","creation_date":"2020-10-24","name":"309 not te4no.mp3"},"254.mp3":{"src":"audio\\bass\\254.mp3","creation_date":"2020-8-30","name":"254.mp3"},"1187 2023-03-20 2255.mp3":{"src":"audio\\bass\\1187 2023-03-20 2255.mp3","creation_date":"2023-3-20","name":"1187 2023-03-20 2255.mp3"},"1162.mp3":{"src":"audio\\bass\\1162.mp3","creation_date":"2023-2-23","name":"1162.mp3"},"sorted":[{"src":"audio\\bass\\1187 2023-03-20 2255.mp3","creation_date":"2023-3-20","name":"1187 2023-03-20 2255.mp3"},{"src":"audio\\bass\\1162.mp3","creation_date":"2023-2-23","name":"1162.mp3"},{"src":"audio\\bass\\836.mp3","creation_date":"2022-4-3","name":"836.mp3"},{"src":"audio\\bass\\801.mp3","creation_date":"2022-2-27","name":"801.mp3"},{"src":"audio\\bass\\642 other.mp3","creation_date":"2021-9-22","name":"642 other.mp3"},{"src":"audio\\bass\\589.mp3","creation_date":"2021-7-30","name":"589.mp3"},{"src":"audio\\bass\\560-v2.mp3","creation_date":"2021-7-1","name":"560-v2.mp3"},{"src":"audio\\bass\\515.mp3","creation_date":"2021-5-17","name":"515.mp3"},{"src":"audio\\bass\\316.mp3","creation_date":"2020-11-1","name":"316.mp3"},{"src":"audio\\bass\\309 not te4no.mp3","creation_date":"2020-10-24","name":"309 not te4no.mp3"},{"src":"audio\\bass\\254.mp3","creation_date":"2020-8-30","name":"254.mp3"}]}}}};
 window.BLOG_POSTS = {"2023_08_18_forward_pathtracing_in_comp_shader":{"date":"2023-08-18","title":"3D (and 2D) forward pathtracing in a compute shader"},"2023_08_17_flame_fractals_in_comp_shader":{"date":"2023-08-17","title":"Rendering flame fractals with a compute shader"}};
+window.DARK_MODE = false;
 const app = new App_svelte({
     target: document.body,
     props: {},
