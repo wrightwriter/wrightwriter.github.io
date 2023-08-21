@@ -5243,12 +5243,13 @@ function create_fragment(ctx) {
 			video = dom_element("video");
 			attr_dev(video, "class", "lozad");
 			attr_dev(video, "data-src", /*src*/ ctx[0]);
-			video.loop = true;
-			video.autoplay = true;
-			video.muted = true;
-			add_location(video, file, -1, 1179);
+			video.loop = /*loop*/ ctx[3];
+			video.autoplay = /*autoplay*/ ctx[1];
+			video.muted = /*muted*/ ctx[2];
+			video.controls = /*controls*/ ctx[4];
+			add_location(video, file, -1, 1363);
 			attr_dev(div, "class", "video-container");
-			add_location(div, file, -1, 1148);
+			add_location(div, file, -1, 1332);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -5256,11 +5257,27 @@ function create_fragment(ctx) {
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
 			append_dev(div, video);
-			/*video_binding*/ ctx[2](video);
+			/*video_binding*/ ctx[6](video);
 		},
 		p: function update(ctx, [dirty]) {
 			if (dirty & /*src*/ 1) {
 				attr_dev(video, "data-src", /*src*/ ctx[0]);
+			}
+
+			if (dirty & /*loop*/ 8) {
+				prop_dev(video, "loop", /*loop*/ ctx[3]);
+			}
+
+			if (dirty & /*autoplay*/ 2) {
+				prop_dev(video, "autoplay", /*autoplay*/ ctx[1]);
+			}
+
+			if (dirty & /*muted*/ 4) {
+				prop_dev(video, "muted", /*muted*/ ctx[2]);
+			}
+
+			if (dirty & /*controls*/ 16) {
+				prop_dev(video, "controls", /*controls*/ ctx[4]);
 			}
 		},
 		i: utils_noop,
@@ -5270,7 +5287,7 @@ function create_fragment(ctx) {
 				detach_dev(div);
 			}
 
-			/*video_binding*/ ctx[2](null);
+			/*video_binding*/ ctx[6](null);
 		}
 	};
 
@@ -5290,6 +5307,10 @@ function instance($$self, $$props, $$invalidate) {
 	validate_slots('Video', slots, []);
 	let video_element;
 	let { src = "" } = $$props;
+	let { autoplay = true } = $$props;
+	let { muted = true } = $$props;
+	let { loop = true } = $$props;
+	let { controls = false } = $$props;
 
 	onDestroy(() => {
 		
@@ -5301,7 +5322,7 @@ function instance($$self, $$props, $$invalidate) {
 				if (entry.isIntersecting) {
 					try {
 						entry.target.play().then(() => {
-							$$invalidate(1, video_element.controls = false, video_element);
+							$$invalidate(5, video_element.controls = false, video_element);
 						}).catch(e => {
 							
 						});
@@ -5314,33 +5335,35 @@ function instance($$self, $$props, $$invalidate) {
 			});
 		}
 
-		const observer = new IntersectionObserver(handleVideoIntersection, {});
-		observer.observe(video_element);
+		if (autoplay) {
+			const observer = new IntersectionObserver(handleVideoIntersection, {});
+			observer.observe(video_element);
 
-		video_element.addEventListener(
-			'loadeddata',
-			function () {
-				if (video_element.paused) {
-					$$invalidate(1, video_element.controls = true, video_element);
+			video_element.addEventListener(
+				'loadeddata',
+				function () {
+					if (video_element.paused) {
+						$$invalidate(5, video_element.controls = true, video_element);
 
-					$$invalidate(
-						1,
-						video_element.parentElement.onclick = () => {
-							$$invalidate(1, video_element.controls = false, video_element);
+						$$invalidate(
+							5,
+							video_element.parentElement.onclick = () => {
+								$$invalidate(5, video_element.controls = false, video_element);
 
-							if (video_element.paused) {
-								video_element.play();
-							}
-						},
-						video_element
-					);
-				}
-			},
-			false
-		);
+								if (video_element.paused) {
+									video_element.play();
+								}
+							},
+							video_element
+						);
+					}
+				},
+				false
+			);
+		}
 	});
 
-	const writable_props = ['src'];
+	const writable_props = ['src', 'autoplay', 'muted', 'loop', 'controls'];
 
 	Object.keys($$props).forEach(key => {
 		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Video> was created with unknown prop '${key}'`);
@@ -5349,32 +5372,56 @@ function instance($$self, $$props, $$invalidate) {
 	function video_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			video_element = $$value;
-			$$invalidate(1, video_element);
+			$$invalidate(5, video_element);
 		});
 	}
 
 	$$self.$$set = $$props => {
 		if ('src' in $$props) $$invalidate(0, src = $$props.src);
+		if ('autoplay' in $$props) $$invalidate(1, autoplay = $$props.autoplay);
+		if ('muted' in $$props) $$invalidate(2, muted = $$props.muted);
+		if ('loop' in $$props) $$invalidate(3, loop = $$props.loop);
+		if ('controls' in $$props) $$invalidate(4, controls = $$props.controls);
 	};
 
-	$$self.$capture_state = () => ({ onDestroy: onDestroy, onMount: onMount, video_element, src });
+	$$self.$capture_state = () => ({
+		onDestroy: onDestroy,
+		onMount: onMount,
+		video_element,
+		src,
+		autoplay,
+		muted,
+		loop,
+		controls
+	});
 
 	$$self.$inject_state = $$props => {
-		if ('video_element' in $$props) $$invalidate(1, video_element = $$props.video_element);
+		if ('video_element' in $$props) $$invalidate(5, video_element = $$props.video_element);
 		if ('src' in $$props) $$invalidate(0, src = $$props.src);
+		if ('autoplay' in $$props) $$invalidate(1, autoplay = $$props.autoplay);
+		if ('muted' in $$props) $$invalidate(2, muted = $$props.muted);
+		if ('loop' in $$props) $$invalidate(3, loop = $$props.loop);
+		if ('controls' in $$props) $$invalidate(4, controls = $$props.controls);
 	};
 
 	if ($$props && "$$inject" in $$props) {
 		$$self.$inject_state($$props.$$inject);
 	}
 
-	return [src, video_element, video_binding];
+	return [src, autoplay, muted, loop, controls, video_element, video_binding];
 }
 
 class Video extends SvelteComponentDev {
 	constructor(options) {
 		super(options);
-		init(this, options, instance, create_fragment, safe_not_equal, { src: 0 });
+
+		init(this, options, instance, create_fragment, safe_not_equal, {
+			src: 0,
+			autoplay: 1,
+			muted: 2,
+			loop: 3,
+			controls: 4
+		});
 
 		dispatch_dev("SvelteRegisterComponent", {
 			component: this,
@@ -5389,6 +5436,38 @@ class Video extends SvelteComponentDev {
 	}
 
 	set src(value) {
+		throw new Error("<Video>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	get autoplay() {
+		throw new Error("<Video>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	set autoplay(value) {
+		throw new Error("<Video>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	get muted() {
+		throw new Error("<Video>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	set muted(value) {
+		throw new Error("<Video>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	get loop() {
+		throw new Error("<Video>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	set loop(value) {
+		throw new Error("<Video>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	get controls() {
+		throw new Error("<Video>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+	}
+
+	set controls(value) {
 		throw new Error("<Video>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
 	}
 }
@@ -7438,18 +7517,32 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 	let t177;
 	let video0;
 	let t178;
-	let video1;
+	let brb28;
 	let t179;
-	let video2;
+	let video1;
 	let t180;
-	let video3;
+	let brb29;
 	let t181;
-	let video4;
+	let video2;
 	let t182;
-	let video5;
+	let brb30;
 	let t183;
-	let image1;
+	let video3;
 	let t184;
+	let brb31;
+	let t185;
+	let video4;
+	let t186;
+	let brb32;
+	let t187;
+	let video5;
+	let t188;
+	let brb33;
+	let t189;
+	let image1;
+	let t190;
+	let brb34;
+	let t191;
 	let image2;
 	let current;
 
@@ -7501,56 +7594,68 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 
 	video0 = new Video_svelte({
 			props: {
-				src: "images/generative_mograph/chrome_WqJeO3gecm.mp4"
+				src: "/images/generative_mograph/chrome_WqJeO3gecm.mp4",
+				autoplay: false,
+				controls: true
 			},
 			$$inline: true
 		});
 
 	video1 = new Video_svelte({
 			props: {
-				src: "images/generative_mograph/vivaldi_r0PEmo85Q3.mp4"
+				src: "/images/generative_mograph/vivaldi_r0PEmo85Q3.mp4",
+				autoplay: false,
+				controls: true
 			},
 			$$inline: true
 		});
 
 	video2 = new Video_svelte({
 			props: {
-				src: "images/generative_mograph/chrome_yM83fEWe71.mp4"
+				src: "/images/generative_mograph/chrome_yM83fEWe71.mp4",
+				autoplay: false,
+				controls: true
 			},
 			$$inline: true
 		});
 
 	video3 = new Video_svelte({
 			props: {
-				src: "images/generative_mograph/chrome_Wb6pBvRRgB.mp4"
+				src: "/images/generative_mograph/chrome_Wb6pBvRRgB.mp4",
+				autoplay: false,
+				controls: true
 			},
 			$$inline: true
 		});
 
 	video4 = new Video_svelte({
 			props: {
-				src: "images/generative_mograph/chrome_c2bM8EGIdS.mp4"
+				src: "/images/generative_mograph/chrome_c2bM8EGIdS.mp4",
+				autoplay: false,
+				controls: true
 			},
 			$$inline: true
 		});
 
 	video5 = new Video_svelte({
 			props: {
-				src: "images/generative_mograph/chrome_4pKmSCfcQD.mp4"
+				src: "/images/generative_mograph/chrome_4pKmSCfcQD.mp4",
+				autoplay: false,
+				controls: true
 			},
 			$$inline: true
 		});
 
 	image1 = new Image_svelte({
 			props: {
-				src: "images/generative_mograph/image (29).png"
+				src: "/images/generative_static/image (29).png"
 			},
 			$$inline: true
 		});
 
 	image2 = new Image_svelte({
 			props: {
-				src: "images/generative_mograph/image (26).png"
+				src: "/images/generative_static/image (26).png"
 			},
 			$$inline: true
 		});
@@ -7861,18 +7966,32 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 			t177 = space();
 			create_component(video0.$$.fragment);
 			t178 = space();
-			create_component(video1.$$.fragment);
+			brb28 = dom_element("brb");
 			t179 = space();
-			create_component(video2.$$.fragment);
+			create_component(video1.$$.fragment);
 			t180 = space();
-			create_component(video3.$$.fragment);
+			brb29 = dom_element("brb");
 			t181 = space();
-			create_component(video4.$$.fragment);
+			create_component(video2.$$.fragment);
 			t182 = space();
-			create_component(video5.$$.fragment);
+			brb30 = dom_element("brb");
 			t183 = space();
-			create_component(image1.$$.fragment);
+			create_component(video3.$$.fragment);
 			t184 = space();
+			brb31 = dom_element("brb");
+			t185 = space();
+			create_component(video4.$$.fragment);
+			t186 = space();
+			brb32 = dom_element("brb");
+			t187 = space();
+			create_component(video5.$$.fragment);
+			t188 = space();
+			brb33 = dom_element("brb");
+			t189 = space();
+			create_component(image1.$$.fragment);
+			t190 = space();
+			brb34 = dom_element("brb");
+			t191 = space();
 			create_component(image2.$$.fragment);
 			add_location(brb0, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 18, 0, 813);
 			add_location(brb1, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 19, 0, 821);
@@ -8051,14 +8170,21 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 			add_location(brb23, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 294, 0, 32406);
 			attr_dev(pre5, "class", "language-glsl");
 			add_location(pre5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 295, 0, 32414);
-			add_location(brb24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 301, 1, 34485);
-			add_location(strong5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 302, 1, 34497);
-			add_location(h25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 302, 1, 34493);
-			add_location(brb25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 304, 2, 34531);
-			add_location(p19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 305, 2, 34539);
-			add_location(brb26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 307, 1, 34602);
-			add_location(p20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 309, 1, 34610);
-			add_location(brb27, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 310, 1, 34645);
+			add_location(brb24, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 300, 0, 34485);
+			add_location(strong5, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 301, 0, 34497);
+			add_location(h25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 301, 0, 34493);
+			add_location(brb25, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 302, 0, 34531);
+			add_location(p19, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 303, 0, 34539);
+			add_location(brb26, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 304, 0, 34602);
+			add_location(p20, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 305, 0, 34610);
+			add_location(brb27, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 306, 0, 34645);
+			add_location(brb28, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 308, 0, 34750);
+			add_location(brb29, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 310, 0, 34856);
+			add_location(brb30, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 313, 1, 34961);
+			add_location(brb31, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 315, 1, 35066);
+			add_location(brb32, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 318, 2, 35171);
+			add_location(brb33, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 321, 1, 35276);
+			add_location(brb34, _2023_08_17_flame_fractals_in_comp_shader_svelte_file, 324, 1, 35341);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -8320,18 +8446,32 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 			insert_dev(target, t177, anchor);
 			mount_component(video0, target, anchor);
 			insert_dev(target, t178, anchor);
-			mount_component(video1, target, anchor);
+			insert_dev(target, brb28, anchor);
 			insert_dev(target, t179, anchor);
-			mount_component(video2, target, anchor);
+			mount_component(video1, target, anchor);
 			insert_dev(target, t180, anchor);
-			mount_component(video3, target, anchor);
+			insert_dev(target, brb29, anchor);
 			insert_dev(target, t181, anchor);
-			mount_component(video4, target, anchor);
+			mount_component(video2, target, anchor);
 			insert_dev(target, t182, anchor);
-			mount_component(video5, target, anchor);
+			insert_dev(target, brb30, anchor);
 			insert_dev(target, t183, anchor);
-			mount_component(image1, target, anchor);
+			mount_component(video3, target, anchor);
 			insert_dev(target, t184, anchor);
+			insert_dev(target, brb31, anchor);
+			insert_dev(target, t185, anchor);
+			mount_component(video4, target, anchor);
+			insert_dev(target, t186, anchor);
+			insert_dev(target, brb32, anchor);
+			insert_dev(target, t187, anchor);
+			mount_component(video5, target, anchor);
+			insert_dev(target, t188, anchor);
+			insert_dev(target, brb33, anchor);
+			insert_dev(target, t189, anchor);
+			mount_component(image1, target, anchor);
+			insert_dev(target, t190, anchor);
+			insert_dev(target, brb34, anchor);
+			insert_dev(target, t191, anchor);
 			mount_component(image2, target, anchor);
 			current = true;
 		},
@@ -8532,12 +8672,26 @@ function _2023_08_17_flame_fractals_in_comp_shader_svelte_create_fragment(ctx) {
 				detach_dev(brb27);
 				detach_dev(t177);
 				detach_dev(t178);
+				detach_dev(brb28);
 				detach_dev(t179);
 				detach_dev(t180);
+				detach_dev(brb29);
 				detach_dev(t181);
 				detach_dev(t182);
+				detach_dev(brb30);
 				detach_dev(t183);
 				detach_dev(t184);
+				detach_dev(brb31);
+				detach_dev(t185);
+				detach_dev(t186);
+				detach_dev(brb32);
+				detach_dev(t187);
+				detach_dev(t188);
+				detach_dev(brb33);
+				detach_dev(t189);
+				detach_dev(t190);
+				detach_dev(brb34);
+				detach_dev(t191);
 			}
 
 			destroy_component(blogtitle, detaching);
@@ -9270,7 +9424,7 @@ const { console: NavBar_svelte_console_1 } = globals;
 const NavBar_svelte_file = "src\\components\\utils\\NavBar.svelte";
 
 function NavBar_svelte_add_css(target) {
-	append_styles(target, "svelte-1k1hygh", "#bar.svelte-1k1hygh.svelte-1k1hygh{width:100%;margin-top:1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;width:100%}#bar.svelte-1k1hygh #bar-left.svelte-1k1hygh{display:flex;flex-direction:column}#bar.svelte-1k1hygh mark.svelte-1k1hygh{background:var(--accent-dark)}#bar.svelte-1k1hygh .logo.svelte-1k1hygh{font-size:4rem;margin-left:1rem;height:fit-content;text-decoration:none}#bar.svelte-1k1hygh .logo.logo-behind.svelte-1k1hygh{position:absolute}#bar.svelte-1k1hygh .logo.hovered.svelte-1k1hygh{color:var(--accent-dark) !important}#bar.svelte-1k1hygh .logo.hovered.hover-effect-0.svelte-1k1hygh{animation:svelte-1k1hygh-glitch-anim3 10s infinite linear alternate-reverse}@keyframes svelte-1k1hygh-distort1{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0.5rem, 0rem)}25%{transform:translate(0.5rem, 1.5rem)}37.5%{transform:translate(0rem, 0.5rem)}50%{transform:translate(0.5rem, 0.5rem)}62.5%{transform:translate(0.5rem, 0rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0rem, 0.5rem)}100%{transform:translate(1.5rem, 0.5rem)}}@keyframes svelte-1k1hygh-distort2{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0rem, 0.5rem)}25%{transform:translate(1.5rem, 0.5rem)}37.5%{transform:translate(1.5rem, 0rem)}50%{transform:translate(1.5rem, 0.5rem)}62.5%{transform:translate(0rem, 1.5rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0.5rem, 0rem)}100%{transform:translate(0.5rem, 0.5rem)}}@keyframes svelte-1k1hygh-glitch-anim3{0%{clip:rect(0.8rem, 9999px, 3.5rem, 0);transform-origin:center}2%{clip:rect(3.4rem, 9999px, 2.5rem, 0);transform-origin:center}4%{clip:rect(2rem, 9999px, 2rem, 0);transform-origin:center}6%{clip:rect(2.8rem, 9999px, 3.5rem, 0);transform-origin:center}8%{clip:rect(0.5rem, 9999px, 3rem, 0);transform-origin:center}10%{clip:rect(2.5rem, 9999px, 5rem, 0);transform-origin:center}12%{clip:rect(3.7rem, 9999px, 4.5rem, 0);transform-origin:center}14%{clip:rect(4rem, 9999px, 1rem, 0);transform-origin:center}16%{clip:rect(3.3rem, 9999px, 2rem, 0);transform-origin:center}18%{clip:rect(3.7rem, 9999px, 2.5rem, 0);transform-origin:center}20%{clip:rect(3.8rem, 9999px, 3rem, 0);transform-origin:center}22%{clip:rect(2.7rem, 9999px, 4rem, 0);transform-origin:center}24%{clip:rect(3.1rem, 9999px, 0.5rem, 0);transform-origin:center}26%{clip:rect(0.4rem, 9999px, 5rem, 0);transform-origin:center}28%{clip:rect(1.3rem, 9999px, 2rem, 0);transform-origin:center}30%{clip:rect(2.7rem, 9999px, 3.5rem, 0);transform-origin:center}32%{clip:rect(2.7rem, 9999px, 4rem, 0);transform-origin:center}34%{clip:rect(3.9rem, 9999px, 2.5rem, 0);transform-origin:center}36%{clip:rect(3.1rem, 9999px, 3.5rem, 0);transform-origin:center}38%{clip:rect(2.1rem, 9999px, 4rem, 0);transform-origin:center}40%{clip:rect(0.1rem, 9999px, 1.5rem, 0);transform-origin:center}42%{clip:rect(2.1rem, 9999px, 5rem, 0);transform-origin:center}44%{clip:rect(1rem, 9999px, 1rem, 0);transform-origin:center}46%{clip:rect(3rem, 9999px, 1.5rem, 0);transform-origin:center}48%{clip:rect(2.9rem, 9999px, 3.5rem, 0);transform-origin:center}50%{clip:rect(3.5rem, 9999px, 0.5rem, 0);transform-origin:center}52%{clip:rect(1.1rem, 9999px, 3rem, 0);transform-origin:center}54%{clip:rect(3.1rem, 9999px, 2rem, 0);transform-origin:center}56%{clip:rect(1.4rem, 9999px, 0.5rem, 0);transform-origin:center}58%{clip:rect(2rem, 9999px, 3rem, 0);transform-origin:center}60%{clip:rect(1rem, 9999px, 1rem, 0);transform-origin:center}62%{clip:rect(1.8rem, 9999px, 5rem, 0);transform-origin:center}64%{clip:rect(4rem, 9999px, 2.5rem, 0);transform-origin:center}66%{clip:rect(2.9rem, 9999px, 3rem, 0);transform-origin:center}68%{clip:rect(1.6rem, 9999px, 5rem, 0);transform-origin:center}70%{clip:rect(0.2rem, 9999px, 0.5rem, 0);transform-origin:center}72%{clip:rect(3.7rem, 9999px, 2.5rem, 0);transform-origin:center}74%{clip:rect(2.9rem, 9999px, 2.5rem, 0);transform-origin:center}76%{clip:rect(2.6rem, 9999px, 3rem, 0);transform-origin:center}78%{clip:rect(3.8rem, 9999px, 0.5rem, 0);transform-origin:center}80%{clip:rect(2.8rem, 9999px, 5rem, 0);transform-origin:center}82%{clip:rect(1.6rem, 9999px, 4rem, 0);transform-origin:center}84%{clip:rect(1.5rem, 9999px, 2rem, 0);transform-origin:center}86%{clip:rect(1.9rem, 9999px, 4.5rem, 0);transform-origin:center}88%{clip:rect(3.4rem, 9999px, 5rem, 0);transform-origin:center}90%{clip:rect(0.4rem, 9999px, 4.5rem, 0);transform-origin:center}92%{clip:rect(1.1rem, 9999px, 3.5rem, 0);transform-origin:center}94%{clip:rect(2.4rem, 9999px, 4rem, 0);transform-origin:center}96%{clip:rect(0.1rem, 9999px, 5rem, 0);transform-origin:center}98%{clip:rect(3.4rem, 9999px, 3rem, 0);transform-origin:center}}@keyframes svelte-1k1hygh-cooool{0%{color:pink !important}2%{color:pink !important}4%{color:pink !important}6%{color:pink !important}8%{color:pink !important}10%{color:pink !important}12%{color:pink !important}14%{color:pink !important}16%{color:pink !important}18%{color:pink !important}20%{color:pink !important}22%{color:pink !important}24%{color:pink !important}26%{color:pink !important}28%{color:pink !important}30%{color:pink !important}32%{color:pink !important}34%{color:pink !important}36%{color:pink !important}38%{color:pink !important}40%{color:pink !important}42%{color:pink !important}44%{color:pink !important}46%{color:pink !important}48%{color:pink !important}50%{color:pink !important}52%{color:pink !important}54%{color:pink !important}56%{color:pink !important}58%{color:pink !important}60%{color:pink !important}62%{color:pink !important}64%{color:pink !important}66%{color:pink !important}68%{color:pink !important}70%{color:pink !important}72%{color:pink !important}74%{color:pink !important}76%{color:pink !important}78%{color:pink !important}80%{color:pink !important}82%{color:pink !important}84%{color:pink !important}86%{color:pink !important}88%{color:pink !important}90%{color:pink !important}92%{color:pink !important}94%{color:pink !important}96%{color:pink !important}98%{color:pink !important}}#bar.svelte-1k1hygh .logo.hovered.hover-effect-0.logo-behind-a.svelte-1k1hygh{color:#ff5500 !important;animation:svelte-1k1hygh-distort1 300ms linear infinite, svelte-1k1hygh-glitch-anim3 5s infinite linear alternate-reverse, svelte-1k1hygh-cooool 5s infinite linear alternate-reverse}#bar.svelte-1k1hygh .logo.hovered.hover-effect-0.logo-behind-b.svelte-1k1hygh{color:#450f8b !important;animation:svelte-1k1hygh-distort2 300ms linear infinite, svelte-1k1hygh-glitch-anim3 3s infinite linear alternate-reverse}#bar.svelte-1k1hygh .logo.hover-effect-1.svelte-1k1hygh{animation:svelte-1k1hygh-glitch-skew 1s infinite linear alternate-reverse}@keyframes svelte-1k1hygh-glitch-anim{0%{clip:rect(1.1rem, 9999px, 2rem, 0);transform:skew(2deg);z-index:2}2%{clip:rect(0.6rem, 9999px, 1rem, 0);transform:skew(3.4deg);z-index:3}4%{clip:rect(2.2rem, 9999px, 0.5rem, 0);transform:skew(8.1deg);z-index:1}6%{clip:rect(3.9rem, 9999px, 4.5rem, 0);transform:skew(2.5deg);z-index:3}8%{clip:rect(0.2rem, 9999px, 1.5rem, 0);transform:skew(7.3deg);z-index:3}10%{clip:rect(0.6rem, 9999px, 0.5rem, 0);transform:skew(0.7deg);z-index:4}12%{clip:rect(0.4rem, 9999px, 1.5rem, 0);transform:skew(0.5deg);z-index:3}14%{clip:rect(2.7rem, 9999px, 4.5rem, 0);transform:skew(10deg);z-index:2}16%{clip:rect(0.8rem, 9999px, 1rem, 0);transform:skew(2deg);z-index:3}18%{clip:rect(0.7rem, 9999px, 5rem, 0);transform:skew(3.5deg);z-index:2}20%{clip:rect(1.3rem, 9999px, 5rem, 0);transform:skew(5.6deg);z-index:3}22%{clip:rect(3.7rem, 9999px, 2rem, 0);transform:skew(8.7deg);z-index:1}24%{clip:rect(0.5rem, 9999px, 3.5rem, 0);transform:skew(4.9deg);z-index:1}26%{clip:rect(1.6rem, 9999px, 1.5rem, 0);transform:skew(1.5deg);z-index:1}28%{clip:rect(0.9rem, 9999px, 3.5rem, 0);transform:skew(5.3deg);z-index:4}30%{clip:rect(2.6rem, 9999px, 3.5rem, 0);transform:skew(9.8deg);z-index:1}32%{clip:rect(1.5rem, 9999px, 4.5rem, 0);transform:skew(0.4deg);z-index:3}34%{clip:rect(1.1rem, 9999px, 5rem, 0);transform:skew(2.2deg);z-index:1}36%{clip:rect(2rem, 9999px, 1.5rem, 0);transform:skew(0.4deg);z-index:2}38%{clip:rect(2.3rem, 9999px, 5rem, 0);transform:skew(4.5deg);z-index:3}40%{clip:rect(0.8rem, 9999px, 3.5rem, 0);transform:skew(0.5deg);z-index:4}42%{clip:rect(4rem, 9999px, 4rem, 0);transform:skew(3.9deg);z-index:2}44%{clip:rect(0.7rem, 9999px, 5rem, 0);transform:skew(2.9deg);z-index:3}46%{clip:rect(1.4rem, 9999px, 4.5rem, 0);transform:skew(6.9deg);z-index:2}48%{clip:rect(4rem, 9999px, 4.5rem, 0);transform:skew(4.7deg);z-index:4}50%{clip:rect(0.2rem, 9999px, 3rem, 0);transform:skew(0.4deg);z-index:1}52%{clip:rect(2.2rem, 9999px, 2rem, 0);transform:skew(6.3deg);z-index:2}54%{clip:rect(0.4rem, 9999px, 3.5rem, 0);transform:skew(2.2deg);z-index:4}56%{clip:rect(0.1rem, 9999px, 3rem, 0);transform:skew(6.8deg);z-index:3}58%{clip:rect(0.1rem, 9999px, 4rem, 0);transform:skew(1.3deg);z-index:3}60%{clip:rect(3.6rem, 9999px, 0.5rem, 0);transform:skew(0.2deg);z-index:2}62%{clip:rect(1rem, 9999px, 4.5rem, 0);transform:skew(1.3deg);z-index:3}64%{clip:rect(0.2rem, 9999px, 0.5rem, 0);transform:skew(7.4deg);z-index:1}66%{clip:rect(0.1rem, 9999px, 5rem, 0);transform:skew(5.1deg);z-index:2}68%{clip:rect(0.9rem, 9999px, 2.5rem, 0);transform:skew(4.1deg);z-index:3}70%{clip:rect(3.5rem, 9999px, 3.5rem, 0);transform:skew(2.6deg);z-index:4}72%{clip:rect(1.4rem, 9999px, 4rem, 0);transform:skew(6.5deg);z-index:1}74%{clip:rect(0.1rem, 9999px, 3.5rem, 0);transform:skew(5.1deg);z-index:3}76%{clip:rect(2.3rem, 9999px, 0.5rem, 0);transform:skew(5deg);z-index:3}78%{clip:rect(1.8rem, 9999px, 4.5rem, 0);transform:skew(4.4deg);z-index:3}80%{clip:rect(1.6rem, 9999px, 1.5rem, 0);transform:skew(6.5deg);z-index:2}82%{clip:rect(3.3rem, 9999px, 4rem, 0);transform:skew(0.5deg);z-index:3}84%{clip:rect(0.4rem, 9999px, 3rem, 0);transform:skew(0.3deg);z-index:2}86%{clip:rect(0.8rem, 9999px, 2.5rem, 0);transform:skew(5deg);z-index:1}88%{clip:rect(2.7rem, 9999px, 5rem, 0);transform:skew(6.1deg);z-index:3}90%{clip:rect(1.5rem, 9999px, 1.5rem, 0);transform:skew(6deg);z-index:2}92%{clip:rect(2rem, 9999px, 2rem, 0);transform:skew(0.4deg);z-index:4}94%{clip:rect(0.1rem, 9999px, 5rem, 0);transform:skew(7.7deg);z-index:3}96%{clip:rect(0.9rem, 9999px, 2rem, 0);transform:skew(0.7deg);z-index:4}98%{clip:rect(2.4rem, 9999px, 4rem, 0);transform:skew(3.8deg);z-index:1}}@keyframes svelte-1k1hygh-glitch-anim2{0%{clip:rect(0.2rem, 99999px, 3.9rem, 0)}0.6666666667%{clip:rect(0.16rem, 99999px, 2.7rem, 0)}1.3333333333%{clip:rect(0.04rem, 99999px, 5.4rem, 0)}2%{clip:rect(0.18rem, 99999px, 4.2rem, 0)}2.6666666667%{clip:rect(0.04rem, 99999px, 2.1rem, 0)}3.3333333333%{clip:rect(0.08rem, 99999px, 3.1rem, 0)}4%{clip:rect(0.1rem, 99999px, 4.2rem, 0)}4.6666666667%{clip:rect(0.08rem, 99999px, 3.2rem, 0)}5.3333333333%{clip:rect(0.02rem, 99999px, 7.7rem, 0)}6%{clip:rect(0.18rem, 99999px, 7rem, 0)}6.6666666667%{clip:rect(0.12rem, 99999px, 2.5rem, 0)}7.3333333333%{clip:rect(0.2rem, 99999px, 6.9rem, 0)}8%{clip:rect(0.16rem, 99999px, 8.8rem, 0)}8.6666666667%{clip:rect(0.02rem, 99999px, 9rem, 0)}9.3333333333%{clip:rect(0.04rem, 99999px, 1.5rem, 0)}10%{clip:rect(0.2rem, 99999px, 8.1rem, 0)}10.6666666667%{clip:rect(0.14rem, 99999px, 9.5rem, 0)}11.3333333333%{clip:rect(0.08rem, 99999px, 5.4rem, 0)}12%{clip:rect(0.08rem, 99999px, 6rem, 0)}12.6666666667%{clip:rect(0.12rem, 99999px, 3.6rem, 0)}13.3333333333%{clip:rect(0.08rem, 99999px, 1rem, 0)}14%{clip:rect(0.1rem, 99999px, 5.6rem, 0)}14.6666666667%{clip:rect(0.02rem, 99999px, 1.1rem, 0)}15.3333333333%{clip:rect(0.06rem, 99999px, 2rem, 0)}16%{clip:rect(0.02rem, 99999px, 1.6rem, 0)}16.6666666667%{clip:rect(0.02rem, 99999px, 1.7rem, 0)}17.3333333333%{clip:rect(0.08rem, 99999px, 2.7rem, 0)}18%{clip:rect(0.08rem, 99999px, 6.8rem, 0)}18.6666666667%{clip:rect(0.02rem, 99999px, 8.2rem, 0)}19.3333333333%{clip:rect(0.02rem, 99999px, 8.2rem, 0)}20%{clip:rect(0.08rem, 99999px, 4.8rem, 0)}20.6666666667%{clip:rect(0.1rem, 99999px, 7.9rem, 0)}21.3333333333%{clip:rect(0.1rem, 99999px, 7.4rem, 0)}22%{clip:rect(0.1rem, 99999px, 1rem, 0)}22.6666666667%{clip:rect(0.2rem, 99999px, 8.4rem, 0)}23.3333333333%{clip:rect(0.14rem, 99999px, 2.8rem, 0)}24%{clip:rect(0.1rem, 99999px, 0.9rem, 0)}24.6666666667%{clip:rect(0.08rem, 99999px, 5.9rem, 0)}25.3333333333%{clip:rect(0.12rem, 99999px, 6.6rem, 0)}26%{clip:rect(0.18rem, 99999px, 0.3rem, 0)}26.6666666667%{clip:rect(0.06rem, 99999px, 7.4rem, 0)}27.3333333333%{clip:rect(0.02rem, 99999px, 1.8rem, 0)}28%{clip:rect(0.06rem, 99999px, 10rem, 0)}28.6666666667%{clip:rect(0.18rem, 99999px, 8rem, 0)}29.3333333333%{clip:rect(0.16rem, 99999px, 2.9rem, 0)}30%{clip:rect(0.04rem, 99999px, 4.4rem, 0)}30.6666666667%{clip:rect(0.02rem, 99999px, 8.3rem, 0)}31.3333333333%{clip:rect(0.12rem, 99999px, 1.4rem, 0)}32%{clip:rect(0.02rem, 99999px, 4.1rem, 0)}32.6666666667%{clip:rect(0.1rem, 99999px, 4.3rem, 0)}33.3333333333%{clip:rect(0.02rem, 99999px, 5.1rem, 0)}34%{clip:rect(0.06rem, 99999px, 6.9rem, 0)}34.6666666667%{clip:rect(0.14rem, 99999px, 4.7rem, 0)}35.3333333333%{clip:rect(0.08rem, 99999px, 0.2rem, 0)}36%{clip:rect(0.18rem, 99999px, 5rem, 0)}36.6666666667%{clip:rect(0.14rem, 99999px, 0.8rem, 0)}37.3333333333%{clip:rect(0.16rem, 99999px, 3.3rem, 0)}38%{clip:rect(0.04rem, 99999px, 9.6rem, 0)}38.6666666667%{clip:rect(0.14rem, 99999px, 8.6rem, 0)}39.3333333333%{clip:rect(0.04rem, 99999px, 9.7rem, 0)}40%{clip:rect(0.06rem, 99999px, 4.6rem, 0)}40.6666666667%{clip:rect(0.2rem, 99999px, 5.7rem, 0)}41.3333333333%{clip:rect(0.14rem, 99999px, 3.2rem, 0)}42%{clip:rect(0.04rem, 99999px, 1.9rem, 0)}42.6666666667%{clip:rect(0.1rem, 99999px, 6.4rem, 0)}43.3333333333%{clip:rect(0.14rem, 99999px, 7.4rem, 0)}44%{clip:rect(0.18rem, 99999px, 1.5rem, 0)}44.6666666667%{clip:rect(0.06rem, 99999px, 4.3rem, 0)}45.3333333333%{clip:rect(0.02rem, 99999px, 1.9rem, 0)}46%{clip:rect(0.16rem, 99999px, 0.3rem, 0)}46.6666666667%{clip:rect(0.2rem, 99999px, 9.2rem, 0)}47.3333333333%{clip:rect(0.1rem, 99999px, 0.2rem, 0)}48%{clip:rect(0.08rem, 99999px, 9.5rem, 0)}48.6666666667%{clip:rect(0.12rem, 99999px, 8.9rem, 0)}49.3333333333%{clip:rect(0.12rem, 99999px, 8.1rem, 0)}50%{clip:rect(0.12rem, 99999px, 6.3rem, 0)}50.6666666667%{clip:rect(0.12rem, 99999px, 3.9rem, 0)}51.3333333333%{clip:rect(0.06rem, 99999px, 6.7rem, 0)}52%{clip:rect(0.02rem, 99999px, 6.6rem, 0)}52.6666666667%{clip:rect(0.02rem, 99999px, 3.7rem, 0)}53.3333333333%{clip:rect(0.1rem, 99999px, 3.5rem, 0)}54%{clip:rect(0.1rem, 99999px, 3.2rem, 0)}54.6666666667%{clip:rect(0.18rem, 99999px, 3.8rem, 0)}55.3333333333%{clip:rect(0.16rem, 99999px, 9.3rem, 0)}56%{clip:rect(0.02rem, 99999px, 3rem, 0)}56.6666666667%{clip:rect(0.16rem, 99999px, 1.6rem, 0)}57.3333333333%{clip:rect(0.04rem, 99999px, 1.3rem, 0)}58%{clip:rect(0.16rem, 99999px, 2.9rem, 0)}58.6666666667%{clip:rect(0.12rem, 99999px, 8.1rem, 0)}59.3333333333%{clip:rect(0.2rem, 99999px, 0.8rem, 0)}60%{clip:rect(0.1rem, 99999px, 3.1rem, 0)}60.6666666667%{clip:rect(0.04rem, 99999px, 9.3rem, 0)}61.3333333333%{clip:rect(0.18rem, 99999px, 1.5rem, 0)}62%{clip:rect(0.02rem, 99999px, 5.8rem, 0)}62.6666666667%{clip:rect(0.06rem, 99999px, 4.5rem, 0)}63.3333333333%{clip:rect(0.02rem, 99999px, 8.7rem, 0)}64%{clip:rect(0.2rem, 99999px, 4.8rem, 0)}64.6666666667%{clip:rect(0.08rem, 99999px, 5rem, 0)}65.3333333333%{clip:rect(0.04rem, 99999px, 1.5rem, 0)}66%{clip:rect(0.02rem, 99999px, 3.4rem, 0)}66.6666666667%{clip:rect(0.08rem, 99999px, 7.8rem, 0)}67.3333333333%{clip:rect(0.04rem, 99999px, 4.9rem, 0)}68%{clip:rect(0.12rem, 99999px, 3.5rem, 0)}68.6666666667%{clip:rect(0.16rem, 99999px, 4.9rem, 0)}69.3333333333%{clip:rect(0.16rem, 99999px, 1.5rem, 0)}70%{clip:rect(0.08rem, 99999px, 7.6rem, 0)}70.6666666667%{clip:rect(0.16rem, 99999px, 2.3rem, 0)}71.3333333333%{clip:rect(0.16rem, 99999px, 9.3rem, 0)}72%{clip:rect(0.04rem, 99999px, 7rem, 0)}72.6666666667%{clip:rect(0.14rem, 99999px, 7.2rem, 0)}73.3333333333%{clip:rect(0.06rem, 99999px, 3.4rem, 0)}74%{clip:rect(0.02rem, 99999px, 1.4rem, 0)}74.6666666667%{clip:rect(0.08rem, 99999px, 3.3rem, 0)}75.3333333333%{clip:rect(0.1rem, 99999px, 5.1rem, 0)}76%{clip:rect(0.06rem, 99999px, 2.4rem, 0)}76.6666666667%{clip:rect(0.16rem, 99999px, 1.8rem, 0)}77.3333333333%{clip:rect(0.16rem, 99999px, 10rem, 0)}78%{clip:rect(0.16rem, 99999px, 4.5rem, 0)}78.6666666667%{clip:rect(0.2rem, 99999px, 4.4rem, 0)}79.3333333333%{clip:rect(0.2rem, 99999px, 6.7rem, 0)}80%{clip:rect(0.2rem, 99999px, 5.2rem, 0)}80.6666666667%{clip:rect(0.04rem, 99999px, 7.7rem, 0)}81.3333333333%{clip:rect(0.06rem, 99999px, 7.2rem, 0)}82%{clip:rect(0.08rem, 99999px, 5.3rem, 0)}82.6666666667%{clip:rect(0.2rem, 99999px, 1.4rem, 0)}83.3333333333%{clip:rect(0.12rem, 99999px, 10rem, 0)}84%{clip:rect(0.1rem, 99999px, 5.8rem, 0)}84.6666666667%{clip:rect(0.02rem, 99999px, 7.6rem, 0)}85.3333333333%{clip:rect(0.1rem, 99999px, 8.2rem, 0)}86%{clip:rect(0.06rem, 99999px, 7.9rem, 0)}86.6666666667%{clip:rect(0.16rem, 99999px, 8.7rem, 0)}87.3333333333%{clip:rect(0.2rem, 99999px, 1.8rem, 0)}88%{clip:rect(0.2rem, 99999px, 1.5rem, 0)}88.6666666667%{clip:rect(0.16rem, 99999px, 2.2rem, 0)}89.3333333333%{clip:rect(0.16rem, 99999px, 4.7rem, 0)}90%{clip:rect(0.16rem, 99999px, 6.3rem, 0)}90.6666666667%{clip:rect(0.02rem, 99999px, 3.1rem, 0)}91.3333333333%{clip:rect(0.08rem, 99999px, 9.9rem, 0)}92%{clip:rect(0.12rem, 99999px, 6.9rem, 0)}92.6666666667%{clip:rect(0.14rem, 99999px, 9.4rem, 0)}93.3333333333%{clip:rect(0.12rem, 99999px, 8.4rem, 0)}94%{clip:rect(0.02rem, 99999px, 8.2rem, 0)}94.6666666667%{clip:rect(0.1rem, 99999px, 6.6rem, 0)}95.3333333333%{clip:rect(0.16rem, 99999px, 2.4rem, 0)}96%{clip:rect(0.14rem, 99999px, 1.6rem, 0)}96.6666666667%{clip:rect(0.08rem, 99999px, 4.3rem, 0)}97.3333333333%{clip:rect(0.12rem, 99999px, 3.7rem, 0)}98%{clip:rect(0.2rem, 99999px, 5.3rem, 0)}98.6666666667%{clip:rect(0.12rem, 99999px, 3.3rem, 0)}99.3333333333%{clip:rect(0.16rem, 99999px, 7.4rem, 0)}}@keyframes svelte-1k1hygh-glitch-skew{0%{transform:skew(3deg)}10%{transform:skew(5deg)}20%{transform:skew(0deg)}30%{transform:skew(-3deg)}40%{transform:skew(-1deg)}50%{transform:skew(3deg)}60%{transform:skew(0deg)}70%{transform:skew(-3deg)}80%{transform:skew(-2deg)}90%{transform:skew(-1deg)}}#bar.svelte-1k1hygh .logo.hover-effect-1.logo-behind-a.svelte-1k1hygh{color:var(--accent-light);transform:translateX(-0.5rem);color:#ff5500 !important;text-shadow:-2px 0 #ff5500, 2px 2px #ff5500;clip:rect(44px, 450px, 56px, 0);animation:svelte-1k1hygh-glitch-anim2 5s infinite linear alternate-reverse}#bar.svelte-1k1hygh .logo.hover-effect-1.logo-behind-b.svelte-1k1hygh{color:#bfcc2e !important;z-index:1;transform:translateX(0.2rem);text-shadow:-2px 0 #450f8b;clip:rect(44px, 450px, 56px, 0);animation:svelte-1k1hygh-glitch-anim 5s infinite linear alternate-reverse}#bar.svelte-1k1hygh .logo.logo-behind.svelte-1k1hygh{width:0px;height:0px;overflow:visible;pointer-events:none}#bar.svelte-1k1hygh .logo.logo-behind.svelte-1k1hygh:not(.hovered){display:none}#bar.svelte-1k1hygh #bar-right.svelte-1k1hygh{margin-left:auto;display:flex;margin-right:1rem;margin-top:1rem;position:relative}#bar.svelte-1k1hygh #bar-right #menus.svelte-1k1hygh{display:flex}#bar.svelte-1k1hygh #bar-right #menus #menu.svelte-1k1hygh{height:10rem;display:flex;flex-direction:column;justify-content:space-between;margin-right:1rem}#bar.svelte-1k1hygh #bar-right #menus #menu.svelte-1k1hygh .menu-item{font-weight:750;font-style:italic;width:fit-content}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTmF2QmFyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUE0Q2lCLG1DQUNqQixLQUFLLENBQUksSUFBQyxDQUNWLFVBQVUsQ0FBSSxJQUFHLENBQ2pCLGFBQVMsTUFDVCxPQUFRLENBQUcsSUFBQyxDQUNaLFNBQVUsS0FBTyxDQUNqQixLQUFLLENBQUksSUFDVCxDQUNBLG1CQUFJLENBQUMsd0JBQVUsQ0FDZixPQUFTLENBQUMsSUFBSyxDQUNmLGNBQWdCLENBQUMsTUFDakIsQ0FDQSxtQkFBSSxvQkFBSSxDQUNOLFVBQUssbUJBQ1AsQ0FDQSx5Q0FDQSxlQUNDLFdBQVksQ0FBQyxJQUNiLENBQ0EsTUFBTyxDQUFDLFdBQVUsQ0FDbEIsZUFBaUIsS0FFakIsQ0FJQSxtQkFBSSxpQ0FBeUIsQ0FFN0IsUUFBSSxTQUNKLENBQ0EsbUJBQUksNkJBQTJCLENBRS9CLEtBQUksa0JBQTBCLFlBRTlCLENBRUEseUJBQVMsc0NBQWtCLFVBQ3ZCLDRCQUFlLGFBQWMseUVBRy9CLFdBQWUsTUFBSyxVQUV0QixNQUdJLG9CQUFrQixhQUt0QixDQUVBLEdBQUksQ0FJSixTQUFhLFdBQU0scUJBRWxCLFVBQ0MsZUFBb0IsYUFHckIsVUFDSyxXQUFXLE1BQVEsRUFBRSxhQUl6QixVQUNHLFdBQWEsTUFBQyxxQkFJakIsQ0FBTyxVQUFLLE1BQVUsZUFFdkIsVUFDQyxXQUFnQixJQUFFLG1EQVFwQixDQUVBLFdBQVUsdUJBQVMsQ0FDbEIsR0FDRixtQ0FDQyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJOYXZCYXIuc3ZlbHRlIl19 */");
+	append_styles(target, "svelte-1xqe3af", "#bar.svelte-1xqe3af.svelte-1xqe3af{width:100%;margin-top:1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;width:100%}#bar.svelte-1xqe3af #bar-left.svelte-1xqe3af{display:flex;flex-direction:column}#bar.svelte-1xqe3af mark.svelte-1xqe3af{background:var(--accent-dark)}#bar.svelte-1xqe3af .logo.svelte-1xqe3af{font-size:4rem;margin-left:1rem;height:fit-content;text-decoration:none}#bar.svelte-1xqe3af .logo.logo-behind.svelte-1xqe3af{position:absolute}#bar.svelte-1xqe3af .logo.hovered.svelte-1xqe3af{color:var(--accent-dark) !important}#bar.svelte-1xqe3af .logo.hovered.hover-effect-0.svelte-1xqe3af{animation:svelte-1xqe3af-glitch-anim3 10s infinite linear alternate-reverse}@keyframes svelte-1xqe3af-distort1{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0.5rem, 0rem)}25%{transform:translate(0.5rem, 1.5rem)}37.5%{transform:translate(0rem, 0.5rem)}50%{transform:translate(0.5rem, 0.5rem)}62.5%{transform:translate(0.5rem, 0rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0rem, 0.5rem)}100%{transform:translate(1.5rem, 0.5rem)}}@keyframes svelte-1xqe3af-distort2{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0rem, 0.5rem)}25%{transform:translate(1.5rem, 0.5rem)}37.5%{transform:translate(1.5rem, 0rem)}50%{transform:translate(1.5rem, 0.5rem)}62.5%{transform:translate(0rem, 1.5rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0.5rem, 0rem)}100%{transform:translate(0.5rem, 0.5rem)}}@keyframes svelte-1xqe3af-glitch-anim3{0%{clip:rect(1rem, 9999px, 3.5rem, 0);transform-origin:center}2%{clip:rect(2.5rem, 9999px, 4rem, 0);transform-origin:center}4%{clip:rect(0.9rem, 9999px, 4.5rem, 0);transform-origin:center}6%{clip:rect(1.6rem, 9999px, 1rem, 0);transform-origin:center}8%{clip:rect(3rem, 9999px, 4.5rem, 0);transform-origin:center}10%{clip:rect(2.8rem, 9999px, 4.5rem, 0);transform-origin:center}12%{clip:rect(2.9rem, 9999px, 4rem, 0);transform-origin:center}14%{clip:rect(3.4rem, 9999px, 4.5rem, 0);transform-origin:center}16%{clip:rect(1.1rem, 9999px, 0.5rem, 0);transform-origin:center}18%{clip:rect(3.6rem, 9999px, 1rem, 0);transform-origin:center}20%{clip:rect(3rem, 9999px, 5rem, 0);transform-origin:center}22%{clip:rect(1.5rem, 9999px, 2.5rem, 0);transform-origin:center}24%{clip:rect(0.7rem, 9999px, 1rem, 0);transform-origin:center}26%{clip:rect(0.7rem, 9999px, 2.5rem, 0);transform-origin:center}28%{clip:rect(1.3rem, 9999px, 3rem, 0);transform-origin:center}30%{clip:rect(1.3rem, 9999px, 2.5rem, 0);transform-origin:center}32%{clip:rect(1rem, 9999px, 4rem, 0);transform-origin:center}34%{clip:rect(3.4rem, 9999px, 1rem, 0);transform-origin:center}36%{clip:rect(3.6rem, 9999px, 0.5rem, 0);transform-origin:center}38%{clip:rect(2.3rem, 9999px, 1.5rem, 0);transform-origin:center}40%{clip:rect(1.1rem, 9999px, 2rem, 0);transform-origin:center}42%{clip:rect(3.2rem, 9999px, 1rem, 0);transform-origin:center}44%{clip:rect(1.6rem, 9999px, 1.5rem, 0);transform-origin:center}46%{clip:rect(1.2rem, 9999px, 5rem, 0);transform-origin:center}48%{clip:rect(3.4rem, 9999px, 2rem, 0);transform-origin:center}50%{clip:rect(3.9rem, 9999px, 3.5rem, 0);transform-origin:center}52%{clip:rect(0.2rem, 9999px, 3rem, 0);transform-origin:center}54%{clip:rect(0.9rem, 9999px, 0.5rem, 0);transform-origin:center}56%{clip:rect(0.4rem, 9999px, 0.5rem, 0);transform-origin:center}58%{clip:rect(4rem, 9999px, 3.5rem, 0);transform-origin:center}60%{clip:rect(2.4rem, 9999px, 1rem, 0);transform-origin:center}62%{clip:rect(0.9rem, 9999px, 3rem, 0);transform-origin:center}64%{clip:rect(2.8rem, 9999px, 3.5rem, 0);transform-origin:center}66%{clip:rect(1.6rem, 9999px, 4.5rem, 0);transform-origin:center}68%{clip:rect(3.8rem, 9999px, 1rem, 0);transform-origin:center}70%{clip:rect(1.2rem, 9999px, 5rem, 0);transform-origin:center}72%{clip:rect(2rem, 9999px, 3.5rem, 0);transform-origin:center}74%{clip:rect(1.1rem, 9999px, 5rem, 0);transform-origin:center}76%{clip:rect(2.9rem, 9999px, 2.5rem, 0);transform-origin:center}78%{clip:rect(4rem, 9999px, 0.5rem, 0);transform-origin:center}80%{clip:rect(2.4rem, 9999px, 4rem, 0);transform-origin:center}82%{clip:rect(0.1rem, 9999px, 0.5rem, 0);transform-origin:center}84%{clip:rect(1.9rem, 9999px, 0.5rem, 0);transform-origin:center}86%{clip:rect(2.2rem, 9999px, 1.5rem, 0);transform-origin:center}88%{clip:rect(0.4rem, 9999px, 0.5rem, 0);transform-origin:center}90%{clip:rect(2.6rem, 9999px, 5rem, 0);transform-origin:center}92%{clip:rect(0.3rem, 9999px, 1.5rem, 0);transform-origin:center}94%{clip:rect(2.3rem, 9999px, 2.5rem, 0);transform-origin:center}96%{clip:rect(1.1rem, 9999px, 1.5rem, 0);transform-origin:center}98%{clip:rect(3.3rem, 9999px, 1.5rem, 0);transform-origin:center}}@keyframes svelte-1xqe3af-cooool{0%{color:pink !important}2%{color:pink !important}4%{color:pink !important}6%{color:pink !important}8%{color:pink !important}10%{color:pink !important}12%{color:pink !important}14%{color:pink !important}16%{color:pink !important}18%{color:pink !important}20%{color:pink !important}22%{color:pink !important}24%{color:pink !important}26%{color:pink !important}28%{color:pink !important}30%{color:pink !important}32%{color:pink !important}34%{color:pink !important}36%{color:pink !important}38%{color:pink !important}40%{color:pink !important}42%{color:pink !important}44%{color:pink !important}46%{color:pink !important}48%{color:pink !important}50%{color:pink !important}52%{color:pink !important}54%{color:pink !important}56%{color:pink !important}58%{color:pink !important}60%{color:pink !important}62%{color:pink !important}64%{color:pink !important}66%{color:pink !important}68%{color:pink !important}70%{color:pink !important}72%{color:pink !important}74%{color:pink !important}76%{color:pink !important}78%{color:pink !important}80%{color:pink !important}82%{color:pink !important}84%{color:pink !important}86%{color:pink !important}88%{color:pink !important}90%{color:pink !important}92%{color:pink !important}94%{color:pink !important}96%{color:pink !important}98%{color:pink !important}}#bar.svelte-1xqe3af .logo.hovered.hover-effect-0.logo-behind-a.svelte-1xqe3af{color:#ff5500 !important;animation:svelte-1xqe3af-distort1 300ms linear infinite, svelte-1xqe3af-glitch-anim3 5s infinite linear alternate-reverse, svelte-1xqe3af-cooool 5s infinite linear alternate-reverse}#bar.svelte-1xqe3af .logo.hovered.hover-effect-0.logo-behind-b.svelte-1xqe3af{color:#450f8b !important;animation:svelte-1xqe3af-distort2 300ms linear infinite, svelte-1xqe3af-glitch-anim3 3s infinite linear alternate-reverse}#bar.svelte-1xqe3af .logo.hover-effect-1.svelte-1xqe3af{animation:svelte-1xqe3af-glitch-skew 1s infinite linear alternate-reverse}@keyframes svelte-1xqe3af-glitch-anim{0%{clip:rect(1.7rem, 9999px, 1.5rem, 0);transform:skew(5.7deg);z-index:1}2%{clip:rect(0.9rem, 9999px, 4rem, 0);transform:skew(0.8deg);z-index:2}4%{clip:rect(3.6rem, 9999px, 5rem, 0);transform:skew(4.9deg);z-index:1}6%{clip:rect(1.1rem, 9999px, 4.5rem, 0);transform:skew(6.9deg);z-index:3}8%{clip:rect(0.8rem, 9999px, 4rem, 0);transform:skew(3.2deg);z-index:4}10%{clip:rect(2rem, 9999px, 2.5rem, 0);transform:skew(7.2deg);z-index:1}12%{clip:rect(3.8rem, 9999px, 3.5rem, 0);transform:skew(7.8deg);z-index:1}14%{clip:rect(1.1rem, 9999px, 2rem, 0);transform:skew(4.3deg);z-index:3}16%{clip:rect(2rem, 9999px, 4.5rem, 0);transform:skew(1.1deg);z-index:1}18%{clip:rect(3.7rem, 9999px, 1rem, 0);transform:skew(4.9deg);z-index:3}20%{clip:rect(2.2rem, 9999px, 4rem, 0);transform:skew(0.6deg);z-index:3}22%{clip:rect(3.3rem, 9999px, 2rem, 0);transform:skew(1.9deg);z-index:2}24%{clip:rect(0.2rem, 9999px, 5rem, 0);transform:skew(6.8deg);z-index:2}26%{clip:rect(3rem, 9999px, 1rem, 0);transform:skew(4.5deg);z-index:4}28%{clip:rect(2.5rem, 9999px, 2rem, 0);transform:skew(2.2deg);z-index:1}30%{clip:rect(0.8rem, 9999px, 1.5rem, 0);transform:skew(1.4deg);z-index:2}32%{clip:rect(2.7rem, 9999px, 2.5rem, 0);transform:skew(7.3deg);z-index:3}34%{clip:rect(3.5rem, 9999px, 0.5rem, 0);transform:skew(8.2deg);z-index:3}36%{clip:rect(2.3rem, 9999px, 3.5rem, 0);transform:skew(0.1deg);z-index:2}38%{clip:rect(4rem, 9999px, 2rem, 0);transform:skew(2.3deg);z-index:1}40%{clip:rect(2.9rem, 9999px, 2rem, 0);transform:skew(1.8deg);z-index:2}42%{clip:rect(2.5rem, 9999px, 4rem, 0);transform:skew(2.5deg);z-index:2}44%{clip:rect(3.7rem, 9999px, 2.5rem, 0);transform:skew(5.5deg);z-index:1}46%{clip:rect(1.6rem, 9999px, 2.5rem, 0);transform:skew(10deg);z-index:4}48%{clip:rect(1.8rem, 9999px, 2rem, 0);transform:skew(8.3deg);z-index:4}50%{clip:rect(0.8rem, 9999px, 1.5rem, 0);transform:skew(4.6deg);z-index:4}52%{clip:rect(0.8rem, 9999px, 1rem, 0);transform:skew(1deg);z-index:2}54%{clip:rect(1.7rem, 9999px, 2.5rem, 0);transform:skew(4.7deg);z-index:2}56%{clip:rect(0.8rem, 9999px, 0.5rem, 0);transform:skew(3.3deg);z-index:4}58%{clip:rect(2.8rem, 9999px, 3.5rem, 0);transform:skew(6.8deg);z-index:1}60%{clip:rect(4rem, 9999px, 2rem, 0);transform:skew(6deg);z-index:1}62%{clip:rect(3.6rem, 9999px, 3.5rem, 0);transform:skew(1.1deg);z-index:4}64%{clip:rect(3.1rem, 9999px, 2.5rem, 0);transform:skew(1.8deg);z-index:4}66%{clip:rect(0.9rem, 9999px, 1rem, 0);transform:skew(5.1deg);z-index:2}68%{clip:rect(3.2rem, 9999px, 5rem, 0);transform:skew(1.9deg);z-index:3}70%{clip:rect(3.6rem, 9999px, 0.5rem, 0);transform:skew(3.6deg);z-index:3}72%{clip:rect(1.4rem, 9999px, 4rem, 0);transform:skew(6.9deg);z-index:3}74%{clip:rect(1.3rem, 9999px, 4.5rem, 0);transform:skew(2.4deg);z-index:2}76%{clip:rect(3.6rem, 9999px, 1rem, 0);transform:skew(4.8deg);z-index:1}78%{clip:rect(3rem, 9999px, 0.5rem, 0);transform:skew(4.5deg);z-index:4}80%{clip:rect(3.1rem, 9999px, 5rem, 0);transform:skew(8.4deg);z-index:1}82%{clip:rect(3.9rem, 9999px, 2rem, 0);transform:skew(0.8deg);z-index:2}84%{clip:rect(0.3rem, 9999px, 2.5rem, 0);transform:skew(4.9deg);z-index:4}86%{clip:rect(1.8rem, 9999px, 2.5rem, 0);transform:skew(1deg);z-index:4}88%{clip:rect(3.9rem, 9999px, 3.5rem, 0);transform:skew(2deg);z-index:1}90%{clip:rect(0.8rem, 9999px, 5rem, 0);transform:skew(9.3deg);z-index:4}92%{clip:rect(3.7rem, 9999px, 3.5rem, 0);transform:skew(8.7deg);z-index:3}94%{clip:rect(1rem, 9999px, 2rem, 0);transform:skew(1.7deg);z-index:1}96%{clip:rect(2.4rem, 9999px, 3rem, 0);transform:skew(2.4deg);z-index:4}98%{clip:rect(2.6rem, 9999px, 4rem, 0);transform:skew(1.2deg);z-index:1}}@keyframes svelte-1xqe3af-glitch-anim2{0%{clip:rect(0.16rem, 99999px, 8.1rem, 0)}0.6666666667%{clip:rect(0.2rem, 99999px, 7.8rem, 0)}1.3333333333%{clip:rect(0.12rem, 99999px, 5.6rem, 0)}2%{clip:rect(0.14rem, 99999px, 2.9rem, 0)}2.6666666667%{clip:rect(0.06rem, 99999px, 6.8rem, 0)}3.3333333333%{clip:rect(0.12rem, 99999px, 5.6rem, 0)}4%{clip:rect(0.1rem, 99999px, 4.1rem, 0)}4.6666666667%{clip:rect(0.12rem, 99999px, 4.6rem, 0)}5.3333333333%{clip:rect(0.16rem, 99999px, 7.8rem, 0)}6%{clip:rect(0.16rem, 99999px, 1rem, 0)}6.6666666667%{clip:rect(0.04rem, 99999px, 5.8rem, 0)}7.3333333333%{clip:rect(0.16rem, 99999px, 1.5rem, 0)}8%{clip:rect(0.06rem, 99999px, 4.4rem, 0)}8.6666666667%{clip:rect(0.16rem, 99999px, 3.6rem, 0)}9.3333333333%{clip:rect(0.08rem, 99999px, 0.5rem, 0)}10%{clip:rect(0.06rem, 99999px, 7.3rem, 0)}10.6666666667%{clip:rect(0.1rem, 99999px, 3.4rem, 0)}11.3333333333%{clip:rect(0.06rem, 99999px, 8.9rem, 0)}12%{clip:rect(0.2rem, 99999px, 7.4rem, 0)}12.6666666667%{clip:rect(0.2rem, 99999px, 9rem, 0)}13.3333333333%{clip:rect(0.08rem, 99999px, 4rem, 0)}14%{clip:rect(0.18rem, 99999px, 4.6rem, 0)}14.6666666667%{clip:rect(0.18rem, 99999px, 1.7rem, 0)}15.3333333333%{clip:rect(0.08rem, 99999px, 7rem, 0)}16%{clip:rect(0.16rem, 99999px, 6.7rem, 0)}16.6666666667%{clip:rect(0.02rem, 99999px, 9.8rem, 0)}17.3333333333%{clip:rect(0.14rem, 99999px, 6.1rem, 0)}18%{clip:rect(0.02rem, 99999px, 9.2rem, 0)}18.6666666667%{clip:rect(0.18rem, 99999px, 3.9rem, 0)}19.3333333333%{clip:rect(0.06rem, 99999px, 8.4rem, 0)}20%{clip:rect(0.04rem, 99999px, 1.7rem, 0)}20.6666666667%{clip:rect(0.1rem, 99999px, 5.3rem, 0)}21.3333333333%{clip:rect(0.1rem, 99999px, 3.9rem, 0)}22%{clip:rect(0.1rem, 99999px, 0.4rem, 0)}22.6666666667%{clip:rect(0.18rem, 99999px, 2.9rem, 0)}23.3333333333%{clip:rect(0.2rem, 99999px, 0.8rem, 0)}24%{clip:rect(0.12rem, 99999px, 1.9rem, 0)}24.6666666667%{clip:rect(0.16rem, 99999px, 7.5rem, 0)}25.3333333333%{clip:rect(0.06rem, 99999px, 3.5rem, 0)}26%{clip:rect(0.1rem, 99999px, 2.8rem, 0)}26.6666666667%{clip:rect(0.1rem, 99999px, 9.2rem, 0)}27.3333333333%{clip:rect(0.16rem, 99999px, 7.5rem, 0)}28%{clip:rect(0.04rem, 99999px, 1.9rem, 0)}28.6666666667%{clip:rect(0.12rem, 99999px, 1.5rem, 0)}29.3333333333%{clip:rect(0.04rem, 99999px, 4.6rem, 0)}30%{clip:rect(0.06rem, 99999px, 4rem, 0)}30.6666666667%{clip:rect(0.16rem, 99999px, 3.5rem, 0)}31.3333333333%{clip:rect(0.1rem, 99999px, 7.2rem, 0)}32%{clip:rect(0.16rem, 99999px, 1.3rem, 0)}32.6666666667%{clip:rect(0.06rem, 99999px, 1.3rem, 0)}33.3333333333%{clip:rect(0.14rem, 99999px, 7.8rem, 0)}34%{clip:rect(0.16rem, 99999px, 3.7rem, 0)}34.6666666667%{clip:rect(0.06rem, 99999px, 1.2rem, 0)}35.3333333333%{clip:rect(0.2rem, 99999px, 9rem, 0)}36%{clip:rect(0.04rem, 99999px, 3.2rem, 0)}36.6666666667%{clip:rect(0.06rem, 99999px, 7.4rem, 0)}37.3333333333%{clip:rect(0.18rem, 99999px, 5.9rem, 0)}38%{clip:rect(0.18rem, 99999px, 3.5rem, 0)}38.6666666667%{clip:rect(0.06rem, 99999px, 2.8rem, 0)}39.3333333333%{clip:rect(0.2rem, 99999px, 4.8rem, 0)}40%{clip:rect(0.16rem, 99999px, 4.1rem, 0)}40.6666666667%{clip:rect(0.2rem, 99999px, 1.4rem, 0)}41.3333333333%{clip:rect(0.1rem, 99999px, 2.5rem, 0)}42%{clip:rect(0.02rem, 99999px, 6.4rem, 0)}42.6666666667%{clip:rect(0.1rem, 99999px, 9.9rem, 0)}43.3333333333%{clip:rect(0.2rem, 99999px, 0.8rem, 0)}44%{clip:rect(0.16rem, 99999px, 8.3rem, 0)}44.6666666667%{clip:rect(0.12rem, 99999px, 0.7rem, 0)}45.3333333333%{clip:rect(0.1rem, 99999px, 6.9rem, 0)}46%{clip:rect(0.14rem, 99999px, 4.8rem, 0)}46.6666666667%{clip:rect(0.18rem, 99999px, 0.5rem, 0)}47.3333333333%{clip:rect(0.02rem, 99999px, 4.6rem, 0)}48%{clip:rect(0.14rem, 99999px, 0.9rem, 0)}48.6666666667%{clip:rect(0.2rem, 99999px, 1rem, 0)}49.3333333333%{clip:rect(0.12rem, 99999px, 5.1rem, 0)}50%{clip:rect(0.18rem, 99999px, 7.3rem, 0)}50.6666666667%{clip:rect(0.14rem, 99999px, 6.8rem, 0)}51.3333333333%{clip:rect(0.14rem, 99999px, 7.4rem, 0)}52%{clip:rect(0.2rem, 99999px, 8.7rem, 0)}52.6666666667%{clip:rect(0.2rem, 99999px, 7.9rem, 0)}53.3333333333%{clip:rect(0.04rem, 99999px, 5.9rem, 0)}54%{clip:rect(0.12rem, 99999px, 6.2rem, 0)}54.6666666667%{clip:rect(0.12rem, 99999px, 4.4rem, 0)}55.3333333333%{clip:rect(0.14rem, 99999px, 9.1rem, 0)}56%{clip:rect(0.18rem, 99999px, 5rem, 0)}56.6666666667%{clip:rect(0.1rem, 99999px, 0.3rem, 0)}57.3333333333%{clip:rect(0.12rem, 99999px, 8.3rem, 0)}58%{clip:rect(0.12rem, 99999px, 5.8rem, 0)}58.6666666667%{clip:rect(0.14rem, 99999px, 6.7rem, 0)}59.3333333333%{clip:rect(0.08rem, 99999px, 0.7rem, 0)}60%{clip:rect(0.14rem, 99999px, 9.3rem, 0)}60.6666666667%{clip:rect(0.16rem, 99999px, 8.9rem, 0)}61.3333333333%{clip:rect(0.02rem, 99999px, 9.1rem, 0)}62%{clip:rect(0.2rem, 99999px, 9.5rem, 0)}62.6666666667%{clip:rect(0.14rem, 99999px, 3.1rem, 0)}63.3333333333%{clip:rect(0.14rem, 99999px, 7.6rem, 0)}64%{clip:rect(0.12rem, 99999px, 3.2rem, 0)}64.6666666667%{clip:rect(0.04rem, 99999px, 7.2rem, 0)}65.3333333333%{clip:rect(0.2rem, 99999px, 0.4rem, 0)}66%{clip:rect(0.16rem, 99999px, 3.6rem, 0)}66.6666666667%{clip:rect(0.06rem, 99999px, 9.2rem, 0)}67.3333333333%{clip:rect(0.04rem, 99999px, 1.5rem, 0)}68%{clip:rect(0.08rem, 99999px, 1.1rem, 0)}68.6666666667%{clip:rect(0.04rem, 99999px, 5.3rem, 0)}69.3333333333%{clip:rect(0.14rem, 99999px, 6.6rem, 0)}70%{clip:rect(0.1rem, 99999px, 3.1rem, 0)}70.6666666667%{clip:rect(0.18rem, 99999px, 0.6rem, 0)}71.3333333333%{clip:rect(0.12rem, 99999px, 9.2rem, 0)}72%{clip:rect(0.12rem, 99999px, 2.3rem, 0)}72.6666666667%{clip:rect(0.16rem, 99999px, 5.1rem, 0)}73.3333333333%{clip:rect(0.2rem, 99999px, 0.8rem, 0)}74%{clip:rect(0.12rem, 99999px, 1.5rem, 0)}74.6666666667%{clip:rect(0.14rem, 99999px, 2.5rem, 0)}75.3333333333%{clip:rect(0.02rem, 99999px, 5.5rem, 0)}76%{clip:rect(0.16rem, 99999px, 7.4rem, 0)}76.6666666667%{clip:rect(0.02rem, 99999px, 0.6rem, 0)}77.3333333333%{clip:rect(0.06rem, 99999px, 2.9rem, 0)}78%{clip:rect(0.08rem, 99999px, 8.5rem, 0)}78.6666666667%{clip:rect(0.14rem, 99999px, 8.9rem, 0)}79.3333333333%{clip:rect(0.14rem, 99999px, 8rem, 0)}80%{clip:rect(0.16rem, 99999px, 4.7rem, 0)}80.6666666667%{clip:rect(0.1rem, 99999px, 0.8rem, 0)}81.3333333333%{clip:rect(0.04rem, 99999px, 6.9rem, 0)}82%{clip:rect(0.06rem, 99999px, 3.6rem, 0)}82.6666666667%{clip:rect(0.06rem, 99999px, 9.3rem, 0)}83.3333333333%{clip:rect(0.2rem, 99999px, 4rem, 0)}84%{clip:rect(0.18rem, 99999px, 6.2rem, 0)}84.6666666667%{clip:rect(0.06rem, 99999px, 6.9rem, 0)}85.3333333333%{clip:rect(0.18rem, 99999px, 7.8rem, 0)}86%{clip:rect(0.14rem, 99999px, 7.6rem, 0)}86.6666666667%{clip:rect(0.1rem, 99999px, 1.5rem, 0)}87.3333333333%{clip:rect(0.16rem, 99999px, 0.9rem, 0)}88%{clip:rect(0.16rem, 99999px, 7rem, 0)}88.6666666667%{clip:rect(0.18rem, 99999px, 8.8rem, 0)}89.3333333333%{clip:rect(0.18rem, 99999px, 8.8rem, 0)}90%{clip:rect(0.06rem, 99999px, 8.5rem, 0)}90.6666666667%{clip:rect(0.02rem, 99999px, 2.5rem, 0)}91.3333333333%{clip:rect(0.16rem, 99999px, 3.9rem, 0)}92%{clip:rect(0.14rem, 99999px, 2.7rem, 0)}92.6666666667%{clip:rect(0.1rem, 99999px, 7.6rem, 0)}93.3333333333%{clip:rect(0.06rem, 99999px, 0.6rem, 0)}94%{clip:rect(0.1rem, 99999px, 8.1rem, 0)}94.6666666667%{clip:rect(0.06rem, 99999px, 2.9rem, 0)}95.3333333333%{clip:rect(0.1rem, 99999px, 5.6rem, 0)}96%{clip:rect(0.2rem, 99999px, 5.7rem, 0)}96.6666666667%{clip:rect(0.1rem, 99999px, 7.9rem, 0)}97.3333333333%{clip:rect(0.2rem, 99999px, 4.8rem, 0)}98%{clip:rect(0.04rem, 99999px, 2.1rem, 0)}98.6666666667%{clip:rect(0.06rem, 99999px, 5.7rem, 0)}99.3333333333%{clip:rect(0.08rem, 99999px, 8.6rem, 0)}}@keyframes svelte-1xqe3af-glitch-skew{0%{transform:skew(3deg)}10%{transform:skew(4deg)}20%{transform:skew(4deg)}30%{transform:skew(-1deg)}40%{transform:skew(-3deg)}50%{transform:skew(-2deg)}60%{transform:skew(-1deg)}70%{transform:skew(-3deg)}80%{transform:skew(-3deg)}90%{transform:skew(0deg)}}#bar.svelte-1xqe3af .logo.hover-effect-1.logo-behind-a.svelte-1xqe3af{color:var(--accent-light);transform:translateX(-0.5rem);color:#ff5500 !important;text-shadow:-2px 0 #ff5500, 2px 2px #ff5500;clip:rect(44px, 450px, 56px, 0);animation:svelte-1xqe3af-glitch-anim2 5s infinite linear alternate-reverse}#bar.svelte-1xqe3af .logo.hover-effect-1.logo-behind-b.svelte-1xqe3af{color:#bfcc2e !important;z-index:1;transform:translateX(0.2rem);text-shadow:-2px 0 #450f8b;clip:rect(44px, 450px, 56px, 0);animation:svelte-1xqe3af-glitch-anim 5s infinite linear alternate-reverse}#bar.svelte-1xqe3af .logo.logo-behind.svelte-1xqe3af{width:0px;height:0px;overflow:visible;pointer-events:none}#bar.svelte-1xqe3af .logo.logo-behind.svelte-1xqe3af:not(.hovered){display:none}#bar.svelte-1xqe3af #bar-right.svelte-1xqe3af{margin-left:auto;display:flex;margin-right:1rem;margin-top:1rem;position:relative}#bar.svelte-1xqe3af #bar-right #menus.svelte-1xqe3af{display:flex}#bar.svelte-1xqe3af #bar-right #menus #menu.svelte-1xqe3af{height:10rem;display:flex;flex-direction:column;justify-content:space-between;margin-right:1rem}#bar.svelte-1xqe3af #bar-right #menus #menu.svelte-1xqe3af .menu-item{font-weight:750;font-style:italic;width:fit-content}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTmF2QmFyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUE0Q2lCLG1DQUNqQixLQUFLLENBQUksSUFBQyxDQUNWLFVBQVUsQ0FBSSxJQUFHLENBQ2pCLGFBQVMsTUFDVCxPQUFRLENBQUcsSUFBQyxDQUNaLFNBQVUsS0FBTyxDQUNqQixLQUFLLENBQUksSUFDVCxDQUNBLG1CQUFJLENBQUMsd0JBQVUsQ0FDZixPQUFTLENBQUMsSUFBSyxDQUNmLGNBQWdCLENBQUMsTUFDakIsQ0FDQSxtQkFBSSxvQkFBSSxDQUNOLFVBQUssbUJBQ1AsQ0FDQSx5Q0FDQSxlQUNDLFdBQVksQ0FBQyxJQUNiLENBQ0EsTUFBTyxDQUFDLFdBQVUsQ0FDbEIsZUFBaUIsS0FFakIsQ0FJQSxtQkFBSSxpQ0FBeUIsQ0FFN0IsUUFBSSxTQUNKLENBQ0EsbUJBQUksNkJBQTJCLENBRS9CLEtBQUksa0JBQTBCLFlBRTlCLENBRUEseUJBQVMsc0NBQWtCLFVBQ3ZCLDRCQUFlLGFBQWMseUVBRy9CLFdBQWUsTUFBSyxVQUV0QixNQUdJLG9CQUFrQixhQUt0QixDQUVBLEdBQUksQ0FJSixTQUFhLFdBQU0scUJBRWxCLFVBQ0MsZUFBb0IsYUFHckIsVUFDSyxXQUFXLE1BQVEsRUFBRSxhQUl6QixVQUNHLFdBQWEsTUFBQyxxQkFJakIsQ0FBTyxVQUFLLE1BQVUsZUFFdkIsVUFDQyxXQUFnQixJQUFFLG1EQVFwQixDQUVBLFdBQVUsdUJBQVMsQ0FDbEIsR0FDRixtQ0FDQyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJOYXZCYXIuc3ZlbHRlIl19 */");
 }
 
 // (1300:1) {:else}
@@ -9281,7 +9435,7 @@ function NavBar_svelte_create_else_block(ctx) {
 		c: function create() {
 			style = dom_element("style");
 			style.innerHTML = ``;
-			add_location(style, NavBar_svelte_file, -1, 25980);
+			add_location(style, NavBar_svelte_file, -1, 25985);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, style, anchor);
@@ -9312,7 +9466,7 @@ function create_if_block_2(ctx) {
 		c: function create() {
 			style = dom_element("style");
 			style.textContent = "#bar-right{\n\twidth: 100%;\n}\n#toggle-container{\n\tmargin-left: 0px;\n\tmargin-right: auto;\n}";
-			add_location(style, NavBar_svelte_file, -1, 25863);
+			add_location(style, NavBar_svelte_file, -1, 25868);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, style, anchor);
@@ -9535,37 +9689,37 @@ function NavBar_svelte_create_fragment(ctx) {
 			create_component(link4.$$.fragment);
 			t14 = space();
 			create_component(link5.$$.fragment);
-			attr_dev(mark, "class", "svelte-1k1hygh");
-			add_location(mark, NavBar_svelte_file, -1, 26213);
+			attr_dev(mark, "class", "svelte-1xqe3af");
+			add_location(mark, NavBar_svelte_file, -1, 26218);
 			attr_dev(a0, "href", "/");
-			attr_dev(a0, "class", a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-1k1hygh");
-			add_location(a0, NavBar_svelte_file, -1, 26141);
+			attr_dev(a0, "class", a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-1xqe3af");
+			add_location(a0, NavBar_svelte_file, -1, 26146);
 			attr_dev(a1, "href", "/");
-			attr_dev(a1, "class", a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-1k1hygh");
-			add_location(a1, NavBar_svelte_file, -1, 26256);
+			attr_dev(a1, "class", a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-1xqe3af");
+			add_location(a1, NavBar_svelte_file, -1, 26261);
 			attr_dev(a2, "href", "/");
-			attr_dev(a2, "class", a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-1k1hygh");
-			add_location(a2, NavBar_svelte_file, -1, 26348);
+			attr_dev(a2, "class", a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-1xqe3af");
+			add_location(a2, NavBar_svelte_file, -1, 26353);
 			attr_dev(div0, "id", "logo-container");
-			add_location(div0, NavBar_svelte_file, -1, 26112);
+			add_location(div0, NavBar_svelte_file, -1, 26117);
 			attr_dev(div1, "id", "bar-left");
-			attr_dev(div1, "class", "svelte-1k1hygh");
-			add_location(div1, NavBar_svelte_file, -1, 26065);
+			attr_dev(div1, "class", "svelte-1xqe3af");
+			add_location(div1, NavBar_svelte_file, -1, 26070);
 			attr_dev(div2, "id", "menu");
-			attr_dev(div2, "class", "svelte-1k1hygh");
-			add_location(div2, NavBar_svelte_file, -1, 26650);
+			attr_dev(div2, "class", "svelte-1xqe3af");
+			add_location(div2, NavBar_svelte_file, -1, 26655);
 			attr_dev(div3, "id", "menu");
-			attr_dev(div3, "class", "svelte-1k1hygh");
-			add_location(div3, NavBar_svelte_file, -1, 26951);
+			attr_dev(div3, "class", "svelte-1xqe3af");
+			add_location(div3, NavBar_svelte_file, -1, 26956);
 			attr_dev(div4, "id", "menus");
-			attr_dev(div4, "class", "svelte-1k1hygh");
-			add_location(div4, NavBar_svelte_file, -1, 26604);
+			attr_dev(div4, "class", "svelte-1xqe3af");
+			add_location(div4, NavBar_svelte_file, -1, 26609);
 			attr_dev(div5, "id", "bar-right");
-			attr_dev(div5, "class", "svelte-1k1hygh");
-			add_location(div5, NavBar_svelte_file, -1, 26505);
+			attr_dev(div5, "class", "svelte-1xqe3af");
+			add_location(div5, NavBar_svelte_file, -1, 26510);
 			attr_dev(nav, "id", "bar");
-			attr_dev(nav, "class", "svelte-1k1hygh");
-			add_location(nav, NavBar_svelte_file, -1, 26022);
+			attr_dev(nav, "class", "svelte-1xqe3af");
+			add_location(nav, NavBar_svelte_file, -1, 26027);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -9629,15 +9783,15 @@ function NavBar_svelte_create_fragment(ctx) {
 				}
 			}
 
-			if (!current || dirty & /*hovered_class*/ 64 && a0_class_value !== (a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-1k1hygh")) {
+			if (!current || dirty & /*hovered_class*/ 64 && a0_class_value !== (a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-1xqe3af")) {
 				attr_dev(a0, "class", a0_class_value);
 			}
 
-			if (!current || dirty & /*hovered_class*/ 64 && a1_class_value !== (a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-1k1hygh")) {
+			if (!current || dirty & /*hovered_class*/ 64 && a1_class_value !== (a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-1xqe3af")) {
 				attr_dev(a1, "class", a1_class_value);
 			}
 
-			if (!current || dirty & /*hovered_class*/ 64 && a2_class_value !== (a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-1k1hygh")) {
+			if (!current || dirty & /*hovered_class*/ 64 && a2_class_value !== (a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-1xqe3af")) {
 				attr_dev(a2, "class", a2_class_value);
 			}
 
