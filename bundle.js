@@ -9377,7 +9377,7 @@ const { console: NavBar_svelte_console_1 } = globals;
 const NavBar_svelte_file = "src\\components\\utils\\NavBar.svelte";
 
 function NavBar_svelte_add_css(target) {
-	append_styles(target, "svelte-fylets", "#bar.svelte-fylets.svelte-fylets{width:100%;margin-top:1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;width:100%}#bar.svelte-fylets #bar-left.svelte-fylets{display:flex;flex-direction:column}#bar.svelte-fylets mark.svelte-fylets{background:var(--accent-dark)}#bar.svelte-fylets .logo.svelte-fylets{font-size:4rem;margin-left:1rem;height:fit-content;text-decoration:none}#bar.svelte-fylets .logo.logo-behind.svelte-fylets{position:absolute}#bar.svelte-fylets .logo.hovered.svelte-fylets{color:var(--accent-dark) !important}#bar.svelte-fylets .logo.hovered.hover-effect-0.svelte-fylets{animation:svelte-fylets-glitch-anim3 10s infinite linear alternate-reverse}@keyframes svelte-fylets-distort1{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0.5rem, 0rem)}25%{transform:translate(0.5rem, 1.5rem)}37.5%{transform:translate(0rem, 0.5rem)}50%{transform:translate(0.5rem, 0.5rem)}62.5%{transform:translate(0.5rem, 0rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0rem, 0.5rem)}100%{transform:translate(1.5rem, 0.5rem)}}@keyframes svelte-fylets-distort2{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0rem, 0.5rem)}25%{transform:translate(1.5rem, 0.5rem)}37.5%{transform:translate(1.5rem, 0rem)}50%{transform:translate(1.5rem, 0.5rem)}62.5%{transform:translate(0rem, 1.5rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0.5rem, 0rem)}100%{transform:translate(0.5rem, 0.5rem)}}@keyframes svelte-fylets-glitch-anim3{0%{clip:rect(3.2rem, 9999px, 1.5rem, 0);transform-origin:center}2%{clip:rect(0.8rem, 9999px, 3.5rem, 0);transform-origin:center}4%{clip:rect(2.6rem, 9999px, 4rem, 0);transform-origin:center}6%{clip:rect(3rem, 9999px, 2.5rem, 0);transform-origin:center}8%{clip:rect(2.6rem, 9999px, 0.5rem, 0);transform-origin:center}10%{clip:rect(0.8rem, 9999px, 4rem, 0);transform-origin:center}12%{clip:rect(1.2rem, 9999px, 5rem, 0);transform-origin:center}14%{clip:rect(3.2rem, 9999px, 4.5rem, 0);transform-origin:center}16%{clip:rect(1.7rem, 9999px, 1rem, 0);transform-origin:center}18%{clip:rect(2.1rem, 9999px, 2rem, 0);transform-origin:center}20%{clip:rect(1.3rem, 9999px, 3rem, 0);transform-origin:center}22%{clip:rect(1.7rem, 9999px, 3rem, 0);transform-origin:center}24%{clip:rect(2.2rem, 9999px, 3.5rem, 0);transform-origin:center}26%{clip:rect(0.3rem, 9999px, 2.5rem, 0);transform-origin:center}28%{clip:rect(1.3rem, 9999px, 1rem, 0);transform-origin:center}30%{clip:rect(3rem, 9999px, 1.5rem, 0);transform-origin:center}32%{clip:rect(3.3rem, 9999px, 3rem, 0);transform-origin:center}34%{clip:rect(2.8rem, 9999px, 2rem, 0);transform-origin:center}36%{clip:rect(1.3rem, 9999px, 3.5rem, 0);transform-origin:center}38%{clip:rect(2.6rem, 9999px, 1rem, 0);transform-origin:center}40%{clip:rect(0.2rem, 9999px, 0.5rem, 0);transform-origin:center}42%{clip:rect(2.2rem, 9999px, 5rem, 0);transform-origin:center}44%{clip:rect(3.2rem, 9999px, 1rem, 0);transform-origin:center}46%{clip:rect(2.8rem, 9999px, 3.5rem, 0);transform-origin:center}48%{clip:rect(2.5rem, 9999px, 2.5rem, 0);transform-origin:center}50%{clip:rect(3.1rem, 9999px, 1rem, 0);transform-origin:center}52%{clip:rect(3.4rem, 9999px, 5rem, 0);transform-origin:center}54%{clip:rect(0.7rem, 9999px, 0.5rem, 0);transform-origin:center}56%{clip:rect(0.4rem, 9999px, 4.5rem, 0);transform-origin:center}58%{clip:rect(2rem, 9999px, 5rem, 0);transform-origin:center}60%{clip:rect(2.2rem, 9999px, 3rem, 0);transform-origin:center}62%{clip:rect(0.4rem, 9999px, 3rem, 0);transform-origin:center}64%{clip:rect(1.3rem, 9999px, 4rem, 0);transform-origin:center}66%{clip:rect(2.7rem, 9999px, 4.5rem, 0);transform-origin:center}68%{clip:rect(3.6rem, 9999px, 0.5rem, 0);transform-origin:center}70%{clip:rect(4rem, 9999px, 1.5rem, 0);transform-origin:center}72%{clip:rect(0.2rem, 9999px, 3.5rem, 0);transform-origin:center}74%{clip:rect(1.2rem, 9999px, 3rem, 0);transform-origin:center}76%{clip:rect(0.5rem, 9999px, 4rem, 0);transform-origin:center}78%{clip:rect(0.5rem, 9999px, 2rem, 0);transform-origin:center}80%{clip:rect(3.4rem, 9999px, 2.5rem, 0);transform-origin:center}82%{clip:rect(3.5rem, 9999px, 0.5rem, 0);transform-origin:center}84%{clip:rect(1.8rem, 9999px, 4rem, 0);transform-origin:center}86%{clip:rect(3.7rem, 9999px, 0.5rem, 0);transform-origin:center}88%{clip:rect(2.9rem, 9999px, 2.5rem, 0);transform-origin:center}90%{clip:rect(0.9rem, 9999px, 4rem, 0);transform-origin:center}92%{clip:rect(1.7rem, 9999px, 3.5rem, 0);transform-origin:center}94%{clip:rect(1.1rem, 9999px, 0.5rem, 0);transform-origin:center}96%{clip:rect(1rem, 9999px, 1.5rem, 0);transform-origin:center}98%{clip:rect(2.2rem, 9999px, 4.5rem, 0);transform-origin:center}}@keyframes svelte-fylets-cooool{0%{color:pink !important}2%{color:pink !important}4%{color:pink !important}6%{color:pink !important}8%{color:pink !important}10%{color:pink !important}12%{color:pink !important}14%{color:pink !important}16%{color:pink !important}18%{color:pink !important}20%{color:pink !important}22%{color:pink !important}24%{color:pink !important}26%{color:pink !important}28%{color:pink !important}30%{color:pink !important}32%{color:pink !important}34%{color:pink !important}36%{color:pink !important}38%{color:pink !important}40%{color:pink !important}42%{color:pink !important}44%{color:pink !important}46%{color:pink !important}48%{color:pink !important}50%{color:pink !important}52%{color:pink !important}54%{color:pink !important}56%{color:pink !important}58%{color:pink !important}60%{color:pink !important}62%{color:pink !important}64%{color:pink !important}66%{color:pink !important}68%{color:pink !important}70%{color:pink !important}72%{color:pink !important}74%{color:pink !important}76%{color:pink !important}78%{color:pink !important}80%{color:pink !important}82%{color:pink !important}84%{color:pink !important}86%{color:pink !important}88%{color:pink !important}90%{color:pink !important}92%{color:pink !important}94%{color:pink !important}96%{color:pink !important}98%{color:pink !important}}#bar.svelte-fylets .logo.hovered.hover-effect-0.logo-behind-a.svelte-fylets{color:#ff5500 !important;animation:svelte-fylets-distort1 300ms linear infinite, svelte-fylets-glitch-anim3 5s infinite linear alternate-reverse, svelte-fylets-cooool 5s infinite linear alternate-reverse}#bar.svelte-fylets .logo.hovered.hover-effect-0.logo-behind-b.svelte-fylets{color:#450f8b !important;animation:svelte-fylets-distort2 300ms linear infinite, svelte-fylets-glitch-anim3 3s infinite linear alternate-reverse}#bar.svelte-fylets .logo.hover-effect-1.svelte-fylets{animation:svelte-fylets-glitch-skew 1s infinite linear alternate-reverse}@keyframes svelte-fylets-glitch-anim{0%{clip:rect(0.7rem, 9999px, 4rem, 0);transform:skew(8.1deg);z-index:2}2%{clip:rect(3.9rem, 9999px, 4.5rem, 0);transform:skew(2deg);z-index:3}4%{clip:rect(1rem, 9999px, 0.5rem, 0);transform:skew(9.7deg);z-index:1}6%{clip:rect(0.7rem, 9999px, 3rem, 0);transform:skew(3.8deg);z-index:1}8%{clip:rect(3.8rem, 9999px, 3.5rem, 0);transform:skew(9deg);z-index:2}10%{clip:rect(1rem, 9999px, 3rem, 0);transform:skew(7.3deg);z-index:4}12%{clip:rect(2.9rem, 9999px, 2rem, 0);transform:skew(7deg);z-index:3}14%{clip:rect(3rem, 9999px, 1rem, 0);transform:skew(9.6deg);z-index:1}16%{clip:rect(1.7rem, 9999px, 0.5rem, 0);transform:skew(9.2deg);z-index:2}18%{clip:rect(1.9rem, 9999px, 4rem, 0);transform:skew(3.8deg);z-index:4}20%{clip:rect(3.4rem, 9999px, 0.5rem, 0);transform:skew(4.3deg);z-index:1}22%{clip:rect(1.5rem, 9999px, 1rem, 0);transform:skew(1deg);z-index:3}24%{clip:rect(0.8rem, 9999px, 5rem, 0);transform:skew(7.4deg);z-index:2}26%{clip:rect(3.3rem, 9999px, 4rem, 0);transform:skew(5.2deg);z-index:2}28%{clip:rect(1.8rem, 9999px, 4.5rem, 0);transform:skew(6.3deg);z-index:1}30%{clip:rect(1rem, 9999px, 4rem, 0);transform:skew(5.8deg);z-index:4}32%{clip:rect(1.3rem, 9999px, 4rem, 0);transform:skew(10deg);z-index:3}34%{clip:rect(0.7rem, 9999px, 4rem, 0);transform:skew(8.8deg);z-index:1}36%{clip:rect(1rem, 9999px, 5rem, 0);transform:skew(4.3deg);z-index:2}38%{clip:rect(0.3rem, 9999px, 5rem, 0);transform:skew(8.2deg);z-index:4}40%{clip:rect(3.6rem, 9999px, 3rem, 0);transform:skew(8.3deg);z-index:3}42%{clip:rect(3.6rem, 9999px, 4rem, 0);transform:skew(9.5deg);z-index:4}44%{clip:rect(0.1rem, 9999px, 2rem, 0);transform:skew(5.6deg);z-index:2}46%{clip:rect(0.7rem, 9999px, 4rem, 0);transform:skew(7.3deg);z-index:3}48%{clip:rect(2.5rem, 9999px, 5rem, 0);transform:skew(2.7deg);z-index:1}50%{clip:rect(3.4rem, 9999px, 2rem, 0);transform:skew(4.4deg);z-index:3}52%{clip:rect(1.3rem, 9999px, 2.5rem, 0);transform:skew(9.8deg);z-index:1}54%{clip:rect(0.5rem, 9999px, 3.5rem, 0);transform:skew(3.6deg);z-index:1}56%{clip:rect(0.1rem, 9999px, 0.5rem, 0);transform:skew(0.1deg);z-index:1}58%{clip:rect(3.5rem, 9999px, 2rem, 0);transform:skew(0.2deg);z-index:1}60%{clip:rect(1rem, 9999px, 2rem, 0);transform:skew(7.2deg);z-index:3}62%{clip:rect(3.5rem, 9999px, 1.5rem, 0);transform:skew(5.8deg);z-index:2}64%{clip:rect(2.5rem, 9999px, 1rem, 0);transform:skew(7.9deg);z-index:3}66%{clip:rect(0.2rem, 9999px, 4rem, 0);transform:skew(7.6deg);z-index:2}68%{clip:rect(2.3rem, 9999px, 2rem, 0);transform:skew(7.7deg);z-index:1}70%{clip:rect(0.8rem, 9999px, 3.5rem, 0);transform:skew(1.1deg);z-index:3}72%{clip:rect(1rem, 9999px, 1rem, 0);transform:skew(4.9deg);z-index:1}74%{clip:rect(0.4rem, 9999px, 2.5rem, 0);transform:skew(4.6deg);z-index:2}76%{clip:rect(1.2rem, 9999px, 1.5rem, 0);transform:skew(5.7deg);z-index:3}78%{clip:rect(0.4rem, 9999px, 0.5rem, 0);transform:skew(7.5deg);z-index:4}80%{clip:rect(3.4rem, 9999px, 4.5rem, 0);transform:skew(5.7deg);z-index:3}82%{clip:rect(0.7rem, 9999px, 2rem, 0);transform:skew(4.7deg);z-index:4}84%{clip:rect(3.6rem, 9999px, 2rem, 0);transform:skew(7.5deg);z-index:4}86%{clip:rect(1.3rem, 9999px, 3rem, 0);transform:skew(9.4deg);z-index:3}88%{clip:rect(2.8rem, 9999px, 0.5rem, 0);transform:skew(4deg);z-index:3}90%{clip:rect(3.2rem, 9999px, 0.5rem, 0);transform:skew(5.9deg);z-index:2}92%{clip:rect(0.5rem, 9999px, 2rem, 0);transform:skew(1.5deg);z-index:1}94%{clip:rect(1.4rem, 9999px, 2rem, 0);transform:skew(6.5deg);z-index:3}96%{clip:rect(4rem, 9999px, 4rem, 0);transform:skew(8deg);z-index:3}98%{clip:rect(0.5rem, 9999px, 4rem, 0);transform:skew(1.1deg);z-index:1}}@keyframes svelte-fylets-glitch-anim2{0%{clip:rect(0.04rem, 99999px, 9.7rem, 0)}0.6666666667%{clip:rect(0.1rem, 99999px, 6.4rem, 0)}1.3333333333%{clip:rect(0.2rem, 99999px, 8.9rem, 0)}2%{clip:rect(0.12rem, 99999px, 7rem, 0)}2.6666666667%{clip:rect(0.1rem, 99999px, 9.9rem, 0)}3.3333333333%{clip:rect(0.18rem, 99999px, 3.8rem, 0)}4%{clip:rect(0.16rem, 99999px, 6rem, 0)}4.6666666667%{clip:rect(0.18rem, 99999px, 3.4rem, 0)}5.3333333333%{clip:rect(0.2rem, 99999px, 2.3rem, 0)}6%{clip:rect(0.2rem, 99999px, 0.6rem, 0)}6.6666666667%{clip:rect(0.18rem, 99999px, 1.1rem, 0)}7.3333333333%{clip:rect(0.02rem, 99999px, 4.1rem, 0)}8%{clip:rect(0.1rem, 99999px, 9.4rem, 0)}8.6666666667%{clip:rect(0.06rem, 99999px, 0.2rem, 0)}9.3333333333%{clip:rect(0.18rem, 99999px, 5.8rem, 0)}10%{clip:rect(0.04rem, 99999px, 7.5rem, 0)}10.6666666667%{clip:rect(0.2rem, 99999px, 4.8rem, 0)}11.3333333333%{clip:rect(0.2rem, 99999px, 8rem, 0)}12%{clip:rect(0.1rem, 99999px, 7.7rem, 0)}12.6666666667%{clip:rect(0.1rem, 99999px, 4rem, 0)}13.3333333333%{clip:rect(0.08rem, 99999px, 7.2rem, 0)}14%{clip:rect(0.18rem, 99999px, 0.6rem, 0)}14.6666666667%{clip:rect(0.08rem, 99999px, 9.3rem, 0)}15.3333333333%{clip:rect(0.1rem, 99999px, 0.9rem, 0)}16%{clip:rect(0.12rem, 99999px, 0.2rem, 0)}16.6666666667%{clip:rect(0.04rem, 99999px, 6.6rem, 0)}17.3333333333%{clip:rect(0.18rem, 99999px, 5.7rem, 0)}18%{clip:rect(0.1rem, 99999px, 2.3rem, 0)}18.6666666667%{clip:rect(0.08rem, 99999px, 8.6rem, 0)}19.3333333333%{clip:rect(0.02rem, 99999px, 7.3rem, 0)}20%{clip:rect(0.02rem, 99999px, 9rem, 0)}20.6666666667%{clip:rect(0.06rem, 99999px, 1.3rem, 0)}21.3333333333%{clip:rect(0.04rem, 99999px, 3.2rem, 0)}22%{clip:rect(0.14rem, 99999px, 3.8rem, 0)}22.6666666667%{clip:rect(0.06rem, 99999px, 2.5rem, 0)}23.3333333333%{clip:rect(0.2rem, 99999px, 10rem, 0)}24%{clip:rect(0.14rem, 99999px, 7rem, 0)}24.6666666667%{clip:rect(0.2rem, 99999px, 6rem, 0)}25.3333333333%{clip:rect(0.12rem, 99999px, 1.1rem, 0)}26%{clip:rect(0.08rem, 99999px, 0.2rem, 0)}26.6666666667%{clip:rect(0.1rem, 99999px, 6.4rem, 0)}27.3333333333%{clip:rect(0.1rem, 99999px, 5.7rem, 0)}28%{clip:rect(0.08rem, 99999px, 9.7rem, 0)}28.6666666667%{clip:rect(0.18rem, 99999px, 2.8rem, 0)}29.3333333333%{clip:rect(0.1rem, 99999px, 9.9rem, 0)}30%{clip:rect(0.06rem, 99999px, 7.3rem, 0)}30.6666666667%{clip:rect(0.16rem, 99999px, 3rem, 0)}31.3333333333%{clip:rect(0.2rem, 99999px, 4.6rem, 0)}32%{clip:rect(0.2rem, 99999px, 7.1rem, 0)}32.6666666667%{clip:rect(0.08rem, 99999px, 3.6rem, 0)}33.3333333333%{clip:rect(0.1rem, 99999px, 1.5rem, 0)}34%{clip:rect(0.12rem, 99999px, 3.6rem, 0)}34.6666666667%{clip:rect(0.1rem, 99999px, 3.8rem, 0)}35.3333333333%{clip:rect(0.1rem, 99999px, 1.7rem, 0)}36%{clip:rect(0.1rem, 99999px, 8.8rem, 0)}36.6666666667%{clip:rect(0.14rem, 99999px, 2.2rem, 0)}37.3333333333%{clip:rect(0.16rem, 99999px, 1.6rem, 0)}38%{clip:rect(0.18rem, 99999px, 1.6rem, 0)}38.6666666667%{clip:rect(0.18rem, 99999px, 1.6rem, 0)}39.3333333333%{clip:rect(0.2rem, 99999px, 0.8rem, 0)}40%{clip:rect(0.06rem, 99999px, 8rem, 0)}40.6666666667%{clip:rect(0.12rem, 99999px, 4.1rem, 0)}41.3333333333%{clip:rect(0.08rem, 99999px, 9.6rem, 0)}42%{clip:rect(0.16rem, 99999px, 8.6rem, 0)}42.6666666667%{clip:rect(0.02rem, 99999px, 9.9rem, 0)}43.3333333333%{clip:rect(0.12rem, 99999px, 0.5rem, 0)}44%{clip:rect(0.14rem, 99999px, 1.8rem, 0)}44.6666666667%{clip:rect(0.08rem, 99999px, 7.4rem, 0)}45.3333333333%{clip:rect(0.06rem, 99999px, 8.4rem, 0)}46%{clip:rect(0.02rem, 99999px, 4.3rem, 0)}46.6666666667%{clip:rect(0.14rem, 99999px, 7.9rem, 0)}47.3333333333%{clip:rect(0.18rem, 99999px, 2.5rem, 0)}48%{clip:rect(0.2rem, 99999px, 2.4rem, 0)}48.6666666667%{clip:rect(0.08rem, 99999px, 4rem, 0)}49.3333333333%{clip:rect(0.12rem, 99999px, 1rem, 0)}50%{clip:rect(0.18rem, 99999px, 2.7rem, 0)}50.6666666667%{clip:rect(0.2rem, 99999px, 3.2rem, 0)}51.3333333333%{clip:rect(0.1rem, 99999px, 6rem, 0)}52%{clip:rect(0.1rem, 99999px, 4.5rem, 0)}52.6666666667%{clip:rect(0.12rem, 99999px, 7.6rem, 0)}53.3333333333%{clip:rect(0.16rem, 99999px, 2.8rem, 0)}54%{clip:rect(0.16rem, 99999px, 9.7rem, 0)}54.6666666667%{clip:rect(0.04rem, 99999px, 6.9rem, 0)}55.3333333333%{clip:rect(0.18rem, 99999px, 2.6rem, 0)}56%{clip:rect(0.02rem, 99999px, 9.6rem, 0)}56.6666666667%{clip:rect(0.12rem, 99999px, 4.8rem, 0)}57.3333333333%{clip:rect(0.08rem, 99999px, 1rem, 0)}58%{clip:rect(0.08rem, 99999px, 3.6rem, 0)}58.6666666667%{clip:rect(0.12rem, 99999px, 3.1rem, 0)}59.3333333333%{clip:rect(0.14rem, 99999px, 7.1rem, 0)}60%{clip:rect(0.1rem, 99999px, 4.5rem, 0)}60.6666666667%{clip:rect(0.12rem, 99999px, 6rem, 0)}61.3333333333%{clip:rect(0.04rem, 99999px, 8.8rem, 0)}62%{clip:rect(0.14rem, 99999px, 7rem, 0)}62.6666666667%{clip:rect(0.12rem, 99999px, 6.1rem, 0)}63.3333333333%{clip:rect(0.16rem, 99999px, 1.6rem, 0)}64%{clip:rect(0.2rem, 99999px, 6.5rem, 0)}64.6666666667%{clip:rect(0.2rem, 99999px, 8.4rem, 0)}65.3333333333%{clip:rect(0.08rem, 99999px, 1.3rem, 0)}66%{clip:rect(0.04rem, 99999px, 2.8rem, 0)}66.6666666667%{clip:rect(0.18rem, 99999px, 9.4rem, 0)}67.3333333333%{clip:rect(0.18rem, 99999px, 3.8rem, 0)}68%{clip:rect(0.1rem, 99999px, 6.2rem, 0)}68.6666666667%{clip:rect(0.12rem, 99999px, 4.8rem, 0)}69.3333333333%{clip:rect(0.04rem, 99999px, 1.6rem, 0)}70%{clip:rect(0.08rem, 99999px, 3rem, 0)}70.6666666667%{clip:rect(0.04rem, 99999px, 3.5rem, 0)}71.3333333333%{clip:rect(0.18rem, 99999px, 9.3rem, 0)}72%{clip:rect(0.1rem, 99999px, 0.1rem, 0)}72.6666666667%{clip:rect(0.06rem, 99999px, 8.9rem, 0)}73.3333333333%{clip:rect(0.16rem, 99999px, 1.3rem, 0)}74%{clip:rect(0.14rem, 99999px, 2.9rem, 0)}74.6666666667%{clip:rect(0.02rem, 99999px, 2.4rem, 0)}75.3333333333%{clip:rect(0.04rem, 99999px, 4.3rem, 0)}76%{clip:rect(0.08rem, 99999px, 9.2rem, 0)}76.6666666667%{clip:rect(0.18rem, 99999px, 4.7rem, 0)}77.3333333333%{clip:rect(0.06rem, 99999px, 8.7rem, 0)}78%{clip:rect(0.2rem, 99999px, 5.4rem, 0)}78.6666666667%{clip:rect(0.14rem, 99999px, 9.6rem, 0)}79.3333333333%{clip:rect(0.16rem, 99999px, 7.7rem, 0)}80%{clip:rect(0.16rem, 99999px, 3.3rem, 0)}80.6666666667%{clip:rect(0.08rem, 99999px, 4.3rem, 0)}81.3333333333%{clip:rect(0.08rem, 99999px, 10rem, 0)}82%{clip:rect(0.08rem, 99999px, 9.6rem, 0)}82.6666666667%{clip:rect(0.06rem, 99999px, 7.3rem, 0)}83.3333333333%{clip:rect(0.18rem, 99999px, 0.4rem, 0)}84%{clip:rect(0.18rem, 99999px, 2rem, 0)}84.6666666667%{clip:rect(0.18rem, 99999px, 0.6rem, 0)}85.3333333333%{clip:rect(0.2rem, 99999px, 8.9rem, 0)}86%{clip:rect(0.16rem, 99999px, 9.6rem, 0)}86.6666666667%{clip:rect(0.08rem, 99999px, 5rem, 0)}87.3333333333%{clip:rect(0.2rem, 99999px, 2.6rem, 0)}88%{clip:rect(0.08rem, 99999px, 5.1rem, 0)}88.6666666667%{clip:rect(0.1rem, 99999px, 6.8rem, 0)}89.3333333333%{clip:rect(0.02rem, 99999px, 3.8rem, 0)}90%{clip:rect(0.2rem, 99999px, 6.8rem, 0)}90.6666666667%{clip:rect(0.02rem, 99999px, 4.4rem, 0)}91.3333333333%{clip:rect(0.06rem, 99999px, 7.8rem, 0)}92%{clip:rect(0.14rem, 99999px, 5.2rem, 0)}92.6666666667%{clip:rect(0.16rem, 99999px, 3.4rem, 0)}93.3333333333%{clip:rect(0.2rem, 99999px, 7rem, 0)}94%{clip:rect(0.12rem, 99999px, 4.6rem, 0)}94.6666666667%{clip:rect(0.1rem, 99999px, 3.1rem, 0)}95.3333333333%{clip:rect(0.08rem, 99999px, 2.4rem, 0)}96%{clip:rect(0.06rem, 99999px, 4.5rem, 0)}96.6666666667%{clip:rect(0.12rem, 99999px, 4.6rem, 0)}97.3333333333%{clip:rect(0.1rem, 99999px, 7.5rem, 0)}98%{clip:rect(0.02rem, 99999px, 8.7rem, 0)}98.6666666667%{clip:rect(0.16rem, 99999px, 4.1rem, 0)}99.3333333333%{clip:rect(0.06rem, 99999px, 7rem, 0)}}@keyframes svelte-fylets-glitch-skew{0%{transform:skew(-2deg)}10%{transform:skew(-3deg)}20%{transform:skew(2deg)}30%{transform:skew(0deg)}40%{transform:skew(4deg)}50%{transform:skew(5deg)}60%{transform:skew(-3deg)}70%{transform:skew(-1deg)}80%{transform:skew(3deg)}90%{transform:skew(5deg)}}#bar.svelte-fylets .logo.hover-effect-1.logo-behind-a.svelte-fylets{color:var(--accent-light);transform:translateX(-0.5rem);color:#ff5500 !important;text-shadow:-2px 0 #ff5500, 2px 2px #ff5500;clip:rect(44px, 450px, 56px, 0);animation:svelte-fylets-glitch-anim2 5s infinite linear alternate-reverse}#bar.svelte-fylets .logo.hover-effect-1.logo-behind-b.svelte-fylets{color:#bfcc2e !important;z-index:1;transform:translateX(0.2rem);text-shadow:-2px 0 #450f8b;clip:rect(44px, 450px, 56px, 0);animation:svelte-fylets-glitch-anim 5s infinite linear alternate-reverse}#bar.svelte-fylets .logo.logo-behind.svelte-fylets{width:0px;height:0px;overflow:visible;pointer-events:none}#bar.svelte-fylets .logo.logo-behind.svelte-fylets:not(.hovered){display:none}#bar.svelte-fylets #bar-right.svelte-fylets{margin-left:auto;display:flex;margin-right:1rem;margin-top:1rem;position:relative}#bar.svelte-fylets #bar-right #menus.svelte-fylets{display:flex}#bar.svelte-fylets #bar-right #menus #menu.svelte-fylets{height:10rem;display:flex;flex-direction:column;justify-content:space-between;margin-right:1rem}#bar.svelte-fylets #bar-right #menus #menu.svelte-fylets .menu-item{font-weight:750;font-style:italic;width:fit-content}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTmF2QmFyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUE0Q2lCLGlDQUNqQixLQUFLLENBQUksSUFBQyxDQUNWLFVBQVUsQ0FBSSxJQUFHLENBQ2pCLGFBQVMsTUFDVCxPQUFRLENBQUcsSUFBQyxDQUNaLFNBQVUsS0FBTyxDQUNqQixLQUFLLENBQUksSUFDVCxDQUNBLGtCQUFJLENBQUMsdUJBQVUsQ0FDZixPQUFTLENBQUMsSUFBSyxDQUNmLGNBQWdCLENBQUMsTUFDakIsQ0FDQSxrQkFBSSxDQUFDLGtCQUFJLENBQ1AsVUFBTSxtQkFDUixDQUNBLGtCQUFFLENBQUcsbUJBQUMsQ0FDTixlQUNBLGlCQUNDLE1BQU8sWUFDUCxDQUNBLGVBQVEsQ0FBUyxJQUNqQixDQUVBLHdCQUFPLDBCQUFjLENBSXJCLFFBQUksU0FFSixDQUNBLGtCQUFJLDRCQUF5QixDQUM3QixLQUFJLGtCQUEyQixZQUUvQixDQUVBLGtCQUFJLGNBQVksNkJBQVEsQ0FFeEIsU0FBUywrQkFBa0IsOENBRXpCLHNCQUFZLGFBQ04saUNBR1IsaUNBR0EsQ0FLQSxHQUFJLENBRUEsMEJBQTBCLFFBQVEsQ0FJdEMsTUFDQyxDQUNBLFNBQU8sZUFBaUIsUUFBUSxLQUU5QixDQUVGLG9CQUFhLFFBQWdCLE1BQUMsT0FFN0IsVUFHQSxXQUFnQixRQUFTLG1EQU14QixDQUNGLG9CQUFhLFlBQWlCLGdCQUc1QixXQUFhLE1BQUMsUUFBYSxHQU05QixXQUFFLHVCQUVGLEdBQ0MsU0FBTywwQkFDVCxDQUNDLEtBQU0iLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiTmF2QmFyLnN2ZWx0ZSJdfQ== */");
+	append_styles(target, "svelte-14nofvq", "#bar.svelte-14nofvq.svelte-14nofvq{width:100%;margin-top:1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;width:100%}#bar.svelte-14nofvq #bar-left.svelte-14nofvq{display:flex;flex-direction:column}#bar.svelte-14nofvq mark.svelte-14nofvq{background:var(--accent-dark)}#bar.svelte-14nofvq .logo.svelte-14nofvq{font-size:4rem;margin-left:1rem;height:fit-content;text-decoration:none}#bar.svelte-14nofvq .logo.logo-behind.svelte-14nofvq{position:absolute}#bar.svelte-14nofvq .logo.hovered.svelte-14nofvq{color:var(--accent-dark) !important}#bar.svelte-14nofvq .logo.hovered.hover-effect-0.svelte-14nofvq{animation:svelte-14nofvq-glitch-anim3 10s infinite linear alternate-reverse}@keyframes svelte-14nofvq-distort1{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0.5rem, 0rem)}25%{transform:translate(0.5rem, 1.5rem)}37.5%{transform:translate(0rem, 0.5rem)}50%{transform:translate(0.5rem, 0.5rem)}62.5%{transform:translate(0.5rem, 0rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0rem, 0.5rem)}100%{transform:translate(1.5rem, 0.5rem)}}@keyframes svelte-14nofvq-distort2{0%{transform:translate(0.5rem, 0.5rem)}12.5%{transform:translate(0rem, 0.5rem)}25%{transform:translate(1.5rem, 0.5rem)}37.5%{transform:translate(1.5rem, 0rem)}50%{transform:translate(1.5rem, 0.5rem)}62.5%{transform:translate(0rem, 1.5rem)}75%{transform:translate(0.5rem, 0.5rem)}87.5%{transform:translate(0.5rem, 0rem)}100%{transform:translate(0.5rem, 0.5rem)}}@keyframes svelte-14nofvq-glitch-anim3{0%{clip:rect(2.7rem, 9999px, 1.5rem, 0);transform-origin:center}2%{clip:rect(3.9rem, 9999px, 3rem, 0);transform-origin:center}4%{clip:rect(0.9rem, 9999px, 1.5rem, 0);transform-origin:center}6%{clip:rect(3.5rem, 9999px, 5rem, 0);transform-origin:center}8%{clip:rect(0.6rem, 9999px, 1.5rem, 0);transform-origin:center}10%{clip:rect(3.7rem, 9999px, 1.5rem, 0);transform-origin:center}12%{clip:rect(1.5rem, 9999px, 1.5rem, 0);transform-origin:center}14%{clip:rect(2.3rem, 9999px, 3.5rem, 0);transform-origin:center}16%{clip:rect(3.9rem, 9999px, 3.5rem, 0);transform-origin:center}18%{clip:rect(3.4rem, 9999px, 1.5rem, 0);transform-origin:center}20%{clip:rect(3rem, 9999px, 3.5rem, 0);transform-origin:center}22%{clip:rect(0.9rem, 9999px, 3rem, 0);transform-origin:center}24%{clip:rect(3.5rem, 9999px, 2rem, 0);transform-origin:center}26%{clip:rect(2.4rem, 9999px, 2.5rem, 0);transform-origin:center}28%{clip:rect(0.5rem, 9999px, 2.5rem, 0);transform-origin:center}30%{clip:rect(0.4rem, 9999px, 2rem, 0);transform-origin:center}32%{clip:rect(1.6rem, 9999px, 5rem, 0);transform-origin:center}34%{clip:rect(3.3rem, 9999px, 3rem, 0);transform-origin:center}36%{clip:rect(0.8rem, 9999px, 5rem, 0);transform-origin:center}38%{clip:rect(3.5rem, 9999px, 4.5rem, 0);transform-origin:center}40%{clip:rect(1.4rem, 9999px, 5rem, 0);transform-origin:center}42%{clip:rect(2.3rem, 9999px, 0.5rem, 0);transform-origin:center}44%{clip:rect(3.3rem, 9999px, 3.5rem, 0);transform-origin:center}46%{clip:rect(2.6rem, 9999px, 2.5rem, 0);transform-origin:center}48%{clip:rect(2.9rem, 9999px, 2rem, 0);transform-origin:center}50%{clip:rect(1.9rem, 9999px, 5rem, 0);transform-origin:center}52%{clip:rect(2.9rem, 9999px, 4.5rem, 0);transform-origin:center}54%{clip:rect(2.8rem, 9999px, 2rem, 0);transform-origin:center}56%{clip:rect(2.6rem, 9999px, 3.5rem, 0);transform-origin:center}58%{clip:rect(0.2rem, 9999px, 3rem, 0);transform-origin:center}60%{clip:rect(3.3rem, 9999px, 4rem, 0);transform-origin:center}62%{clip:rect(0.2rem, 9999px, 1rem, 0);transform-origin:center}64%{clip:rect(3.7rem, 9999px, 0.5rem, 0);transform-origin:center}66%{clip:rect(3.3rem, 9999px, 5rem, 0);transform-origin:center}68%{clip:rect(0.1rem, 9999px, 3rem, 0);transform-origin:center}70%{clip:rect(2.8rem, 9999px, 2rem, 0);transform-origin:center}72%{clip:rect(3.2rem, 9999px, 3.5rem, 0);transform-origin:center}74%{clip:rect(2.7rem, 9999px, 3rem, 0);transform-origin:center}76%{clip:rect(1.6rem, 9999px, 4rem, 0);transform-origin:center}78%{clip:rect(0.4rem, 9999px, 3.5rem, 0);transform-origin:center}80%{clip:rect(3rem, 9999px, 2.5rem, 0);transform-origin:center}82%{clip:rect(1rem, 9999px, 3.5rem, 0);transform-origin:center}84%{clip:rect(0.9rem, 9999px, 1.5rem, 0);transform-origin:center}86%{clip:rect(3.8rem, 9999px, 1.5rem, 0);transform-origin:center}88%{clip:rect(1rem, 9999px, 1rem, 0);transform-origin:center}90%{clip:rect(3.5rem, 9999px, 4.5rem, 0);transform-origin:center}92%{clip:rect(1.4rem, 9999px, 3.5rem, 0);transform-origin:center}94%{clip:rect(2.2rem, 9999px, 3.5rem, 0);transform-origin:center}96%{clip:rect(3.6rem, 9999px, 1.5rem, 0);transform-origin:center}98%{clip:rect(1.3rem, 9999px, 1rem, 0);transform-origin:center}}@keyframes svelte-14nofvq-cooool{0%{color:pink !important}2%{color:pink !important}4%{color:pink !important}6%{color:pink !important}8%{color:pink !important}10%{color:pink !important}12%{color:pink !important}14%{color:pink !important}16%{color:pink !important}18%{color:pink !important}20%{color:pink !important}22%{color:pink !important}24%{color:pink !important}26%{color:pink !important}28%{color:pink !important}30%{color:pink !important}32%{color:pink !important}34%{color:pink !important}36%{color:pink !important}38%{color:pink !important}40%{color:pink !important}42%{color:pink !important}44%{color:pink !important}46%{color:pink !important}48%{color:pink !important}50%{color:pink !important}52%{color:pink !important}54%{color:pink !important}56%{color:pink !important}58%{color:pink !important}60%{color:pink !important}62%{color:pink !important}64%{color:pink !important}66%{color:pink !important}68%{color:pink !important}70%{color:pink !important}72%{color:pink !important}74%{color:pink !important}76%{color:pink !important}78%{color:pink !important}80%{color:pink !important}82%{color:pink !important}84%{color:pink !important}86%{color:pink !important}88%{color:pink !important}90%{color:pink !important}92%{color:pink !important}94%{color:pink !important}96%{color:pink !important}98%{color:pink !important}}#bar.svelte-14nofvq .logo.hovered.hover-effect-0.logo-behind-a.svelte-14nofvq{color:#ff5500 !important;animation:svelte-14nofvq-distort1 300ms linear infinite, svelte-14nofvq-glitch-anim3 5s infinite linear alternate-reverse, svelte-14nofvq-cooool 5s infinite linear alternate-reverse}#bar.svelte-14nofvq .logo.hovered.hover-effect-0.logo-behind-b.svelte-14nofvq{color:#450f8b !important;animation:svelte-14nofvq-distort2 300ms linear infinite, svelte-14nofvq-glitch-anim3 3s infinite linear alternate-reverse}#bar.svelte-14nofvq .logo.hover-effect-1.svelte-14nofvq{animation:svelte-14nofvq-glitch-skew 1s infinite linear alternate-reverse}@keyframes svelte-14nofvq-glitch-anim{0%{clip:rect(2rem, 9999px, 3rem, 0);transform:skew(4.4deg);z-index:1}2%{clip:rect(1.3rem, 9999px, 3rem, 0);transform:skew(5.2deg);z-index:4}4%{clip:rect(3.5rem, 9999px, 4rem, 0);transform:skew(8.4deg);z-index:2}6%{clip:rect(3rem, 9999px, 0.5rem, 0);transform:skew(7.7deg);z-index:4}8%{clip:rect(3.9rem, 9999px, 1rem, 0);transform:skew(8.8deg);z-index:3}10%{clip:rect(0.1rem, 9999px, 1rem, 0);transform:skew(8.9deg);z-index:4}12%{clip:rect(1.2rem, 9999px, 0.5rem, 0);transform:skew(4deg);z-index:4}14%{clip:rect(3.4rem, 9999px, 0.5rem, 0);transform:skew(6.9deg);z-index:1}16%{clip:rect(2.8rem, 9999px, 4rem, 0);transform:skew(9.5deg);z-index:1}18%{clip:rect(1.4rem, 9999px, 0.5rem, 0);transform:skew(8.3deg);z-index:3}20%{clip:rect(1.8rem, 9999px, 3.5rem, 0);transform:skew(5.5deg);z-index:1}22%{clip:rect(4rem, 9999px, 1rem, 0);transform:skew(6deg);z-index:4}24%{clip:rect(2.2rem, 9999px, 4.5rem, 0);transform:skew(7.4deg);z-index:3}26%{clip:rect(3rem, 9999px, 2rem, 0);transform:skew(4deg);z-index:4}28%{clip:rect(1.8rem, 9999px, 0.5rem, 0);transform:skew(3.9deg);z-index:2}30%{clip:rect(1.6rem, 9999px, 3rem, 0);transform:skew(9deg);z-index:4}32%{clip:rect(1.3rem, 9999px, 5rem, 0);transform:skew(4.8deg);z-index:4}34%{clip:rect(1.6rem, 9999px, 0.5rem, 0);transform:skew(7.4deg);z-index:2}36%{clip:rect(3.6rem, 9999px, 4rem, 0);transform:skew(7.3deg);z-index:2}38%{clip:rect(2.9rem, 9999px, 2rem, 0);transform:skew(6.5deg);z-index:2}40%{clip:rect(2rem, 9999px, 3rem, 0);transform:skew(9.2deg);z-index:2}42%{clip:rect(2.1rem, 9999px, 1.5rem, 0);transform:skew(6.8deg);z-index:3}44%{clip:rect(1.4rem, 9999px, 1.5rem, 0);transform:skew(9deg);z-index:3}46%{clip:rect(4rem, 9999px, 4rem, 0);transform:skew(2.4deg);z-index:2}48%{clip:rect(3rem, 9999px, 2.5rem, 0);transform:skew(5.6deg);z-index:3}50%{clip:rect(2.1rem, 9999px, 1.5rem, 0);transform:skew(9.2deg);z-index:3}52%{clip:rect(1.2rem, 9999px, 1.5rem, 0);transform:skew(9.4deg);z-index:4}54%{clip:rect(3.7rem, 9999px, 5rem, 0);transform:skew(0.5deg);z-index:4}56%{clip:rect(2.1rem, 9999px, 0.5rem, 0);transform:skew(8.9deg);z-index:1}58%{clip:rect(2.8rem, 9999px, 1rem, 0);transform:skew(6.6deg);z-index:4}60%{clip:rect(3.9rem, 9999px, 5rem, 0);transform:skew(9.7deg);z-index:1}62%{clip:rect(0.2rem, 9999px, 5rem, 0);transform:skew(5.1deg);z-index:4}64%{clip:rect(0.6rem, 9999px, 4rem, 0);transform:skew(7.1deg);z-index:3}66%{clip:rect(2rem, 9999px, 3.5rem, 0);transform:skew(4.5deg);z-index:3}68%{clip:rect(2.2rem, 9999px, 0.5rem, 0);transform:skew(9.3deg);z-index:1}70%{clip:rect(0.4rem, 9999px, 4.5rem, 0);transform:skew(8deg);z-index:3}72%{clip:rect(1.4rem, 9999px, 3rem, 0);transform:skew(9.7deg);z-index:2}74%{clip:rect(0.8rem, 9999px, 0.5rem, 0);transform:skew(6.5deg);z-index:3}76%{clip:rect(3.1rem, 9999px, 2.5rem, 0);transform:skew(1.1deg);z-index:3}78%{clip:rect(3.5rem, 9999px, 3rem, 0);transform:skew(7.1deg);z-index:3}80%{clip:rect(1.1rem, 9999px, 5rem, 0);transform:skew(9.8deg);z-index:4}82%{clip:rect(3.6rem, 9999px, 3.5rem, 0);transform:skew(7.6deg);z-index:2}84%{clip:rect(1.6rem, 9999px, 5rem, 0);transform:skew(3deg);z-index:3}86%{clip:rect(1.1rem, 9999px, 2.5rem, 0);transform:skew(7.7deg);z-index:3}88%{clip:rect(2rem, 9999px, 3.5rem, 0);transform:skew(8.1deg);z-index:1}90%{clip:rect(1.5rem, 9999px, 2rem, 0);transform:skew(6.5deg);z-index:1}92%{clip:rect(3.8rem, 9999px, 3.5rem, 0);transform:skew(4.8deg);z-index:4}94%{clip:rect(0.9rem, 9999px, 2rem, 0);transform:skew(9.9deg);z-index:4}96%{clip:rect(0.1rem, 9999px, 4rem, 0);transform:skew(3.4deg);z-index:4}98%{clip:rect(2.6rem, 9999px, 3.5rem, 0);transform:skew(6.6deg);z-index:2}}@keyframes svelte-14nofvq-glitch-anim2{0%{clip:rect(0.14rem, 99999px, 2.9rem, 0)}0.6666666667%{clip:rect(0.08rem, 99999px, 8.8rem, 0)}1.3333333333%{clip:rect(0.06rem, 99999px, 9.9rem, 0)}2%{clip:rect(0.08rem, 99999px, 4.7rem, 0)}2.6666666667%{clip:rect(0.18rem, 99999px, 3.8rem, 0)}3.3333333333%{clip:rect(0.18rem, 99999px, 8.7rem, 0)}4%{clip:rect(0.2rem, 99999px, 2.1rem, 0)}4.6666666667%{clip:rect(0.02rem, 99999px, 4.2rem, 0)}5.3333333333%{clip:rect(0.2rem, 99999px, 1.9rem, 0)}6%{clip:rect(0.08rem, 99999px, 7.9rem, 0)}6.6666666667%{clip:rect(0.04rem, 99999px, 9.2rem, 0)}7.3333333333%{clip:rect(0.14rem, 99999px, 0.4rem, 0)}8%{clip:rect(0.2rem, 99999px, 2.6rem, 0)}8.6666666667%{clip:rect(0.12rem, 99999px, 3.9rem, 0)}9.3333333333%{clip:rect(0.04rem, 99999px, 4.5rem, 0)}10%{clip:rect(0.12rem, 99999px, 10rem, 0)}10.6666666667%{clip:rect(0.2rem, 99999px, 8.7rem, 0)}11.3333333333%{clip:rect(0.14rem, 99999px, 6.9rem, 0)}12%{clip:rect(0.02rem, 99999px, 8rem, 0)}12.6666666667%{clip:rect(0.18rem, 99999px, 3.5rem, 0)}13.3333333333%{clip:rect(0.1rem, 99999px, 7.8rem, 0)}14%{clip:rect(0.1rem, 99999px, 2.3rem, 0)}14.6666666667%{clip:rect(0.14rem, 99999px, 0.8rem, 0)}15.3333333333%{clip:rect(0.16rem, 99999px, 9.9rem, 0)}16%{clip:rect(0.06rem, 99999px, 9.2rem, 0)}16.6666666667%{clip:rect(0.12rem, 99999px, 4.2rem, 0)}17.3333333333%{clip:rect(0.16rem, 99999px, 4.1rem, 0)}18%{clip:rect(0.18rem, 99999px, 7.3rem, 0)}18.6666666667%{clip:rect(0.16rem, 99999px, 7.4rem, 0)}19.3333333333%{clip:rect(0.06rem, 99999px, 5.6rem, 0)}20%{clip:rect(0.02rem, 99999px, 3.4rem, 0)}20.6666666667%{clip:rect(0.06rem, 99999px, 8.3rem, 0)}21.3333333333%{clip:rect(0.1rem, 99999px, 1.4rem, 0)}22%{clip:rect(0.1rem, 99999px, 2rem, 0)}22.6666666667%{clip:rect(0.04rem, 99999px, 4.2rem, 0)}23.3333333333%{clip:rect(0.16rem, 99999px, 5.9rem, 0)}24%{clip:rect(0.12rem, 99999px, 5.1rem, 0)}24.6666666667%{clip:rect(0.18rem, 99999px, 1.3rem, 0)}25.3333333333%{clip:rect(0.2rem, 99999px, 1.1rem, 0)}26%{clip:rect(0.08rem, 99999px, 3.7rem, 0)}26.6666666667%{clip:rect(0.14rem, 99999px, 7.1rem, 0)}27.3333333333%{clip:rect(0.16rem, 99999px, 9rem, 0)}28%{clip:rect(0.14rem, 99999px, 4.2rem, 0)}28.6666666667%{clip:rect(0.16rem, 99999px, 4.3rem, 0)}29.3333333333%{clip:rect(0.04rem, 99999px, 3.5rem, 0)}30%{clip:rect(0.16rem, 99999px, 7.5rem, 0)}30.6666666667%{clip:rect(0.04rem, 99999px, 5.7rem, 0)}31.3333333333%{clip:rect(0.1rem, 99999px, 8.6rem, 0)}32%{clip:rect(0.16rem, 99999px, 0.7rem, 0)}32.6666666667%{clip:rect(0.08rem, 99999px, 5.1rem, 0)}33.3333333333%{clip:rect(0.14rem, 99999px, 4.3rem, 0)}34%{clip:rect(0.14rem, 99999px, 8.7rem, 0)}34.6666666667%{clip:rect(0.12rem, 99999px, 4.9rem, 0)}35.3333333333%{clip:rect(0.02rem, 99999px, 7.9rem, 0)}36%{clip:rect(0.1rem, 99999px, 0.3rem, 0)}36.6666666667%{clip:rect(0.2rem, 99999px, 6.7rem, 0)}37.3333333333%{clip:rect(0.02rem, 99999px, 9.4rem, 0)}38%{clip:rect(0.16rem, 99999px, 5.2rem, 0)}38.6666666667%{clip:rect(0.18rem, 99999px, 4.7rem, 0)}39.3333333333%{clip:rect(0.08rem, 99999px, 2.8rem, 0)}40%{clip:rect(0.06rem, 99999px, 0.9rem, 0)}40.6666666667%{clip:rect(0.16rem, 99999px, 7.4rem, 0)}41.3333333333%{clip:rect(0.16rem, 99999px, 8.2rem, 0)}42%{clip:rect(0.16rem, 99999px, 7.8rem, 0)}42.6666666667%{clip:rect(0.12rem, 99999px, 9rem, 0)}43.3333333333%{clip:rect(0.06rem, 99999px, 5.8rem, 0)}44%{clip:rect(0.04rem, 99999px, 5.4rem, 0)}44.6666666667%{clip:rect(0.1rem, 99999px, 6.1rem, 0)}45.3333333333%{clip:rect(0.14rem, 99999px, 5.5rem, 0)}46%{clip:rect(0.16rem, 99999px, 5.1rem, 0)}46.6666666667%{clip:rect(0.16rem, 99999px, 4.9rem, 0)}47.3333333333%{clip:rect(0.18rem, 99999px, 5.2rem, 0)}48%{clip:rect(0.06rem, 99999px, 4.1rem, 0)}48.6666666667%{clip:rect(0.18rem, 99999px, 9.3rem, 0)}49.3333333333%{clip:rect(0.1rem, 99999px, 3.6rem, 0)}50%{clip:rect(0.06rem, 99999px, 4.2rem, 0)}50.6666666667%{clip:rect(0.08rem, 99999px, 1.6rem, 0)}51.3333333333%{clip:rect(0.02rem, 99999px, 4.7rem, 0)}52%{clip:rect(0.16rem, 99999px, 0.9rem, 0)}52.6666666667%{clip:rect(0.18rem, 99999px, 3rem, 0)}53.3333333333%{clip:rect(0.18rem, 99999px, 3.2rem, 0)}54%{clip:rect(0.16rem, 99999px, 2.9rem, 0)}54.6666666667%{clip:rect(0.16rem, 99999px, 5.9rem, 0)}55.3333333333%{clip:rect(0.18rem, 99999px, 0.6rem, 0)}56%{clip:rect(0.18rem, 99999px, 6.2rem, 0)}56.6666666667%{clip:rect(0.16rem, 99999px, 6.1rem, 0)}57.3333333333%{clip:rect(0.18rem, 99999px, 1rem, 0)}58%{clip:rect(0.02rem, 99999px, 4.9rem, 0)}58.6666666667%{clip:rect(0.2rem, 99999px, 3.1rem, 0)}59.3333333333%{clip:rect(0.16rem, 99999px, 5rem, 0)}60%{clip:rect(0.02rem, 99999px, 3.3rem, 0)}60.6666666667%{clip:rect(0.14rem, 99999px, 4.6rem, 0)}61.3333333333%{clip:rect(0.04rem, 99999px, 2.9rem, 0)}62%{clip:rect(0.08rem, 99999px, 4.5rem, 0)}62.6666666667%{clip:rect(0.08rem, 99999px, 6.4rem, 0)}63.3333333333%{clip:rect(0.2rem, 99999px, 3.3rem, 0)}64%{clip:rect(0.06rem, 99999px, 4rem, 0)}64.6666666667%{clip:rect(0.16rem, 99999px, 9rem, 0)}65.3333333333%{clip:rect(0.14rem, 99999px, 1.8rem, 0)}66%{clip:rect(0.04rem, 99999px, 8.7rem, 0)}66.6666666667%{clip:rect(0.1rem, 99999px, 10rem, 0)}67.3333333333%{clip:rect(0.14rem, 99999px, 4.9rem, 0)}68%{clip:rect(0.04rem, 99999px, 5.7rem, 0)}68.6666666667%{clip:rect(0.16rem, 99999px, 3.3rem, 0)}69.3333333333%{clip:rect(0.12rem, 99999px, 1.7rem, 0)}70%{clip:rect(0.12rem, 99999px, 7.9rem, 0)}70.6666666667%{clip:rect(0.1rem, 99999px, 1rem, 0)}71.3333333333%{clip:rect(0.02rem, 99999px, 3.4rem, 0)}72%{clip:rect(0.02rem, 99999px, 0.9rem, 0)}72.6666666667%{clip:rect(0.1rem, 99999px, 0.5rem, 0)}73.3333333333%{clip:rect(0.02rem, 99999px, 6.3rem, 0)}74%{clip:rect(0.14rem, 99999px, 4.9rem, 0)}74.6666666667%{clip:rect(0.14rem, 99999px, 7.4rem, 0)}75.3333333333%{clip:rect(0.2rem, 99999px, 6.4rem, 0)}76%{clip:rect(0.14rem, 99999px, 3.7rem, 0)}76.6666666667%{clip:rect(0.02rem, 99999px, 1.5rem, 0)}77.3333333333%{clip:rect(0.02rem, 99999px, 1.4rem, 0)}78%{clip:rect(0.02rem, 99999px, 0.1rem, 0)}78.6666666667%{clip:rect(0.06rem, 99999px, 9.6rem, 0)}79.3333333333%{clip:rect(0.16rem, 99999px, 5.7rem, 0)}80%{clip:rect(0.08rem, 99999px, 7.7rem, 0)}80.6666666667%{clip:rect(0.02rem, 99999px, 4.4rem, 0)}81.3333333333%{clip:rect(0.12rem, 99999px, 7.9rem, 0)}82%{clip:rect(0.08rem, 99999px, 3.1rem, 0)}82.6666666667%{clip:rect(0.12rem, 99999px, 3.1rem, 0)}83.3333333333%{clip:rect(0.2rem, 99999px, 1.7rem, 0)}84%{clip:rect(0.16rem, 99999px, 9.5rem, 0)}84.6666666667%{clip:rect(0.16rem, 99999px, 3.6rem, 0)}85.3333333333%{clip:rect(0.16rem, 99999px, 6.2rem, 0)}86%{clip:rect(0.02rem, 99999px, 8.6rem, 0)}86.6666666667%{clip:rect(0.16rem, 99999px, 9.7rem, 0)}87.3333333333%{clip:rect(0.2rem, 99999px, 3.9rem, 0)}88%{clip:rect(0.14rem, 99999px, 10rem, 0)}88.6666666667%{clip:rect(0.14rem, 99999px, 3.1rem, 0)}89.3333333333%{clip:rect(0.1rem, 99999px, 3.1rem, 0)}90%{clip:rect(0.02rem, 99999px, 9.1rem, 0)}90.6666666667%{clip:rect(0.06rem, 99999px, 3.5rem, 0)}91.3333333333%{clip:rect(0.12rem, 99999px, 3.3rem, 0)}92%{clip:rect(0.2rem, 99999px, 4.6rem, 0)}92.6666666667%{clip:rect(0.04rem, 99999px, 7.6rem, 0)}93.3333333333%{clip:rect(0.2rem, 99999px, 4.4rem, 0)}94%{clip:rect(0.1rem, 99999px, 8.8rem, 0)}94.6666666667%{clip:rect(0.18rem, 99999px, 9.6rem, 0)}95.3333333333%{clip:rect(0.08rem, 99999px, 6.2rem, 0)}96%{clip:rect(0.1rem, 99999px, 3.3rem, 0)}96.6666666667%{clip:rect(0.04rem, 99999px, 4.3rem, 0)}97.3333333333%{clip:rect(0.1rem, 99999px, 5.6rem, 0)}98%{clip:rect(0.06rem, 99999px, 8.3rem, 0)}98.6666666667%{clip:rect(0.12rem, 99999px, 6.6rem, 0)}99.3333333333%{clip:rect(0.12rem, 99999px, 4.7rem, 0)}}@keyframes svelte-14nofvq-glitch-skew{0%{transform:skew(-4deg)}10%{transform:skew(-4deg)}20%{transform:skew(5deg)}30%{transform:skew(2deg)}40%{transform:skew(2deg)}50%{transform:skew(-2deg)}60%{transform:skew(1deg)}70%{transform:skew(-2deg)}80%{transform:skew(-4deg)}90%{transform:skew(2deg)}}#bar.svelte-14nofvq .logo.hover-effect-1.logo-behind-a.svelte-14nofvq{color:var(--accent-light);transform:translateX(-0.5rem);color:#ff5500 !important;text-shadow:-2px 0 #ff5500, 2px 2px #ff5500;clip:rect(44px, 450px, 56px, 0);animation:svelte-14nofvq-glitch-anim2 5s infinite linear alternate-reverse}#bar.svelte-14nofvq .logo.hover-effect-1.logo-behind-b.svelte-14nofvq{color:#bfcc2e !important;z-index:1;transform:translateX(0.2rem);text-shadow:-2px 0 #450f8b;clip:rect(44px, 450px, 56px, 0);animation:svelte-14nofvq-glitch-anim 5s infinite linear alternate-reverse}#bar.svelte-14nofvq .logo.logo-behind.svelte-14nofvq{width:0px;height:0px;overflow:visible;pointer-events:none}#bar.svelte-14nofvq .logo.logo-behind.svelte-14nofvq:not(.hovered){display:none}#bar.svelte-14nofvq #bar-right.svelte-14nofvq{margin-left:auto;display:flex;margin-right:1rem;margin-top:1rem;position:relative}#bar.svelte-14nofvq #bar-right #menus.svelte-14nofvq{display:flex}#bar.svelte-14nofvq #bar-right #menus #menu.svelte-14nofvq{height:10rem;display:flex;flex-direction:column;justify-content:space-between;margin-right:1rem}#bar.svelte-14nofvq #bar-right #menus #menu.svelte-14nofvq .menu-item{font-weight:750;font-style:italic;width:fit-content}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTmF2QmFyLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUE0Q2lCLG1DQUNqQixLQUFLLENBQUksSUFBQyxDQUNWLFVBQVUsQ0FBSSxJQUFHLENBQ2pCLGFBQVMsTUFDVCxPQUFRLENBQUcsSUFBQyxDQUNaLFNBQVUsS0FBTyxDQUNqQixLQUFLLENBQUksSUFDVCxDQUNBLG1CQUFJLENBQUMsd0JBQVUsQ0FDZixPQUFTLENBQUMsSUFBSyxDQUNmLGNBQWdCLENBQUMsTUFDakIsQ0FDQSxtQkFBSSxDQUFDLG1CQUFJLENBQ1AsVUFBTSxtQkFDUixDQUNBLG1CQUFFLENBQUcsb0JBQUMsQ0FDTixlQUNBLGlCQUNDLE1BQU8sWUFDUCxDQUNBLGVBQVEsQ0FBUyxJQUNqQixDQUVBLHlCQUFPLDJCQUFjLENBSXJCLFFBQUksU0FFSixDQUNBLG1CQUFJLDZCQUF5QixDQUM3QixLQUFJLGtCQUEyQixZQUUvQixDQUVBLG1CQUFJLGNBQVksOEJBQVEsQ0FFeEIsU0FBUyxnQ0FBa0IsOENBRXpCLHVCQUFZLGFBQ04saUNBR1IsaUNBR0EsQ0FLQSxHQUFJLENBRUEsMEJBQTBCLFFBQVEsQ0FJdEMsTUFDQyxDQUNBLFNBQU8sZUFBaUIsUUFBUSxLQUU5QixDQUVGLG9CQUFhLFFBQWdCLE1BQUMsT0FFN0IsVUFHQSxXQUFnQixRQUFTLG1EQU14QixDQUNGLG9CQUFhLFlBQWlCLGdCQUc1QixXQUFhLE1BQUMsUUFBYSxHQU05QixXQUFFLHdCQUVGLEdBQ0MsU0FBTywwQkFDVCxDQUNDLEtBQU0iLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiTmF2QmFyLnN2ZWx0ZSJdfQ== */");
 }
 
 // (1300:1) {:else}
@@ -9388,7 +9388,7 @@ function NavBar_svelte_create_else_block(ctx) {
 		c: function create() {
 			style = dom_element("style");
 			style.innerHTML = ``;
-			add_location(style, NavBar_svelte_file, -1, 25936);
+			add_location(style, NavBar_svelte_file, -1, 25986);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, style, anchor);
@@ -9419,7 +9419,7 @@ function create_if_block_2(ctx) {
 		c: function create() {
 			style = dom_element("style");
 			style.textContent = "#bar-right{\n\twidth: 100%;\n}\n#toggle-container{\n\tmargin-left: 0px;\n\tmargin-right: auto;\n}";
-			add_location(style, NavBar_svelte_file, -1, 25819);
+			add_location(style, NavBar_svelte_file, -1, 25869);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, style, anchor);
@@ -9654,37 +9654,37 @@ function NavBar_svelte_create_fragment(ctx) {
 			create_component(link5.$$.fragment);
 			t15 = space();
 			create_component(link6.$$.fragment);
-			attr_dev(mark, "class", "svelte-fylets");
-			add_location(mark, NavBar_svelte_file, -1, 26169);
+			attr_dev(mark, "class", "svelte-14nofvq");
+			add_location(mark, NavBar_svelte_file, -1, 26219);
 			attr_dev(a0, "href", "/");
-			attr_dev(a0, "class", a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-fylets");
-			add_location(a0, NavBar_svelte_file, -1, 26097);
+			attr_dev(a0, "class", a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-14nofvq");
+			add_location(a0, NavBar_svelte_file, -1, 26147);
 			attr_dev(a1, "href", "/");
-			attr_dev(a1, "class", a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-fylets");
-			add_location(a1, NavBar_svelte_file, -1, 26212);
+			attr_dev(a1, "class", a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-14nofvq");
+			add_location(a1, NavBar_svelte_file, -1, 26262);
 			attr_dev(a2, "href", "/");
-			attr_dev(a2, "class", a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-fylets");
-			add_location(a2, NavBar_svelte_file, -1, 26304);
+			attr_dev(a2, "class", a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-14nofvq");
+			add_location(a2, NavBar_svelte_file, -1, 26354);
 			attr_dev(div0, "id", "logo-container");
-			add_location(div0, NavBar_svelte_file, -1, 26068);
+			add_location(div0, NavBar_svelte_file, -1, 26118);
 			attr_dev(div1, "id", "bar-left");
-			attr_dev(div1, "class", "svelte-fylets");
-			add_location(div1, NavBar_svelte_file, -1, 26021);
+			attr_dev(div1, "class", "svelte-14nofvq");
+			add_location(div1, NavBar_svelte_file, -1, 26071);
 			attr_dev(div2, "id", "menu");
-			attr_dev(div2, "class", "svelte-fylets");
-			add_location(div2, NavBar_svelte_file, -1, 26606);
+			attr_dev(div2, "class", "svelte-14nofvq");
+			add_location(div2, NavBar_svelte_file, -1, 26656);
 			attr_dev(div3, "id", "menu");
-			attr_dev(div3, "class", "svelte-fylets");
-			add_location(div3, NavBar_svelte_file, -1, 26907);
+			attr_dev(div3, "class", "svelte-14nofvq");
+			add_location(div3, NavBar_svelte_file, -1, 26957);
 			attr_dev(div4, "id", "menus");
-			attr_dev(div4, "class", "svelte-fylets");
-			add_location(div4, NavBar_svelte_file, -1, 26560);
+			attr_dev(div4, "class", "svelte-14nofvq");
+			add_location(div4, NavBar_svelte_file, -1, 26610);
 			attr_dev(div5, "id", "bar-right");
-			attr_dev(div5, "class", "svelte-fylets");
-			add_location(div5, NavBar_svelte_file, -1, 26461);
+			attr_dev(div5, "class", "svelte-14nofvq");
+			add_location(div5, NavBar_svelte_file, -1, 26511);
 			attr_dev(nav, "id", "bar");
-			attr_dev(nav, "class", "svelte-fylets");
-			add_location(nav, NavBar_svelte_file, -1, 25978);
+			attr_dev(nav, "class", "svelte-14nofvq");
+			add_location(nav, NavBar_svelte_file, -1, 26028);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -9750,15 +9750,15 @@ function NavBar_svelte_create_fragment(ctx) {
 				}
 			}
 
-			if (!current || dirty & /*hovered_class*/ 64 && a0_class_value !== (a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-fylets")) {
+			if (!current || dirty & /*hovered_class*/ 64 && a0_class_value !== (a0_class_value = "logo logo-behind logo-behind-a " + /*hovered_class*/ ctx[6] + " svelte-14nofvq")) {
 				attr_dev(a0, "class", a0_class_value);
 			}
 
-			if (!current || dirty & /*hovered_class*/ 64 && a1_class_value !== (a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-fylets")) {
+			if (!current || dirty & /*hovered_class*/ 64 && a1_class_value !== (a1_class_value = "logo logo-behind logo-behind-b " + /*hovered_class*/ ctx[6] + " svelte-14nofvq")) {
 				attr_dev(a1, "class", a1_class_value);
 			}
 
-			if (!current || dirty & /*hovered_class*/ 64 && a2_class_value !== (a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-fylets")) {
+			if (!current || dirty & /*hovered_class*/ 64 && a2_class_value !== (a2_class_value = "logo " + /*hovered_class*/ ctx[6] + " svelte-14nofvq")) {
 				attr_dev(a2, "class", a2_class_value);
 			}
 
@@ -10150,7 +10150,7 @@ const { Object: Object_1 } = globals;
 const favdemosPage_svelte_file = "src\\components\\favdemosPage.svelte";
 
 function favdemosPage_svelte_add_css(target) {
-	append_styles(target, "svelte-1njzqxq", ".year.svelte-1njzqxq.svelte-1njzqxq{font-weight:bolder;font-size:2rem;margin-bottom:0.1rem;margin-top:0.9rem}.demo.svelte-1njzqxq.svelte-1njzqxq{width:fit-content;display:flex}.demo.svelte-1njzqxq .svelte-1njzqxq{font-size:1rem}.demo.svelte-1njzqxq .name.svelte-1njzqxq{font-weight:bold}main.svelte-1njzqxq.svelte-1njzqxq{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmF2ZGVtb3NQYWdlLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUFxSUcsK0NBQ0ssaUJBQ0wsQ0FBSSxJQUFLLGNBQ0wsQ0FBSyxpQkFDVCxpREFNQSxvQkFDRyxDQUFFLHlCQUVMLDBCQUNLLENBRUwseUJBSUQscUJBQU0sWUFDRCwrQ0FJSixJQUFJLFVBQ0osaUJBQ0ssWUFDTCxZQUFTLFFBQ1Qsb0JBQ0ssaUJBQ0wsQ0FBSSxJQUFLIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbImZhdmRlbW9zUGFnZS5zdmVsdGUiXX0= */");
+	append_styles(target, "svelte-1njzqxq", ".year.svelte-1njzqxq.svelte-1njzqxq{font-weight:bolder;font-size:2rem;margin-bottom:0.1rem;margin-top:0.9rem}.demo.svelte-1njzqxq.svelte-1njzqxq{width:fit-content;display:flex}.demo.svelte-1njzqxq .svelte-1njzqxq{font-size:1rem}.demo.svelte-1njzqxq .name.svelte-1njzqxq{font-weight:bold}main.svelte-1njzqxq.svelte-1njzqxq{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmF2ZGVtb3NQYWdlLnN2ZWx0ZSIsIm1hcHBpbmdzIjoiQUF3SUcsK0NBQ0ssaUJBQ0wsQ0FBSSxJQUFLLGNBQ0wsQ0FBSyxpQkFDVCxpREFNQSxvQkFDRyxDQUFFLHlCQUVMLDBCQUNLLENBRUwseUJBSUQscUJBQU0sWUFDRCwrQ0FJSixJQUFJLFVBQ0osaUJBQ0ssWUFDTCxZQUFTLFFBQ1Qsb0JBQ0ssaUJBQ0wsQ0FBSSxJQUFLIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbImZhdmRlbW9zUGFnZS5zdmVsdGUiXX0= */");
 }
 
 function get_each_context(ctx, list, i) {
@@ -10167,7 +10167,7 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (163:2) {#each list[year] as demo, i}
+// (166:2) {#each list[year] as demo, i}
 function create_each_block_1(ctx) {
 	let a;
 	let div;
@@ -10185,11 +10185,11 @@ function create_each_block_1(ctx) {
 			div = dom_element("div");
 			div.textContent = `${/*demo*/ ctx[12].name}   —   ${/*demo*/ ctx[12].group}`;
 			attr_dev(div, "class", "name svelte-1njzqxq");
-			add_location(div, favdemosPage_svelte_file, 195, 1, 8111);
+			add_location(div, favdemosPage_svelte_file, 198, 1, 8288);
 			attr_dev(a, "href", a_href_value = /*demo*/ ctx[12].link);
 			attr_dev(a, "target", "”_blank”");
 			attr_dev(a, "class", "demo svelte-1njzqxq");
-			add_location(a, favdemosPage_svelte_file, 194, 0, 7985);
+			add_location(a, favdemosPage_svelte_file, 197, 0, 8162);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -10221,14 +10221,14 @@ function create_each_block_1(ctx) {
 		block,
 		id: create_each_block_1.name,
 		type: "each",
-		source: "(163:2) {#each list[year] as demo, i}",
+		source: "(166:2) {#each list[year] as demo, i}",
 		ctx
 	});
 
 	return block;
 }
 
-// (159:1) {#each Object.keys(list).reverse() as year, i}
+// (162:1) {#each Object.keys(list).reverse() as year, i}
 function create_each_block(ctx) {
 	let div;
 	let t1;
@@ -10252,7 +10252,7 @@ function create_each_block(ctx) {
 
 			each_1_anchor = empty();
 			attr_dev(div, "class", "year svelte-1njzqxq");
-			add_location(div, favdemosPage_svelte_file, -1, 7912);
+			add_location(div, favdemosPage_svelte_file, -1, 8089);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -10305,7 +10305,7 @@ function create_each_block(ctx) {
 		block,
 		id: create_each_block.name,
 		type: "each",
-		source: "(159:1) {#each Object.keys(list).reverse() as year, i}",
+		source: "(162:1) {#each Object.keys(list).reverse() as year, i}",
 		ctx
 	});
 
@@ -10351,7 +10351,7 @@ function favdemosPage_svelte_create_fragment(ctx) {
 			img = dom_element("img");
 			t3 = space();
 			create_component(footer.$$.fragment);
-			add_location(div, favdemosPage_svelte_file, -1, 7848);
+			add_location(div, favdemosPage_svelte_file, -1, 8025);
 			attr_dev(img, "class", "hover-image");
 
 			attr_dev(img, "style", img_style_value = `
@@ -10364,9 +10364,9 @@ function favdemosPage_svelte_create_fragment(ctx) {
 			min-height: 1rem;
 		`);
 
-			add_location(img, favdemosPage_svelte_file, -1, 8396);
+			add_location(img, favdemosPage_svelte_file, -1, 8573);
 			attr_dev(main, "class", "svelte-1njzqxq");
-			add_location(main, favdemosPage_svelte_file, 181, 1, 7831);
+			add_location(main, favdemosPage_svelte_file, 184, 1, 8008);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -10478,6 +10478,9 @@ function favdemosPage_svelte_instance($$self, $$props, $$invalidate) {
 	}
 
 	const list = {
+		2024: [
+			new Demo("Vernal Festival", "Limp Ninja", "https://www.pouet.net/prod.php?which=97522", "https://media.demozoo.org/screens/o/b1/c0/ec30.348994.png")
+		],
 		2023: [
 			new Demo("0b5vr glsl techno live set", "0b5vr", "https://www.pouet.net/prod.php?which=94135", "https://content.pouet.net/files/screenshots/00094/00094135.jpg"),
 			new Demo("seven days", "61Q0", "https://www.pouet.net/prod.php?which=91421", "https://content.pouet.net/files/screenshots/00091/00091421.jpg"),
@@ -11280,7 +11283,7 @@ const { Object: favexegfxPage_svelte_Object_1 } = globals;
 const favexegfxPage_svelte_file = "src\\components\\favexegfxPage.svelte";
 
 function favexegfxPage_svelte_add_css(target) {
-	append_styles(target, "svelte-ksgkd4", ".year.svelte-ksgkd4.svelte-ksgkd4{font-weight:bolder;font-size:2rem;margin-bottom:0.1rem;margin-top:0.9rem}.demo.svelte-ksgkd4.svelte-ksgkd4{width:fit-content;display:flex;flex-direction:column;text-decoration:none !important}.demo.svelte-ksgkd4 .svelte-ksgkd4{font-size:1rem}.demo.svelte-ksgkd4 .name.svelte-ksgkd4{font-weight:var(--text-font-weight);font-size:1.5rem !important;margin-bottom:0.5rem;margin-top:0.5rem}main.svelte-ksgkd4.svelte-ksgkd4{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmF2ZXhlZ2Z4UGFnZS5zdmVsdGUiLCJtYXBwaW5ncyI6IkFBMEtJLDZDQUdHLE9BQ0gsVUFHRCxDQUFJLGtCQUlBLE9BQ0gsV0FHRywrQ0FnQkosb0JBQ0csQ0FBRSxtQkFDRCxDQUFNLE1BQ1QsZ0JBR0csQ0FDSCxrREFPRCxVQUlBLENBQUksNENBUUEsWUFJQSxLQUNILGtCQUFtQixXQUdwQixDQUFJLE1BQ0gsV0FBVyxjQUdaLGtCQUNLLHdDQVNMLE1BQ0QsQ0FBSSxJQUFFLFVBQ0wsQ0FBSSxLQUFNLFdBSVYsWUFDRyxDQUFFLG1CQUNMLEtBQUksZUFJQSxDQUFNLE1BQ1QsVUFHRCIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJmYXZleGVnZnhQYWdlLnN2ZWx0ZSJdfQ== */");
+	append_styles(target, "svelte-ksgkd4", ".year.svelte-ksgkd4.svelte-ksgkd4{font-weight:bolder;font-size:2rem;margin-bottom:0.1rem;margin-top:0.9rem}.demo.svelte-ksgkd4.svelte-ksgkd4{width:fit-content;display:flex;flex-direction:column;text-decoration:none !important}.demo.svelte-ksgkd4 .svelte-ksgkd4{font-size:1rem}.demo.svelte-ksgkd4 .name.svelte-ksgkd4{font-weight:var(--text-font-weight);font-size:1.5rem !important;margin-bottom:0.5rem;margin-top:0.5rem}main.svelte-ksgkd4.svelte-ksgkd4{width:100%;max-width:40rem;min-height:100%;height:fit-content;display:flex;flex-direction:column;max-width:var(--main-max-width)}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmF2ZXhlZ2Z4UGFnZS5zdmVsdGUiLCJtYXBwaW5ncyI6IkFBNEtJLDZDQUdHLE9BQ0gsVUFHRCxDQUFJLGtCQUlBLE9BQ0gsV0FHRywrQ0FnQkosb0JBQ0csQ0FBRSxtQkFDRCxDQUFNLE1BQ1QsZ0JBR0csQ0FDSCxrREFPRCxVQUlBLENBQUksNENBUUEsWUFJQSxLQUNILGtCQUFtQixXQUdwQixDQUFJLE1BQ0gsV0FBVyxjQUdaLGtCQUNLLHdDQVNMLE1BQ0QsQ0FBSSxJQUFFLFVBQ0wsQ0FBSSxLQUFNLFdBSVYsWUFDRyxDQUFFLG1CQUNMLEtBQUksZUFJQSxDQUFNLE1BQ1QsVUFHRCIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJmYXZleGVnZnhQYWdlLnN2ZWx0ZSJdfQ== */");
 }
 
 function favexegfxPage_svelte_get_each_context(ctx, list, i) {
@@ -11297,7 +11300,7 @@ function favexegfxPage_svelte_get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (158:2) {#each list[year] as demo, i}
+// (159:2) {#each list[year] as demo, i}
 function favexegfxPage_svelte_create_each_block_1(ctx) {
 	let a;
 	let div;
@@ -11314,15 +11317,15 @@ function favexegfxPage_svelte_create_each_block_1(ctx) {
 			t3 = space();
 			img = dom_element("img");
 			attr_dev(div, "class", "name svelte-ksgkd4");
-			add_location(div, favexegfxPage_svelte_file, 373, 0, 9491);
+			add_location(div, favexegfxPage_svelte_file, 375, 0, 9637);
 			attr_dev(img, "class", "lozad svelte-ksgkd4");
 			attr_dev(img, "data-src", img_data_src_value = /*demo*/ ctx[10].img_url);
 			attr_dev(img, "height", "345.5rem");
-			add_location(img, favexegfxPage_svelte_file, -1, 9557);
+			add_location(img, favexegfxPage_svelte_file, -1, 9703);
 			attr_dev(a, "href", a_href_value = /*demo*/ ctx[10].link);
 			attr_dev(a, "target", "”_blank”");
 			attr_dev(a, "class", "demo svelte-ksgkd4");
-			add_location(a, favexegfxPage_svelte_file, 372, 2, 9437);
+			add_location(a, favexegfxPage_svelte_file, 374, 2, 9583);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, a, anchor);
@@ -11342,14 +11345,14 @@ function favexegfxPage_svelte_create_each_block_1(ctx) {
 		block,
 		id: favexegfxPage_svelte_create_each_block_1.name,
 		type: "each",
-		source: "(158:2) {#each list[year] as demo, i}",
+		source: "(159:2) {#each list[year] as demo, i}",
 		ctx
 	});
 
 	return block;
 }
 
-// (154:1) {#each Object.keys(list).reverse() as year, i}
+// (155:1) {#each Object.keys(list).reverse() as year, i}
 function favexegfxPage_svelte_create_each_block(ctx) {
 	let div;
 	let t1;
@@ -11373,7 +11376,7 @@ function favexegfxPage_svelte_create_each_block(ctx) {
 
 			each_1_anchor = empty();
 			attr_dev(div, "class", "year svelte-ksgkd4");
-			add_location(div, favexegfxPage_svelte_file, -1, 9362);
+			add_location(div, favexegfxPage_svelte_file, -1, 9508);
 		},
 		m: function mount(target, anchor) {
 			insert_dev(target, div, anchor);
@@ -11426,7 +11429,7 @@ function favexegfxPage_svelte_create_each_block(ctx) {
 		block,
 		id: favexegfxPage_svelte_create_each_block.name,
 		type: "each",
-		source: "(154:1) {#each Object.keys(list).reverse() as year, i}",
+		source: "(155:1) {#each Object.keys(list).reverse() as year, i}",
 		ctx
 	});
 
@@ -11472,7 +11475,7 @@ function favexegfxPage_svelte_create_fragment(ctx) {
 			img = dom_element("img");
 			t3 = space();
 			create_component(footer.$$.fragment);
-			add_location(div, favexegfxPage_svelte_file, 360, 1, 9298);
+			add_location(div, favexegfxPage_svelte_file, 362, 1, 9444);
 			attr_dev(img, "class", "hover-image");
 
 			attr_dev(img, "style", img_style_value = `
@@ -11485,9 +11488,9 @@ function favexegfxPage_svelte_create_fragment(ctx) {
 			min-height: 1rem;
 		`);
 
-			add_location(img, favexegfxPage_svelte_file, -1, 10070);
+			add_location(img, favexegfxPage_svelte_file, -1, 10216);
 			attr_dev(main, "class", "svelte-ksgkd4");
-			add_location(main, favexegfxPage_svelte_file, -1, 9281);
+			add_location(main, favexegfxPage_svelte_file, -1, 9427);
 		},
 		l: function claim(nodes) {
 			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -11600,6 +11603,7 @@ function favexegfxPage_svelte_instance($$self, $$props, $$invalidate) {
 
 	const list = {
 		2024: [
+			new ExeGfx("Tale Of Aeod", "mocoo", "https://demozoo.org/graphics/355407/", "https://media.demozoo.org/screens/o/5a/16/e1c0.348961.png"),
 			new ExeGfx("Fragments Of Self", "yx", "https://demozoo.org/graphics/342289/", "https://media.demozoo.org/screens/o/82/79/6b53.342069.png")
 		],
 		2023: [
