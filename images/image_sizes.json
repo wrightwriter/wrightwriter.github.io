@@ -9,6 +9,11 @@
             "width": 720,
             "height": 720,
             "has_thumb": false
+        },
+        "vestige_gfx.png": {
+            "width": 2560,
+            "height": 1440,
+            "has_thumb": true
         }
     }
 }
